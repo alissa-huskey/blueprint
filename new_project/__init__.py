@@ -1,13 +1,13 @@
 """new-project -- create a new project."""
 
-__all__ = ["__version__"]
+from enum import Enum
+from pathlib import Path
 
+from more_itertools import first
 
 __version__ = "0.0.1"
 
-from enum import Enum
-
-from more_itertools import first
+ROOT = Path(__file__).parent.parent
 
 
 class SysExit(Enum):
@@ -30,11 +30,13 @@ class SysExit(Enum):
     CONFIG      = (78, "Configuration error")
 
     def __init__(self, status, desc):
+        """Set status, desc, and make enable lookup via status."""
         self.status, self.desc = status, desc
         self._value_ = self.status
         self._member_map_[status] = self
 
     def __int__(self):
+        """Convert to int is status."""
         return self.status
 
 

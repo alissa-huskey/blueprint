@@ -27,5 +27,11 @@ class Project(Object):
         self._dest = dest
     dest = attr("dest", setter=_dest_setter)
 
+    @property
+    def path(self):
+        """Path to the project directory."""
+        return self.dest / self.name
+
     def create(self):
         """Create the project."""
+        self.path.mkdir(exist_ok=True)
