@@ -35,3 +35,32 @@ def test_python_project_toml(tmp_path):
 
     assert 'python = ">=3.10"' in toml_contents
     assert 'tool.black' in toml_contents
+
+
+def test_python_project_install(tmp_path):
+    """
+    GIVEN: a PythonProject object where create() has been called
+    WHEN: project.install() is called with a valid filename from the sources
+          directory
+    THEN: The file should exist in the new project
+    """
+    project = PythonProject("myproject", dest=tmp_path)
+    project.create()
+    project.install(".env")
+
+    assert (project.path / ".env").is_file()
+
+
+def test_python_project_install_dotfiles(tmp_path):
+    """
+    GIVEN: a PythonProject object where create() has been called
+    WHEN: project.install_dotfiles() is called
+    THEN: The dotfiles should exist in the new project
+    """
+    project = PythonProject("myproject", dest=tmp_path)
+    project.create()
+    project.install_dotfiles()
+
+    assert (project.path / ".env").is_file()
+    assert (project.path / ".flake8").is_file()
+    assert (project.path / ".python-version").is_file()

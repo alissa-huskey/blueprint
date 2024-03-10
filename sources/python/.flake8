@@ -1,0 +1,10 @@
+[flake8]
+max-line-length = 88
+
+# ignore errors in addition to the ones in ~/.flake8
+extend-ignore = BLK100
+
+per-file-ignores =
+  tests/test_*: D100, D103, F401, F811, D205, D400
+  new_project/__init__.py: E221, E201
+  new_project/cli.py: D401

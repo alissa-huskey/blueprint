@@ -1,5 +1,6 @@
 """Module for a new python project."""
 
+from shutil import copy
 from subprocess import run
 
 from new_project import ROOT
@@ -22,6 +23,16 @@ class PythonProject(Project):
     def pyproject(self):
         """Path to the pyproject.toml file."""
         return self.path / "pyproject.toml"
+
+    def install(self, file):
+        """Copy a file from the source to the dest."""
+        copy(self.SOURCES / file, self.path / file)
+
+    def install_dotfiles(self):
+        """Install all dotfiles from sources into the new project directory."""
+        self.install(".env")
+        self.install(".flake8")
+        self.install(".python-version")
 
     def update_pyproject(self):
         """Change the version and add more options to pyproject.toml."""
