@@ -1,8 +1,6 @@
 from re import search as re_search
 from subprocess import run
 
-from blueprint import python_project
-from blueprint.object import Object
 from blueprint.python_project import PythonProject
 
 
@@ -61,7 +59,7 @@ def test_python_project_setup_dot_python_version(tmp_path):
     THEN: the files should exist
     AND: it should contain the full python version
     """
-    project = PythonProject("myproject", dest=tmp_path, pyversion="3.10.2")
+    project = PythonProject("myproject", dest=tmp_path, pyv="3.10.2")
     project.create()
     project.setup_dot_python_version()
 
@@ -107,7 +105,7 @@ def test_python_project_setup_poetry_use(tmp_path):
     assert cmd_res.returncode == 0
     assert "Creating virtualenv" in cmd_res.stdout
     assert re_search(
-        rf'Virtualenv\nPython:\s+{project.DEFAULT_PYTHON_VERSION}',
+        rf'Virtualenv\nPython:\s+{project.DEFAULT_PYV}',
         verify.stdout
     )
 
@@ -118,11 +116,11 @@ def test_python_project_poetry_init(tmp_path):
     WHEN: project.setup_poetry_init() is called
     THEN: the pyproject.toml should be good
     """
-    project = PythonProject("my_project", dest=tmp_path, pyversion="3.10.2")
+    project = PythonProject("my_project", dest=tmp_path, pyv="3.10.2")
     project.create()
     project.setup_poetry_init()
 
     toml_contents = project.pyproject.read_text()
 
     assert 'name = "my-project"' in toml_contents
-    assert 'python = "3.10.2"' in toml_contents
+    assert 'python = ">=3.10.2"' in toml_contents

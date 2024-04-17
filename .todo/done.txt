@@ -7,3 +7,5 @@ x 2024-04-17 2024-04-17 python: add poetry install
 x 2024-04-17 2024-04-17 python: add .python_version
 x 2024-04-17 2024-04-17 python: fix setup.cfg with best flake8 config
 x 2024-04-17 2024-04-17 python: add object.py and attr.py
+x 2024-04-17 2024-04-17 python: add --pyversion-constraint
+x 2024-04-17 2024-04-17 python: make default pyversion PythonProject.PYTHON_VERSION

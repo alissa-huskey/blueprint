@@ -131,7 +131,9 @@ class Project(Object):
             err = ""
             if hasattr(res, "stderr"):
                 err = res.stderr
-            raise ProgramError(f"Failed CLI command [{res.returncode}] {cmd!r}: {err!r}")
+            raise ProgramError(
+                f"Failed CLI command [{res.returncode}] {cmd!r}: {err!r}"
+            )
 
         return res
 

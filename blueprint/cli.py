@@ -1,6 +1,7 @@
 """Command Line Interface."""
 
 from pathlib import Path
+from collections import namedtuple
 from sys import exit as sys_exit
 from typing import Annotated
 
@@ -9,6 +10,7 @@ from typer import Argument, BadParameter, Context, Option, Typer, confirm
 
 from blueprint import BlueprintError, UserError
 from blueprint.app import App
+from blueprint.python_project import PythonProject
 
 console = Console()
 errors = Console(stderr=True)
@@ -43,19 +45,37 @@ def dest_exists(path: Path):
     return path
 
 
-@new.command()
-def basic(
-    ctx: Context,
-    name: Annotated[str, Argument(
+class GlobalOptionsList(): ...
+
+Global = namedtuple("Global", ["name", "param", "default"], defaults=[None])
+Opts = GlobalOptionsList()
+
+Opts.name = Global(
+    "name",
+    Annotated[str, Argument(
         help="Name of project to create.",
         show_default=False,
     )],
-    dest: Annotated[Path, Option(
+)
+
+Opts.dest = Global(
+    "dest",
+    Annotated[Path, Option(
+        "--dest", "-d",
         show_default=".",
         help="Where to create the project.",
-        rich_help_panel="Main",
-        callback=dest_exists,
-    )] = Path.cwd(),
+        rich_help_panel="Python",
+        callback=dest_exists,)
+    ],
+    Path.cwd()
+)
+
+
+@new.command()
+def basic(
+    ctx: Context,
+    name: Opts.name.param,
+    dest: Opts.dest.param = Opts.dest.default,
 ):
     """Create a basic new project."""
     app = App(name, dest)
@@ -65,24 +85,27 @@ def basic(
 
 @new.command()
 def python(
-    name: Annotated[str, Argument(
-        help="Name of project to create.",
-        show_default=False,
-    )],
-    dest: Annotated[Path, Option(
-        show_default=".",
-        help="Where to create the project.",
-        rich_help_panel="Main",
-        callback=dest_exists,
-    )] = Path.cwd(),
-    python_version: Annotated[str, Option(
-        "--pyversion", "-P",
-        help="Create a Python project.",
-        rich_help_panel="Main",
-    )] = "3.10.2",
+    name: Opts.name.param,
+    dest: Opts.dest.param = Opts.dest.default,
+    pyv: Annotated[str, Option(
+        "--pyv", "-P",
+        help="Python version to use.",
+        rich_help_panel="Python",
+    )] = PythonProject.DEFAULT_PYV,
+    pyv_constraint: Annotated[str, Option(
+        "--pyv-constraint", "-C",
+        help="Supported Python versions.",
+        rich_help_panel="Python",
+    )] = PythonProject.DEFAULT_PYV_CONSTRAINT,
 ):
     """Create Python project."""
-    app = App(name, dest, python_version=python_version, python=True)
+    app = App(
+        name,
+        dest,
+        pyv=pyv,
+        pyv_constraint=pyv_constraint,
+        python=True
+    )
     verify(app)
     app.project.make()
 

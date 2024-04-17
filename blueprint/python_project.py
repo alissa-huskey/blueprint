@@ -9,7 +9,8 @@ class PythonProject(Project):
 
     POETRY_PROJECT_VERSION = "0.1.0"
     SOURCES = ROOT / "sources" / "python"
-    DEFAULT_PYTHON_VERSION = "3.10.2"
+    DEFAULT_PYV = "3.10.2"
+    DEFAULT_PYV_CONSTRAINT = ">=3.10.2"
 
     type: str = "python"
 
@@ -29,9 +30,11 @@ class PythonProject(Project):
         "pytest",
     ]
 
-    def __init__(self, name=None, dest=None, pyversion=None, **kwargs):
+    def __init__(self, name=None, dest=None,
+                 pyv=None, pyv_constraint=None, **kwargs):
         """Create object."""
-        self.pyversion = pyversion or self.DEFAULT_PYTHON_VERSION
+        self.pyv = pyv or self.DEFAULT_PYV
+        self.pyv_constraint = pyv_constraint or self.DEFAULT_PYV_CONSTRAINT
         super().__init__(name, dest)
 
     def create(self):
@@ -43,22 +46,22 @@ class PythonProject(Project):
 
     def setup_dot_python_version(self):
         """Install the python version to .python-version file."""
-        if not self.pyversion:
+        if not self.pyv:
             return
 
         dotfile = self.path / ".python-version"
-        dotfile.write_text(f"{self.pyversion}\n")
+        dotfile.write_text(f"{self.pyv}\n")
 
     @property
     def python_where(self):
         """Return the location to the correct python executable."""
-        if not self.pyversion:
+        if not self.pyv:
             return
         command = [
             "asdf",
             "where",
             "python",
-            self.pyversion,
+            self.pyv,
         ]
         res = self.run(command)
         pyroot = res.stdout.strip()
@@ -105,7 +108,7 @@ class PythonProject(Project):
             "poetry",
             "init",
             f"--name={self.name}",
-            f"--python={self.pyversion}",
+            f"--python={self.pyv_constraint}",
             "--no-interaction",
         ]
 
