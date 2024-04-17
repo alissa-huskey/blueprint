@@ -115,6 +115,9 @@ class PythonProject(Project):
         if self.summary:
             command.append(f"--description={self.summary}")
 
+        if self.license:
+            command.append(f"--license={self.license}")
+
         if self.pyproject.is_file():
             self.pyproject.unlink()
 

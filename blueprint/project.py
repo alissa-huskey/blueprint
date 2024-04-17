@@ -21,11 +21,12 @@ class Project(Object):
 
     type: str = "basic"
 
-    def __init__(self, name=None, dest=None, summary="", **kwargs):
+    def __init__(self, name=None, dest=None, summary="", license="", **kwargs):
         """Create a new project object."""
         self.name = name
         self.dest = dest
         self.summary = summary
+        self.license = license
 
         super().__init__(**kwargs)
 

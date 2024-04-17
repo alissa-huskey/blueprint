@@ -81,6 +81,16 @@ Opts.summary = Global(
     )],
 )
 
+Opts.license = Global(
+    "license",
+    Annotated[str, Option(
+        "--license", "-l",
+        help="License of the package.",
+        rich_help_panel="Project",
+    )],
+    "MIT",
+)
+
 
 @new.command()
 def basic(
@@ -88,9 +98,10 @@ def basic(
     name: Opts.name.param,
     dest: Opts.dest.param = Opts.dest.default,
     summary: Opts.summary.param = Opts.summary.default,
+    license: Opts.license.param = Opts.license.default,
 ):
     """Create a basic new project."""
-    app = App(name, dest, summary=summary)
+    app = App(name, dest, summary=summary, license=license)
     verify(app)
     app.project.make()
 
@@ -100,6 +111,7 @@ def python(
     name: Opts.name.param,
     dest: Opts.dest.param = Opts.dest.default,
     summary: Opts.summary.param = Opts.summary.default,
+    license: Opts.license.param = Opts.license.default,
     pyv: Annotated[str, Option(
         "--pyv", "-P",
         help="Python version to use.",
@@ -116,6 +128,7 @@ def python(
         name,
         dest,
         summary=summary,
+        license=license,
         pyv=pyv,
         pyv_constraint=pyv_constraint,
         python=True
