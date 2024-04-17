@@ -1,6 +1,5 @@
 2024-03-09 maybe add license
 2024-04-17 add: python-cli project type
-2024-04-17 add --desc option
 2024-04-17 add list subcommand to list project types  @later
 2024-04-17 python: make pyv come from envvar & configurable
 2024-04-17 python: add --line-length option @maybe
@@ -9,3 +8,4 @@
 2024-04-17 python: validate pyv
 2024-04-17 python: try/except around asdf where in case version is not installed
 2024-04-17 python: add step to verify that it worked
+2024-04-17 add subcommad like 'change pyvesion' @maybe

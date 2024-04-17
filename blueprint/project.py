@@ -21,10 +21,11 @@ class Project(Object):
 
     type: str = "basic"
 
-    def __init__(self, name=None, dest=None, **kwargs):
+    def __init__(self, name=None, dest=None, summary="", **kwargs):
         """Create a new project object."""
         self.name = name
         self.dest = dest
+        self.summary = summary
 
         super().__init__(**kwargs)
 
@@ -103,6 +104,7 @@ class Project(Object):
             "SNAKE_NAME": self.snake_name,
             "PASCAL_NAME": self.pascal_name,
             "VERSION": self.PROJECT_VERSION,
+            "SUMMARY": self.summary,
         }
 
     def install_all(self):

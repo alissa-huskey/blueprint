@@ -35,7 +35,7 @@ class PythonProject(Project):
         """Create object."""
         self.pyv = pyv or self.DEFAULT_PYV
         self.pyv_constraint = pyv_constraint or self.DEFAULT_PYV_CONSTRAINT
-        super().__init__(name, dest)
+        super().__init__(name, dest, **kwargs)
 
     def create(self):
         """Create the project using poetry."""
@@ -111,6 +111,9 @@ class PythonProject(Project):
             f"--python={self.pyv_constraint}",
             "--no-interaction",
         ]
+
+        if self.summary:
+            command.append(f"--description={self.summary}")
 
         if self.pyproject.is_file():
             self.pyproject.unlink()

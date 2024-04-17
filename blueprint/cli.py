@@ -1,7 +1,7 @@
 """Command Line Interface."""
 
-from pathlib import Path
 from collections import namedtuple
+from pathlib import Path
 from sys import exit as sys_exit
 from typing import Annotated
 
@@ -10,12 +10,15 @@ from typer import Argument, BadParameter, Context, Option, Typer, confirm
 
 from blueprint import BlueprintError, UserError
 from blueprint.app import App
+from blueprint.object import Object
 from blueprint.python_project import PythonProject
 
 console = Console()
 errors = Console(stderr=True)
 cli = Typer()
 new = Typer()
+Opts = Object()
+Global = namedtuple("Global", ["name", "param", "default"], defaults=[None])
 
 
 def exit(status: int = 0):
@@ -45,10 +48,8 @@ def dest_exists(path: Path):
     return path
 
 
-class GlobalOptionsList(): ...
-
-Global = namedtuple("Global", ["name", "param", "default"], defaults=[None])
-Opts = GlobalOptionsList()
+# subcommand: new
+# =====================================================================================
 
 Opts.name = Global(
     "name",
@@ -64,10 +65,20 @@ Opts.dest = Global(
         "--dest", "-d",
         show_default=".",
         help="Where to create the project.",
-        rich_help_panel="Python",
-        callback=dest_exists,)
-    ],
+        rich_help_panel="Project",
+        callback=dest_exists
+    )],
     Path.cwd()
+)
+
+Opts.summary = Global(
+    "summary",
+    Annotated[str, Option(
+        "--summary", "-s",
+        show_default=False,
+        help="One line project description.",
+        rich_help_panel="Project",
+    )],
 )
 
 
@@ -76,9 +87,10 @@ def basic(
     ctx: Context,
     name: Opts.name.param,
     dest: Opts.dest.param = Opts.dest.default,
+    summary: Opts.summary.param = Opts.summary.default,
 ):
     """Create a basic new project."""
-    app = App(name, dest)
+    app = App(name, dest, summary=summary)
     verify(app)
     app.project.make()
 
@@ -87,21 +99,23 @@ def basic(
 def python(
     name: Opts.name.param,
     dest: Opts.dest.param = Opts.dest.default,
+    summary: Opts.summary.param = Opts.summary.default,
     pyv: Annotated[str, Option(
         "--pyv", "-P",
         help="Python version to use.",
-        rich_help_panel="Python",
+        rich_help_panel="Project",
     )] = PythonProject.DEFAULT_PYV,
     pyv_constraint: Annotated[str, Option(
         "--pyv-constraint", "-C",
         help="Supported Python versions.",
-        rich_help_panel="Python",
+        rich_help_panel="Project",
     )] = PythonProject.DEFAULT_PYV_CONSTRAINT,
 ):
     """Create Python project."""
     app = App(
         name,
         dest,
+        summary=summary,
         pyv=pyv,
         pyv_constraint=pyv_constraint,
         python=True

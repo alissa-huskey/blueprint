@@ -19,4 +19,4 @@ class ProjectFactory:
         if is_python:
             klass = PythonProject
 
-        return klass(name, dest)
+        return klass(name, dest, **kwargs)
