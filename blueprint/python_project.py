@@ -76,6 +76,7 @@ class PythonProject(Project):
         self.install("setup.cfg")
         self.install("${SNAKE_NAME}/__init__.py")
         self.install("tests/test_${SNAKE_NAME}.py")
+        super().install_all()
 
     def update_pyproject(self):
         """Change the version and add more options to pyproject.toml."""

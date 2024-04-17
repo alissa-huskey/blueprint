@@ -33,7 +33,7 @@ addopts = "-vvx"
 line-length = "88"
 
 [tool.poetry.scripts]
-new = "blueprint.cli:run"
+init = "blueprint.cli:run"
 
 [build-system]
 requires = ["poetry-core"]

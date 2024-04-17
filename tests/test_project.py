@@ -1,6 +1,6 @@
 import pytest
 
-from blueprint import AccessError
+from blueprint import AccessError, ProgramError
 from blueprint.project import Project
 
 
@@ -112,3 +112,101 @@ def test_project_install_file_subs(tmp_path):
     dest_contents = dest_file.read_text()
 
     assert "My Project" in dest_contents
+
+
+def test_project_install_all(tmp_path):
+    """
+    GIVEN: a Project object where create() has been called
+    WHEN: project.install_all() is called
+    THEN: The files should exist in the new project
+    """
+    project = Project("myproject", dest=tmp_path)
+    project.create()
+    project.install_all()
+
+    assert (project.path / "README.md").is_file()
+
+
+def test_project_source_file():
+    """
+    GIVEN: a Project object
+    WHEN: project.source_file() is called with a filename in the same class
+    THEN: the path to file in the SOURCES dir for that class is returned
+    """
+    project = Project()
+    path = project.source_path("README.md")
+    assert path == Project.SOURCES / "README.md"
+
+
+def test_project_source_file_subclass(tmp_path):
+    """
+    GIVEN: a Project subclass
+    AND: a file exists in the SOURCES dir for that class
+    WHEN: project.source_file() is called with a filename in the same class
+    THEN: the path to file in the SOURCES dir for that class is returned
+    """
+
+    source_path = tmp_path / "special_file"
+    source_path.touch()
+
+    class StubProject(Project):
+        SOURCES = tmp_path
+
+    project = StubProject()
+    path = project.source_path("special_file")
+
+    assert path == source_path
+
+
+def test_project_source_file_subclass_inherit(tmp_path):
+    """
+    GIVEN: a Project subclass
+    AND: a file does not exist in the SOURCES dir for that class
+    AND: a file exists in the SOURCES dir for a parent class
+    WHEN: project.source_file() is called with a filename in the same class
+    THEN: the path to file in the SOURCES dir for the parent class is returned
+    """
+
+    class StubProject(Project):
+        SOURCES = tmp_path
+
+    project = StubProject()
+    path = project.source_path("README.md")
+    assert path == Project.SOURCES / "README.md"
+
+
+def test_project_source_file_subclass_inherit_overwrite(tmp_path):
+    """
+    GIVEN: a Project subclass
+    AND: a file exists in the SOURCES dir for that class
+    AND: a file exists in the SOURCES dir for the parent class
+    WHEN: project.source_file() is called with a filename in the same class
+    THEN: the path to file in the SOURCES dir for that class is returned
+    """
+    source_path = tmp_path / "README.md"
+    source_path.touch()
+
+    class StubProject(Project):
+        SOURCES = tmp_path
+
+    project = StubProject()
+    path = project.source_path("README.md")
+
+    assert path == source_path
+
+
+def test_project_source_file_subclass_inherit_none(tmp_path):
+    """
+    GIVEN: a Project subclass
+    AND: no file exists in the SOURCES dir for that class
+    AND: no file exists in the SOURCES dir for any parent class
+    WHEN: project.source_file() is called with a filename in the same class
+    THEN: None should be returned
+    """
+    class StubProject(Project):
+        SOURCES = tmp_path
+
+    project = StubProject()
+
+    with pytest.raises(ProgramError):
+        project.source_path("missing-file")

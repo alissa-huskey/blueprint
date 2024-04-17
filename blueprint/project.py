@@ -2,10 +2,9 @@
 
 from pathlib import Path
 from re import compile as re_compile
-#  from shutil import copy
 from string import Template
 
-from blueprint import ROOT, AccessError
+from blueprint import ROOT, AccessError, ProgramError
 from blueprint.attr import attr
 from blueprint.object import Object
 
@@ -62,11 +61,24 @@ class Project(Object):
         """Return the title case version of the project name."""
         return self.name.replace("-", " ").title()
 
+    def source_path(self, file):
+        """Return the path to a source file."""
+        for klass in self.__class__.mro():
+            if not issubclass(klass, Project):
+                break
+
+            path = klass.SOURCES / file
+            if path.exists():
+                return path
+
+        klass = self.__class__.__name__
+        raise ProgramError(f"Could not find source file: {file} in class: {klass}")
+
     def install(self, file):
         """Copy a file from the source to the dest."""
         dest_file = Template(file).safe_substitute(self.substitutions)
 
-        src = self.SOURCES / file
+        src = self.source_path(file)
         dest = self.path / dest_file
 
         src_text = src.read_text()
@@ -84,3 +96,12 @@ class Project(Object):
             "PASCAL_NAME": self.pascal_name,
             "VERSION": self.PROJECT_VERSION,
         }
+
+    def install_all(self):
+        """Install all dotfiles from sources into the new project directory."""
+        self.install("README.md")
+
+    def make(self):
+        """Make the project end-to-end."""
+        self.create()
+        self.install_all()

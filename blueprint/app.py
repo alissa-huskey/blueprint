@@ -1,11 +1,10 @@
 """Overall application logic."""
 
-from sys import exit
+from functools import cached_property
 
-from rich.console import Console
-
-from blueprint import BlueprintError
 from blueprint.object import Object
+from blueprint.project import Project
+from blueprint.project_factory import ProjectFactory
 
 
 class App(Object):
@@ -13,21 +12,14 @@ class App(Object):
 
     NAME = "blueprint"
 
-    console = Console()
-    errors = Console(stderr=True)
-
-    def __init__(self, name=None, **kwargs):
-        """."""
+    def __init__(self, name=None, dest=None, **kwargs):
+        """Create object."""
+        self.kwargs = kwargs
         self.name = name or self.NAME
+        self.dest = dest
         super().__init__(**kwargs)
 
-    def error(self, ex):
-        """."""
-        if isinstance(ex, BlueprintError):
-            ex = ex.message
-
-        self.errors.print(f"[red]Error[/red] {ex}")
-
-    def exit(self, status):
-        """."""
-        exit(int(status))
+    @cached_property
+    def project(self) -> Project:
+        """Project that is being created."""
+        return ProjectFactory(self.name, self.dest, **self.kwargs)
