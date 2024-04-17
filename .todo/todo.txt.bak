@@ -8,3 +8,6 @@
 2024-04-17 add: python-cli project type
 2024-04-17 maybe change --python to --type
 2024-04-17 add --desc option
+x 2024-04-17 2024-04-17 add --version option
+2024-04-17 add --list flag or similar to list project types
+2024-04-17 python: make pyversion come from envvar & configurable

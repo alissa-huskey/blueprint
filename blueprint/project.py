@@ -18,10 +18,12 @@ class Project(Object):
     SOURCES = ROOT / "sources" / "bare"
     PROJECT_VERSION = "0.0.1"
 
-    def __init__(self, name=None, dest=None):
+    def __init__(self, name=None, dest=None, **kwargs):
         """Create a new project object."""
         self.name = name
         self.dest = dest
+
+        super().__init__(**kwargs)
 
     def _dest_setter(self, value):
         """Validate and set dest."""

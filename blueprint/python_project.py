@@ -15,6 +15,8 @@ class PythonProject(Project):
     POETRY_PROJECT_VERSION = "0.1.0"
     SOURCES = ROOT / "sources" / "python"
 
+    type: str = "python"
+
     DEV_DEPENDENCIES = [
         "pytest",
         "pdbpp",
