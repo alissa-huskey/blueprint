@@ -77,16 +77,17 @@ class Project(Object):
         raise ProgramError(f"Could not find source file: {file} in class: {klass}")
 
     def install(self, file):
-        """Copy a file from the source to the dest."""
-        dest_file = Template(file).safe_substitute(self.substitutions)
-
+        """Copy a file or create an empty directory from the source to the dest."""
         src = self.source_path(file)
-        dest = self.path / dest_file
+        dest_filename = Template(file).safe_substitute(self.substitutions)
+        dest = self.path / dest_filename
+
+        if src.is_dir():
+            dest.mkdir(parents=True)
+            return
 
         src_text = src.read_text()
-
         text = Template(src_text).safe_substitute(**self.substitutions)
-
         dest.write_text(text)
 
     @property
@@ -102,6 +103,7 @@ class Project(Object):
     def install_all(self):
         """Install all dotfiles from sources into the new project directory."""
         self.install("README.md")
+        self.install(".todo")
 
     def make(self):
         """Make the project end-to-end."""
