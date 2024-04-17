@@ -1,15 +1,15 @@
-x 2024-04-17 2024-03-09 maybe add license
-2024-04-17 add: python-cli project type
+(C) 2024-04-17 add: python-cli project type
 2024-04-17 add list subcommand to list project types  @later
-2024-04-17 python: make pyv come from envvar & configurable
+(B) 2024-04-17 python: make pyv come from envvar & configurable
 2024-04-17 python: add --line-length option @maybe
-2024-04-17 general: add config file for defaults
+(B) 2024-04-17 general: add config file for defaults
 2024-04-17 basic: add --proj-version option
-2024-04-17 python: validate pyv
-2024-04-17 python: try/except around asdf where in case version is not installed
-2024-04-17 python: add step to verify that it worked
+(B) 2024-04-17 python: validate pyv
+(B) 2024-04-17 python: try/except around asdf where in case version is not installed
+(A) 2024-04-17 python: add step to verify that it worked
 2024-04-17 add subcommad like 'change pyvesion' @maybe
 2024-04-17 basic: expand README @maybe
-2024-04-17 basic: rename sources/bare -> sources/basic
+(B) 2024-04-17 basic: rename sources/bare -> sources/basic
 2024-04-17 basic: make a BasicProject subclass of Project @maybe
 2024-04-17 projects: move all project [sub/]classes into a projects dir
+(A) 2024-04-17 python: fix (install) fail to install dev deps due to wrong python version @bug
