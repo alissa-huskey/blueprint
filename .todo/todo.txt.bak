@@ -11,5 +11,7 @@
 2024-04-17 basic: expand README @maybe
 (B) 2024-04-17 basic: rename sources/bare -> sources/basic
 2024-04-17 basic: make a BasicProject subclass of Project @maybe
-2024-04-17 projects: move all project [sub/]classes into a projects dir
+(C) 2024-04-17 projects: move all project [sub/]classes into a projects dir
 (A) 2024-04-17 python: fix (install) fail to install dev deps due to wrong python version @bug
+2024-04-17 add bash script template
+2024-04-17 rename new->proj, then add file @maybe

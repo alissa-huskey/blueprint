@@ -1,5 +1,5 @@
-(C) 2024-04-17 add: python-cli project type
-2024-04-17 add list subcommand to list project types  @later
+(C) 2024-04-17 add type: python-cli
+2024-04-17 add command: list, for project types  @later
 (B) 2024-04-17 python: make pyv come from envvar & configurable
 2024-04-17 python: add --line-length option @maybe
 (B) 2024-04-17 general: add config file for defaults
@@ -7,9 +7,12 @@
 (B) 2024-04-17 python: validate pyv
 (B) 2024-04-17 python: try/except around asdf where in case version is not installed
 (A) 2024-04-17 python: add step to verify that it worked
-2024-04-17 add subcommad like 'change pyvesion' @maybe
+2024-04-17 add command: change (ie, `change pyv`) @maybe
 2024-04-17 basic: expand README @maybe
 (B) 2024-04-17 basic: rename sources/bare -> sources/basic
 2024-04-17 basic: make a BasicProject subclass of Project @maybe
 (C) 2024-04-17 projects: move all project [sub/]classes into a projects dir
-(A) 2024-04-17 python: fix (install) fail to install dev deps due to wrong python version @bug
+(A) 2024-04-17 python: fix (in local install) fail to install dev deps due to wrong python version @bug
+2024-04-17 add feature: bash script template
+2024-04-17 commands: rename new->proj, then add file @maybe
+2024-04-17 add type: git-crypt
