@@ -1,19 +1,24 @@
 """Command Line Interface."""
 
 from pathlib import Path
+from sys import exit as sys_exit
 from typing import Annotated
 
 from rich.console import Console
-from rich.table import Table
-from typer import Argument, BadParameter, Context, Exit, Option, Typer, confirm
+from typer import Argument, BadParameter, Context, Option, Typer, confirm
 
-from blueprint import BlueprintError
+from blueprint import BlueprintError, UserError
 from blueprint.app import App
 
 console = Console()
 errors = Console(stderr=True)
 cli = Typer()
 new = Typer()
+
+
+def exit(status: int = 0):
+    """Exit with status code."""
+    raise sys_exit(int(status))
 
 
 def error(ex: Exception):
@@ -24,11 +29,6 @@ def error(ex: Exception):
     errors.print(f"[red]Error[/red] {ex}")
 
 
-def exit(status: int = 0):
-    """Exit with status code."""
-    raise Exit(code=status)
-
-
 def verify(app: App):
     """Ask the user to confirm that they want to proceed."""
     prompt = f"Create {app.project.type} project at '{app.project.path}'?"
@@ -37,7 +37,7 @@ def verify(app: App):
 
 
 def dest_exists(path: Path):
-    """Callback to confirm the destination directory exists"""
+    """Confirm the destination directory exists."""
     if not path.is_dir():
         raise BadParameter(f"No such directory: {path}")
     return path
@@ -89,6 +89,7 @@ def python(
 
 cli.add_typer(new, name="new")
 
+
 @cli.callback()
 def default():
     """Create a new project from a blueprint."""
@@ -98,7 +99,10 @@ def run():
     """Start the command line interface."""
     try:
         cli()
-    except BlueprintError as e:
+    except UserError as e:
+        error(e.message)
+        exit(e.status)
+    except UserError as e:
         error(e.message)
         exit(e.status)
     except SystemExit:

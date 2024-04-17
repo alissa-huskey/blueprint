@@ -1,2 +1,7 @@
 x 2024-04-17 2024-04-17 bare: add .todo
 x 2024-04-17 2024-04-17 add --version option
+x 2024-04-17 2024-04-17 python: add dev dependencies
+x 2024-04-17 2024-04-17 python: fix setup.cfg with best flake8 config
+x 2024-04-17 2024-04-17 python: add poetry init
+x 2024-04-17 2024-04-17 python: add poetry install
+x 2024-04-17 2024-04-17 python: add .python_version

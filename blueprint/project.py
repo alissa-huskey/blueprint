@@ -3,6 +3,7 @@
 from pathlib import Path
 from re import compile as re_compile
 from string import Template
+from subprocess import run
 
 from git import Repo
 
@@ -17,6 +18,8 @@ class Project(Object):
     pascal_replacer = re_compile(r'[-]([a-z])')
     SOURCES = ROOT / "sources" / "bare"
     PROJECT_VERSION = "0.0.1"
+
+    type: str = "basic"
 
     def __init__(self, name=None, dest=None, **kwargs):
         """Create a new project object."""
@@ -107,9 +110,35 @@ class Project(Object):
         self.install("README.md")
         self.install(".todo")
 
+    def run(self, command: list, capture_output=True, text=True, **kwargs):
+        """Run a CLI command."""
+        cwd = kwargs.pop("cwd", self.path)
+
+        params = dict(
+            capture_output=capture_output,
+            text=text,
+        )
+
+        if cwd:
+            params["cwd"] = cwd
+
+        params.update(kwargs)
+
+        res = run(command, **params)
+
+        if res.returncode:
+            cmd = " ".join(command)
+            err = ""
+            if hasattr(res, "stderr"):
+                err = res.stderr
+            raise ProgramError(f"Failed CLI command [{res.returncode}] {cmd!r}: {err!r}")
+
+        return res
+
     def make(self):
         """Make the project end-to-end."""
         self.create()
+        self.setup()
         self.install_all()
 
     def setup(self):

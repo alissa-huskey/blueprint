@@ -32,13 +32,12 @@ def test_python_project_toml(tmp_path):
     """
     project = PythonProject("myproject", dest=tmp_path)
     project.create()
-    project.update_pyproject()
+    project.setup_pyproject()
 
     toml_contents = project.pyproject.read_text()
 
-    assert 'python = ">=3.10"' in toml_contents
-    assert 'tool.black' in toml_contents
     assert '0.0.1' in toml_contents
+    assert 'tool.pytest.ini_options' in toml_contents
 
 
 def test_python_project_install_all(tmp_path):
@@ -55,22 +54,22 @@ def test_python_project_install_all(tmp_path):
     assert (project.path / "setup.cfg").is_file()
 
 
-def test_python_project_install_dot_python_version(tmp_path):
+def test_python_project_setup_dot_python_version(tmp_path):
     """
     GIVEN: a PythonProject object where create() has been called
     WHEN: project.dot_python_version() is called
     THEN: the files should exist
     AND: it should contain the full python version
     """
-    project = PythonProject("myproject", dest=tmp_path)
+    project = PythonProject("myproject", dest=tmp_path, pyversion="3.10.2")
     project.create()
-    project.install_dot_python_version()
+    project.setup_dot_python_version()
 
     dotfile = project.path / ".python-version"
     contents = dotfile.read_text()
 
     assert dotfile.is_file()
-    assert project.PYTHON_FULL_VERSION in contents
+    assert "3.10.2" in contents
 
 
 def test_python_project_with_subs(tmp_path):
@@ -87,20 +86,7 @@ def test_python_project_with_subs(tmp_path):
     assert (project.path / "my_project" / "__init__.py").is_file()
 
 
-def test_python_project_python_where(monkeypatch):
-    """
-    WHEN: project.python_where is accessed
-    THEN: the path to the python executable from asdf is returned
-    """
-    project = PythonProject()
-    cmd_res = Object(stdout="~/.asdf/installs/python/3.10.2")
-
-    with monkeypatch.context() as m:
-        m.setattr(python_project, "run", lambda *args, **kwargs: cmd_res)
-        assert project.python_where == f"{cmd_res.stdout}/bin/python"
-
-
-def test_python_project_poetry_use(tmp_path):
+def test_python_project_setup_poetry_use(tmp_path):
     """
     WHEN: project.poetry_use is accessed
     THEN: the virtual env should be created in the correct place
@@ -109,7 +95,7 @@ def test_python_project_poetry_use(tmp_path):
     """
     project = PythonProject("my-project", dest=tmp_path)
     project.create()
-    cmd_res = project.poetry_use()
+    cmd_res = project.setup_poetry_use()
 
     verify = run(
         ["poetry", "env", "info"],
@@ -121,6 +107,22 @@ def test_python_project_poetry_use(tmp_path):
     assert cmd_res.returncode == 0
     assert "Creating virtualenv" in cmd_res.stdout
     assert re_search(
-        rf'Virtualenv\nPython:\s+{project.PYTHON_FULL_VERSION}',
+        rf'Virtualenv\nPython:\s+{project.DEFAULT_PYTHON_VERSION}',
         verify.stdout
     )
+
+
+def test_python_project_poetry_init(tmp_path):
+    """
+    GIVEN: a PythonProject object where create() has been called
+    WHEN: project.setup_poetry_init() is called
+    THEN: the pyproject.toml should be good
+    """
+    project = PythonProject("my_project", dest=tmp_path, pyversion="3.10.2")
+    project.create()
+    project.setup_poetry_init()
+
+    toml_contents = project.pyproject.read_text()
+
+    assert 'name = "my-project"' in toml_contents
+    assert 'python = "3.10.2"' in toml_contents

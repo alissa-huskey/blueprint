@@ -1,13 +1,13 @@
 2024-03-09 maybe add license
-2024-04-17 python: add dev dependencies
-2024-04-17 python: add .python_version
-2024-04-17 python: add poetry init
-2024-04-17 python: fix setup.cfg with best flake8 config
 2024-04-17 python: add object.py and attr.py
-2024-04-17 python: add poetry install
 2024-04-17 add: python-cli project type
 2024-04-17 maybe change --python to --type
 2024-04-17 add --desc option
-x 2024-04-17 2024-04-17 add --version option
-2024-04-17 add --list flag or similar to list project types
+2024-04-17 add list subcommand to list project types
 2024-04-17 python: make pyversion come from envvar & configurable
+2024-04-17 python: add --line-length option @maybe
+2024-04-17 general: add config file for defaults
+2024-04-17 basic: add --proj-version option
+2024-04-17 python: make default pyversion PythonProject.PYTHON_VERSION
+2024-04-17 python: add --pyversion-constraint
+2024-04-17 python: fix setup.cfg with best flake8 config
