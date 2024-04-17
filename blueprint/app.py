@@ -4,14 +4,14 @@ from sys import exit
 
 from rich.console import Console
 
-from new_project import NewProjectError
-from new_project.object import Object
+from blueprint import BlueprintError
+from blueprint.object import Object
 
 
 class App(Object):
     """Application controller."""
 
-    NAME = "new-project"
+    NAME = "blueprint"
 
     console = Console()
     errors = Console(stderr=True)
@@ -23,7 +23,7 @@ class App(Object):
 
     def error(self, ex):
         """."""
-        if isinstance(ex, NewProjectError):
+        if isinstance(ex, BlueprintError):
             ex = ex.message
 
         self.errors.print(f"[red]Error[/red] {ex}")

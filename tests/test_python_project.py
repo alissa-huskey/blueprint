@@ -1,11 +1,9 @@
 from re import search as re_search
 from subprocess import run
 
-import pytest
-
-from new_project import python_project
-from new_project.object import Object
-from new_project.python_project import PythonProject
+from blueprint import python_project
+from blueprint.object import Object
+from blueprint.python_project import PythonProject
 
 
 def test_python_project():
@@ -54,7 +52,7 @@ def test_python_project_install_all(tmp_path):
     project.install_all()
 
     assert (project.path / ".env").is_file()
-    assert (project.path / ".flake8").is_file()
+    assert (project.path / "setup.cfg").is_file()
 
 
 def test_python_project_install_dot_python_version(tmp_path):

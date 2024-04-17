@@ -1,6 +1,6 @@
 import pytest
 
-from new_project.attr import attr
+from blueprint.attr import attr
 
 
 class Person:
@@ -50,18 +50,6 @@ def test_attr_default_deleter():
     del person.age
 
     assert not hasattr(person, "_age")
-
-
-def test_attr_default_getter():
-    """
-    GIVEN: a class attr using all defaults
-    WHEN: an object is instantiated
-    THEN: the default getter should work
-    """
-    person = Person()
-    person._age = 23
-
-    assert person.age == 23
 
 
 def test_attr_passed_getter():

@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "new-project"
+name = "blueprint"
 version = "0.0.1"
 description = ""
 authors = ["Alissa Huskey <alissa.huskey@gmail.com>"]
 readme = "README.md"
-packages = [{include = "new_project"}]
+packages = [{include = "blueprint"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10"
@@ -33,7 +33,7 @@ addopts = "-vvx"
 line-length = "88"
 
 [tool.poetry.scripts]
-new = "new_project.cli:run"
+new = "blueprint.cli:run"
 
 [build-system]
 requires = ["poetry-core"]

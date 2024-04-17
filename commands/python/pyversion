@@ -1,0 +1,325 @@
+#!/usr/bin/env bash
+#
+# Change python version in poetry project.
+#
+
+trap 'on_exit ${BASH_LINENO[0]}' EXIT
+trap 'on_err ${BASH_LINENO[0]}' ERR
+
+set -eE           # fail on errors
+set +o posix      # using some noncompliant process redirection features
+
+me="${0##*/}"     # name of script
+# rootdir="$(cd "${0%/*}/." && pwd -P)"
+rootdir="${PWD}"
+_caller_level=0
+_my_exit=
+
+# define in setup()
+USAGE=
+HELP=
+VERSION=
+DESC=
+
+# Utility functions
+# ==============================================================
+
+# define a variable using heredocs
+# usage: define <<EOF
+# ...
+# EOF
+define() {
+   IFS=$'\n' read -r -d '' ${1} || true && :
+}
+
+# handle ERR signal
+# usage: trap on_err ERR
+on_err() {
+  [[ -n "$_my_exit" ]] && return || :
+  local lineno="${1}"
+  perr "Fatal error (${lineno})"
+  echo
+  trace
+}
+
+# handle EXIT signal
+# usage: trap on_exit EXIT
+on_exit() {
+  local lineno="${1}"
+  local ec=$?
+
+  # pdebug "Exit line: ${lineno}"
+  # pinfo "goodbye"
+  exit $ec
+}
+
+# print stacktrace
+# usage: trace
+trace() {
+  local frame=1 frames="${#BASH_LINENO[@]}"
+
+  while read -r line func file < <(caller $frame); do
+    if [[ -z "${file}" ]]; then
+      file="${func}"
+      func=""
+    fi
+
+    # hr
+    # pvar "file"
+    # pvar "func"
+    # pvar "line"
+    # hr
+
+    printf "[%*s] %s:%s %s()\n" "${#frames}" "$frame" "${file//$HOME/~}" "$line" "$func"
+
+    ((frame++));
+  done
+}
+
+# print usage and exit
+# usage: usage
+usage() {
+  printf "\n%s - %s\n%s %s\n" "${me}" "${DESC}" "${me}" "$USAGE"
+}
+#
+# print version and exit
+# usage: version
+version() {
+  printf "%s %s\n" "${me}" "${VERSION}"
+  exit
+}
+
+# print help and exit
+# usage: help
+help() {
+  printf "%s\n" "$HELP"
+  exit
+}
+
+# print error message and exit
+# usage: perr MESSAGE...
+perr() {
+  printf "[%s] \033[31mError:\033[0m %s\n" "${me}" "${*}" >&2
+}
+
+# print command message
+# usage: pcmd CMD...
+pcmd() {
+  [[ -z "${is_verbose_mode}" ]] && return || :
+
+  printf "\033[2m# [%s] %s\033[0m\n" "${me}" "${*}"
+}
+
+# print verbose message
+# usage: pinfo MESSAGE...
+pinfo() {
+  [[ -z "${is_verbose_mode}" ]] && return || :
+
+  printf "\033[36m[%s] \033[0m %s\n" "${me}" "${*}"
+}
+
+# print debug message
+# usage: pdebug MESSAGE...
+pdebug() {
+  [[ -z "${is_debug_mode}" ]] && return || :
+  # if [[ -z "${is_debug_mode}" ]]; then
+  #   return
+  # fi
+
+  printf "[%s] \033[33mDebug> \033[0m %s\n" "${me}" "${*}"
+}
+
+# print variable value message
+# usage: pvar NAME
+pvar() {
+  [[ -z "${is_debug_mode}" ]] && return || :
+  local name="${1}" value
+
+  value="${!name}"
+
+  printf "[%s] \033[33mDebug>\033[0m \033[36m%s\033[0m \t %s\n" "${me}" "${name}" "${value}"
+}
+
+# print program error message and exit
+# usage: abort MESSAGE...
+abort() {
+  _caller_level=1
+  perr "${@}"
+  exit 1
+}
+
+# print user error message and exit
+# usage: usrerr MESSAGE...
+usrerr() {
+  _caller_level=1 _my_exit=1
+  perr "${@}"
+  usage
+  exit 1
+}
+# parse default arguments
+# usage: parse_defaults ARGS...
+parse_defaults() {
+  local -a fwd
+  local sn=1
+
+  while [[ $# -ne 0 ]]; do
+    sn=1
+    case "$1" in
+      -h|--help)     help                                ;;
+      -v|--version)  version                             ;;
+      -n|--dry-run)  is_dryrun_mode=1 is_verbose_mode=1  ;;
+      -q|--quiet)    is_quiet_mode=1                     ;;
+      -V|--verbose)  is_verbose_mode=1                   ;;
+      -D|--debug)    is_debug_mode=1                     ;;
+      *)             fwd+=( "${1}" )                     ;;
+    esac
+    shift $sh
+  done
+
+
+  args=( "${fwd[@]}" )
+}
+
+# run a command or print in dry run mode
+# usage: pdebug MESSAGE...
+run() {
+  pcmd "${*}"
+  _my_exit=1
+
+  [[ -n "${is_dryrun_mode}" ]] && return || :
+
+  "${@}" || abort "Command failed: '${*}'" && :
+}
+
+# Script functions
+# ==============================================================
+
+# setup script variables and defaults
+# usage: usage
+setup() {
+  VERSION="0.1.0"
+  DESC="Change python version in poetry project."
+  USAGE="[-h|-v] [-v] VERSION"
+
+define HELP << EOF
+
+ARGS
+  VERSION     New Python version
+
+OPTIONS
+  -h|--help     Print this message and exit.
+  -v|--version  Print version and exit
+  -n|--dry-run  Print commands but do not run.
+  -D|--debug    Print debug info.
+  -V|--verbose  Print verbose info.
+  -q|--quiet    Do not print anything.
+
+EOF
+}
+
+# parse script arguments
+# usage: parse ARGS...
+parse() {
+  local sn=1
+  local -a args
+
+  parse_defaults ${1:+"$@"}
+  set -- "${args[@]}"
+
+  while [[ $# -ne 0 ]]; do
+    sn=1
+    case "$1" in
+      # -o|--opt) : ;;
+      *)
+        [[ -z "${version}" ]] && version="${1}" || :
+        ;;
+    esac
+    shift $sh
+  done
+
+  {
+    pvar is_debug_mode
+    pvar is_verbose_mode
+    pvar is_dryrun_mode
+    pvar is_quiet_mode
+    pvar version
+  } | column -t -s $'\t'
+}
+
+# validate correct usage
+# usage: validate
+validate() {
+  if [[ -z "${version}" ]]; then
+    usrerr "Version required."
+  fi
+
+  if ! [[ "${version}" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
+    usrerr "Version must be a valid Python (major.minor.patch) version."
+  fi
+}
+
+# Script commands
+# ==============================================================
+
+# desc
+# usage: cmd ...
+# cmd() {
+#   :
+# }
+
+# switch python version in poetry
+switch_versions() {
+  local old_venv major where
+
+  cd "${rootdir}" || abort "Unable to cd to: ${rootdir}" && :
+
+  old_venv="$(poetry env info -p || :)"
+  where="$(asdf where python $version || :)"
+  [[ -d "${where}" ]] || abort "Not a valid Python location from asdf for version: '${version}'. (${where})" && :
+
+  pvar where
+  pvar old_venv
+
+  [[ -d "${old_venv}" ]] && poetry env remove ${old_venv##*/} || :
+  run poetry env use ${where}/bin/python
+  run poetry install
+  run echo "$version" '>' .python_version
+}
+
+# confirm that everything worked
+verify() {
+  local fail poetry_versions
+
+  env_updated=$(poetry env info | grep -ce "Executable: .\+${version%.*}")
+  pyversion=$(python --version)
+
+  if [[ $env_updated -ne 2 ]]; then
+    fail=1
+    perr "Virtual environment not successfullly changed."
+    pcmd poetry env info
+    poetry env info
+  fi
+
+  if ! [[ "${pyversion}" =~ ${version}$ ]]; then
+    fail=1
+    perr "Python executable version not successfully changed."
+    pcmd python --version
+    python --version
+  fi
+
+  [[ -n ${fail} ]] && exit 1 || :
+}
+
+main() {
+  local is_dryrun_mode is_verbose_mode is_quiet_mode is_debug_mode
+  local version
+
+  setup
+  parse ${1:+"$@"}
+
+  validate
+  switch_versions
+  verify
+}
+
+main ${1:+"$@"}

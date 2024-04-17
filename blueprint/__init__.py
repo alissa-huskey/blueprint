@@ -1,4 +1,4 @@
-"""new-project -- create a new project."""
+"""blueprint -- create a new project."""
 
 from enum import Enum
 from pathlib import Path
@@ -40,7 +40,7 @@ class SysExit(Enum):
         return self.status
 
 
-class NewProjectError(BaseException):
+class BlueprintError(BaseException):
     """Base class for project exceptions."""
 
     status: SysExit = SysExit.GENERIC
@@ -56,7 +56,7 @@ class NewProjectError(BaseException):
         return self.status.desc
 
 
-class UserError(NewProjectError):
+class UserError(BlueprintError):
     """Any kind of user error."""
 
     status: SysExit = SysExit.USAGE
@@ -73,7 +73,7 @@ class AccessError(UserError):
     status: SysExit = SysExit.OSERR
 
 
-class ProgramError(NewProjectError):
+class ProgramError(BlueprintError):
     """An error in the programs code code."""
 
     status: SysExit = SysExit.SOFTWARE

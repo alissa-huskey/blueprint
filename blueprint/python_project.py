@@ -2,8 +2,8 @@
 
 from subprocess import run
 
-from new_project import ROOT
-from new_project.project import Project
+from blueprint import ROOT
+from blueprint.project import Project
 
 
 class PythonProject(Project):
@@ -14,6 +14,20 @@ class PythonProject(Project):
     PYTHON_FULL_VERSION = "3.10.2"
     POETRY_PROJECT_VERSION = "0.1.0"
     SOURCES = ROOT / "sources" / "python"
+
+    DEV_DEPENDENCIES = [
+        "pytest",
+        "pdbpp",
+        "ipython",
+        "black",
+        "pynvim",
+        "pylama",
+        "pycodestyle",
+        "flake8",
+        "flake8-black",
+        "flake8-isort",
+        "flake8-docstrings",
+    ]
 
     def create(self):
         """Create the project using poetry."""
@@ -43,6 +57,14 @@ class PythonProject(Project):
         command = ["poetry", "env", "use", self.python_where]
         return run(command, capture_output=True, text=True, cwd=self.path)
 
+    def poetry_dev_install(self):
+        """Install poetry dev dependencies."""
+        command = [
+            "poetry", "install", "--group", "dev",
+            *self.DEV_DEPENDENCIES,
+        ]
+        return run(command, capture_output=True, text=True, cwd=self.path)
+
     @property
     def pyproject(self):
         """Path to the pyproject.toml file."""
@@ -51,7 +73,7 @@ class PythonProject(Project):
     def install_all(self):
         """Install all dotfiles from sources into the new project directory."""
         self.install(".env")
-        self.install(".flake8")
+        self.install("setup.cfg")
         self.install("${SNAKE_NAME}/__init__.py")
         self.install("tests/test_${SNAKE_NAME}.py")
 

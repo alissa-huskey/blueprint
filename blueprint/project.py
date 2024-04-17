@@ -5,9 +5,9 @@ from re import compile as re_compile
 #  from shutil import copy
 from string import Template
 
-from new_project import ROOT, AccessError
-from new_project.attr import attr
-from new_project.object import Object
+from blueprint import ROOT, AccessError
+from blueprint.attr import attr
+from blueprint.object import Object
 
 
 class Project(Object):
@@ -70,7 +70,6 @@ class Project(Object):
         dest = self.path / dest_file
 
         src_text = src.read_text()
-
 
         text = Template(src_text).safe_substitute(**self.substitutions)
 

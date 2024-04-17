@@ -1,4 +1,4 @@
-from new_project import __version__
+from blueprint import __version__
 
 
 def test_version():

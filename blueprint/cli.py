@@ -1,9 +1,8 @@
 """Command Line Interface."""
 
+from blueprint import BlueprintError
+from blueprint.app import App
 from typer import Typer
-
-from new_project import NewProjectError
-from new_project.app import App
 
 cli = Typer()
 app = App()
@@ -11,7 +10,7 @@ app = App()
 
 @cli.command()
 def hello():
-    """Example command."""
+    """Demonstrate example command."""
     print("hello")
 
 
@@ -19,7 +18,7 @@ def run():
     """CLI Runner."""
     try:
         cli()
-    except NewProjectError as e:
+    except BlueprintError as e:
         app.error(e.message)
         app.exit(e.status)
     except SystemExit:

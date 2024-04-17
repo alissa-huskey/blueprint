@@ -1,7 +1,7 @@
 import pytest
 
-from new_project import AccessError
-from new_project.project import Project
+from blueprint import AccessError
+from blueprint.project import Project
 
 
 def test_project():

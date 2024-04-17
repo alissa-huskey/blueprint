@@ -1,4 +1,4 @@
-from new_project.app import App
+from blueprint.app import App
 
 
 def test_app():
