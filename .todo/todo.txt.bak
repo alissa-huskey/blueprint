@@ -1,7 +1,6 @@
 2024-03-09 maybe add license
 2024-04-17 python: add object.py and attr.py
 2024-04-17 add: python-cli project type
-2024-04-17 maybe change --python to --type
 2024-04-17 add --desc option
 2024-04-17 add list subcommand to list project types
 2024-04-17 python: make pyversion come from envvar & configurable
@@ -10,4 +9,4 @@
 2024-04-17 basic: add --proj-version option
 2024-04-17 python: make default pyversion PythonProject.PYTHON_VERSION
 2024-04-17 python: add --pyversion-constraint
-2024-04-17 python: fix setup.cfg with best flake8 config
+x 2024-04-17 2024-04-17 python: fix setup.cfg with best flake8 config
