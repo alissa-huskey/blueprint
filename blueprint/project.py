@@ -4,6 +4,8 @@ from pathlib import Path
 from re import compile as re_compile
 from string import Template
 
+from git import Repo
+
 from blueprint import ROOT, AccessError, ProgramError
 from blueprint.attr import attr
 from blueprint.object import Object
@@ -105,3 +107,7 @@ class Project(Object):
         """Make the project end-to-end."""
         self.create()
         self.install_all()
+
+    def setup(self):
+        """Take setup steps."""
+        Repo.init(self.path)

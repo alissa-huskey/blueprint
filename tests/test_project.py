@@ -70,7 +70,7 @@ def test_project_title_name():
 
 def test_project_install(tmp_path):
     """
-    GIVEN: a roject object where create() has been called
+    GIVEN: a project object where create() has been called
     WHEN: project.install() is called with a valid filename from the sources
           directory
     THEN: The file should exist in the new project
@@ -210,3 +210,16 @@ def test_project_source_file_subclass_inherit_none(tmp_path):
 
     with pytest.raises(ProgramError):
         project.source_path("missing-file")
+
+
+def test_project_setup(tmp_path):
+    """
+    GIVEN: a project object where create() has been called
+    WHEN: project.setup() is called
+    THEN: the project should be git init'd
+    """
+    project = Project("myproject", dest=tmp_path)
+    project.create()
+    project.setup()
+
+    assert (project.path / ".git").is_dir()
