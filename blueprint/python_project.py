@@ -94,6 +94,8 @@ class PythonProject(Project):
         self.install(".env")
         self.install("setup.cfg")
         self.install("${SNAKE_NAME}/__init__.py")
+        self.install("${SNAKE_NAME}/object.py")
+        self.install("${SNAKE_NAME}/attr.py")
         self.install("tests/test_${SNAKE_NAME}.py")
         super().install_all()
 
