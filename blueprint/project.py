@@ -53,22 +53,35 @@ class Project(Object):
 
     @property
     def pascal_name(self):
-        """Return the snake tail version of the project name."""
-        name = self.name.capitalize()
-        name = self.pascal_replacer.sub(
-            lambda m: m.group(1).upper(), name
-        )
-        return name
+        """Return the pascal version of the project name.
+
+        Example: MyProject
+        """
+        return self.title_name.replace(" ", "")
+
+    @property
+    def dash_name(self):
+        """Return the dash version of the project name.
+
+        Example: my-project
+        """
+        return self.name.lower().translate(str.maketrans("_ ", "--"))
 
     @property
     def snake_name(self):
-        """Return the snake tail version of the project name."""
-        return self.name.replace("-", "_")
+        """Return the snake tail version of the project name.
+
+        Example: my_project
+        """
+        return self.name.lower().translate(str.maketrans("- ", "__"))
 
     @property
     def title_name(self):
-        """Return the title case version of the project name."""
-        return self.name.replace("-", " ").title()
+        """Return the title case version of the project name.
+
+        Example: My Project
+        """
+        return self.name.translate(str.maketrans("-_", "  ")).title()
 
     def source_path(self, file):
         """Return the path to a source file."""
@@ -101,6 +114,7 @@ class Project(Object):
     def substitutions(self):
         """Return a mapping of the file substitutions for installing files."""
         return {
+            "DASH_NAME": self.dash_name,
             "TITLE_NAME": self.title_name,
             "SNAKE_NAME": self.snake_name,
             "PASCAL_NAME": self.pascal_name,

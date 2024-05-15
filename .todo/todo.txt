@@ -16,3 +16,4 @@
 2024-04-17 add feature: bash script template
 2024-04-17 commands: rename new->proj, then add file @maybe
 2024-04-17 add type: git-crypt
+2024-04-17 python: add vscode settings

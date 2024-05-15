@@ -41,7 +41,7 @@ class PythonProject(Project):
         """Create the project using poetry."""
         if self.path.exists():
             raise AccessError(f"Directory already exists: {self.path}")
-        command = ["poetry", "new", f"--name={self.name}", str(self.path)]
+        command = ["poetry", "new", f"--name={self.dash_name}", str(self.path)]
         return self.run(command, cwd=None)
 
     def setup_dot_python_version(self):
@@ -107,7 +107,7 @@ class PythonProject(Project):
         command = [
             "poetry",
             "init",
-            f"--name={self.name}",
+            f"--name={self.dash_name}",
             f"--python={self.pyv_constraint}",
             "--no-interaction",
         ]

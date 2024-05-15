@@ -49,6 +49,16 @@ def test_project_create(tmp_path):
     assert (tmp_path/"myproject").is_dir()
 
 
+def test_project_dash_name():
+    """
+    WHEN: project.dash_name is accessed
+    THEN: it should return the dash version of that name
+    """
+    project = Project("my_project")
+
+    assert project.dash_name == "my-project"
+
+
 def test_project_snake_name():
     """
     WHEN: project.snake_name is accessed

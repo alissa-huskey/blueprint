@@ -69,6 +69,22 @@ OPTIONS
     --pyv-constraint  -C  Supported Python versions.
 ```
 
+Templates
+---------
+
+Templates are stored in the sources directory. Variables in the form of
+`${VAR}` can be used in the names of directories and files themselves or their
+contents. Variables include:
+
+| Variable      | Example                       |
+|---------------|-------------------------------|
+| `TITLE_NAME`  | "My Project"                  |
+| `DASH_NAME`   | "my-project"                  |
+| `SNAKE_NAME`  | "my_project"                  |
+| `PASCAL_NAME` | "MyProject"                   |
+| `VERSION`     | "0.1.0"                       |
+| `SUMMARY`     | "My project that does stuff." |
+
 Status
 ------
 
