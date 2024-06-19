@@ -1,7 +1,12 @@
 """Module for a new python project."""
 
+from pathlib import Path
+from shutil import which
+
 from blueprint import ROOT, AccessError
 from blueprint.project import Project
+
+bp = breakpoint
 
 
 class PythonProject(Project):
@@ -37,12 +42,25 @@ class PythonProject(Project):
         self.pyv_constraint = pyv_constraint or self.DEFAULT_PYV_CONSTRAINT
         super().__init__(name, dest, **kwargs)
 
+    @classmethod
+    @property
+    def poetry_exe(cls):
+        """Return the path to the poetry executable."""
+        return which("poetry")
+
     def create(self):
         """Create the project using poetry."""
         if self.path.exists():
             raise AccessError(f"Directory already exists: {self.path}")
-        command = ["poetry", "new", f"--name={self.dash_name}", str(self.path)]
-        return self.run(command, cwd=None)
+        command = [
+            "poetry",
+            "--directory",
+            str(self.dest),
+            "new",
+            f"--name={self.dash_name}",
+            str(self.path)
+        ]
+        return self.run(command, cwd=self.dest)
 
     def setup_dot_python_version(self):
         """Install the python version to .python-version file."""
@@ -71,18 +89,31 @@ class PythonProject(Project):
         """Tell poetry which python executable to use."""
         if not self.python_where:
             return
-        command = ["poetry", "env", "use", self.python_where]
+
+        command = [
+            "poetry",
+            "--directory",
+            str(self.path),
+            "env",
+            "use",
+            self.python_where,
+        ]
         return self.run(command)
 
     def setup_poetry_install(self):
         """Install project and dependencies in venv."""
-        command = ["poetry", "install"]
+        command = ["poetry", "--directory", str(self.path), "install"]
         return self.run(command)
 
     def setup_dev_dependencies(self):
         """Install poetry dev dependencies."""
         command = [
-            "poetry", "add", "--group", "dev",
+            "poetry",
+            "--directory",
+            str(self.path),
+            "add",
+            "--group",
+            "dev",
             *self.DEV_DEPENDENCIES,
         ]
         return self.run(command)
@@ -91,6 +122,20 @@ class PythonProject(Project):
     def pyproject(self):
         """Path to the pyproject.toml file."""
         return self.path / "pyproject.toml"
+
+    @property
+    def venv_path(self) -> Path:
+        """Return the path to this projects virtual environment."""
+        command = [
+            "poetry",
+            "--directory",
+            str(self.path),
+            "env",
+            "info",
+            "--path"
+        ]
+        res = self.run(command)
+        return Path(res.stdout.strip())
 
     def install_all(self):
         """Install all dotfiles from sources into the new project directory."""
@@ -106,6 +151,8 @@ class PythonProject(Project):
         """Generate initial pyproject.toml file."""
         command = [
             "poetry",
+            "--directory",
+            str(self.path),
             "init",
             f"--name={self.dash_name}",
             f"--python={self.pyv_constraint}",
@@ -121,7 +168,7 @@ class PythonProject(Project):
         if self.pyproject.is_file():
             self.pyproject.unlink()
 
-        self.run(command)
+        return self.run(command)
 
     def setup(self):
         """Set up Python project."""

@@ -36,7 +36,7 @@ Toolchain
 
 Behavior
 
-* Generate a `README.md` .
+* Generate a `README.md`.
 * Initialize git.
 * Create `.todo` dir.
 

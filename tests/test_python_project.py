@@ -1,7 +1,29 @@
+from pathlib import Path
 from re import search as re_search
 from subprocess import run
 
+import pytest
+
 from blueprint.python_project import PythonProject
+
+bp = breakpoint
+
+
+@pytest.fixture(scope="session")
+def poetry_cachedir():
+    """Return the hardcoded default Poetry cache path on macOS."""
+    return Path.home() / "Library" / "Caches" / "pypoetry" / "virtualenvs"
+
+
+@pytest.fixture
+def project(tmp_path):
+    """Prepare and cleanup logic."""
+    def make_project(*args, **kwargs):
+        """Create and cleanup a project."""
+        project = PythonProject(*args, **kwargs)
+        yield project
+        if project.env_path.exists():
+            project.env_path.unlink()
 
 
 def test_python_project():
@@ -77,11 +99,31 @@ def test_python_project_with_subs(tmp_path):
     WHEN: project.install() is called with that directory
     THEN: the file will be created in the correct place
     """
-    project = PythonProject("my-project", dest=tmp_path)
+    project = PythonProject("my-pytest-project", dest=tmp_path)
     project.create()
     project.install("${SNAKE_NAME}/__init__.py")
 
-    assert (project.path / "my_project" / "__init__.py").is_file()
+    assert (project.path / "my_pytest_project" / "__init__.py").is_file()
+
+
+@pytest.mark.skip(
+    "Poetry does not return the correct venv "
+    "if you're in a poetry shell for another project."
+)
+def test_python_project_venv_path(tmp_path, poetry_cachedir):
+    """
+    WHEN: project.venv_path is accessed
+    THEN: the path to the virtual env should be returned
+
+    NOTE: This one uses the real filesystem, so it's slow.
+    """
+    project = PythonProject("my-pytest-project", dest=tmp_path)
+    project.create()
+    project.setup_poetry_install()
+    project.venv_path
+
+    assert project.venv_path.name.startswith("my-pytest-project-")
+    assert str(project.venv_path).startswith(str(poetry_cachedir))
 
 
 def test_python_project_setup_poetry_use(tmp_path):
@@ -91,7 +133,7 @@ def test_python_project_setup_poetry_use(tmp_path):
 
     NOTE: This one uses the real filesystem, so it's slow.'
     """
-    project = PythonProject("my-project", dest=tmp_path)
+    project = PythonProject("my-pytest-project", dest=tmp_path)
     project.create()
     cmd_res = project.setup_poetry_use()
 
@@ -103,7 +145,18 @@ def test_python_project_setup_poetry_use(tmp_path):
     )
 
     assert cmd_res.returncode == 0
-    assert "Creating virtualenv" in cmd_res.stdout
+
+    # sometimes poetry uses a leftover venv when a new project is created
+    # so it may say "Using virtualenv" instead of "Creating virtual env"
+    # perhaps all venvs should be cleared out before tests run as part of setup
+    # or teardown
+    # or perhaps the project.create() should clear out the venv if it exists
+    # for now, this is the simplest solution
+    assert (
+        ("Creating virtualenv" in cmd_res.stdout) or
+        ("Using virtualenv" in cmd_res.stdout)
+    )
+
     assert re_search(
         rf'Virtualenv\nPython:\s+{project.DEFAULT_PYV}',
         verify.stdout
@@ -116,11 +169,13 @@ def test_python_project_poetry_init(tmp_path):
     WHEN: project.setup_poetry_init() is called
     THEN: the pyproject.toml should be good
     """
-    project = PythonProject("my_project", dest=tmp_path, pyv="3.10.2")
+    project = PythonProject("my_pytest_project", dest=tmp_path, pyv="3.10.2")
     project.create()
-    project.setup_poetry_init()
+    res = project.setup_poetry_init()
 
     toml_contents = project.pyproject.read_text()
 
-    assert 'name = "my-project"' in toml_contents
+    assert res.returncode == 0
+    assert project.pyproject.is_file()
+    assert 'name = "my-pytest-project"' in toml_contents
     assert 'python = ">=3.10.2"' in toml_contents

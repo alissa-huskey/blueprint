@@ -1,3 +1,9 @@
 # ${TITLE_NAME}
 
-${SUMMARY}
+> ${SUMMARY}
+
+Status
+------
+
+ * Planning
+ * Pre-Alpha

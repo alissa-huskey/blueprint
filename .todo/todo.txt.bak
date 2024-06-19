@@ -1,18 +1,28 @@
-(C) 2024-04-17 add type: python-cli
-2024-04-17 add command: list, for project types  @later
-(B) 2024-04-17 python: make pyv come from envvar & configurable
-2024-04-17 python: add --line-length option @maybe
-(B) 2024-04-17 general: add config file for defaults
-2024-04-17 basic: add --proj-version option
-(B) 2024-04-17 python: validate pyv
-(B) 2024-04-17 python: try/except around asdf where in case version is not installed
-(A) 2024-04-17 python: add step to verify that it worked
-2024-04-17 add command: change (ie, `change pyv`) @maybe
-2024-04-17 basic: expand README @maybe
-(B) 2024-04-17 basic: rename sources/bare -> sources/basic
-2024-04-17 basic: make a BasicProject subclass of Project @maybe
-(C) 2024-04-17 projects: move all project [sub/]classes into a projects dir
-(A) 2024-04-17 python: fix (in local install) fail to install dev deps due to wrong python version @bug
-2024-04-17 add feature: bash script template
-2024-04-17 commands: rename new->proj, then add file @maybe
-2024-04-17 add type: git-crypt
+(C) 2024-04-17 @feature @python add type: python-cli
+(Z) 2024-04-17 @feature @commands add command: list, for project types  @later
+(B) 2024-04-17 @feature @python make pyv (python version) come from envvar & configurable
+(M) 2024-04-17 @feature @python add --line-length (for flake8, etc) option
+(B) 2024-04-17 @feature @general add config file for defaults
+(D) 2024-04-17 @feature @cli @basic add: --proj-version option
+(B) 2024-04-17 @qa @python validate pyv
+(B) 2024-04-17 @qa @python try/except around `asdf where` in case version is not installed
+(A) 2024-04-17 @qa @python add step to verify that it worked
+(M) 2024-04-17 @feature @python @commands add change command (ie, `change pyv`)
+(M) 2024-04-17 @feature @basic expand README
+(B) 2024-04-17 @code-quality @basic rename sources/bare -> sources/basic
+(M) 2024-04-17 @code-quality @basic make a BasicProject subclass of Project @maybe
+(C) 2024-04-17 @code-quality move all project [sub/]classes into a projects dir
+(A) 2024-04-17 @bug @python fix (in local install) fail to install dev deps due to wrong python version
+(M) 2024-04-17 @feature @commands bash script template
+(M) 2024-04-17 @cli @commands rename new->proj
+(M) 2024-04-17 @feature @commands add command: file, ie `bp file bash`, `bp file pytest` to create new file
+(M) 2024-04-17 @feature @types add type: git-crypt
+(M) 2024-04-17 @feature @python add vscode settings
+(M) 2024-05-14 @feature @basic add license to as template var and to readme
+(M) 2024-05-14 @code-quality @sources add sources subdirs prefixed with "--" or soemthing for partial and meta files
+(M) 2024-06-01 @feature @basic add project name to .git/description file
+2024-06-16 @qa @python in tests set poetry virtualenvs.path to a test dir
+2024-06-16 @qa make sure requirements are installed (ie poetry)
+2024-06-18 @bug fix or remove semi-broken PythonProject.venv_path (see: https://github.com/python-poetry/poetry/issues/9493)
+2024-06-18 @quality Refactor Project.run to ShellCommand class; use shutil.which to find command
+2024-06-18 @feature add --github-username; use this in README

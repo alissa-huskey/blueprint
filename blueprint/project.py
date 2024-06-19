@@ -11,6 +11,8 @@ from blueprint import ROOT, AccessError, ProgramError
 from blueprint.attr import attr
 from blueprint.object import Object
 
+bp = breakpoint
+
 
 class Project(Object):
     """A new project."""
@@ -45,7 +47,7 @@ class Project(Object):
     @property
     def path(self):
         """Path to the project directory."""
-        return self.dest / self.name
+        return self.dest / self.dash_name
 
     def create(self):
         """Create the project."""
@@ -140,6 +142,11 @@ class Project(Object):
             params["cwd"] = cwd
 
         params.update(kwargs)
+
+        # if keyword arg shell=True is passed to run()
+        # the command must be a simple string
+        if params.get("shell"):
+            command = " ".join(command)
 
         res = run(command, **params)
 
