@@ -5,6 +5,9 @@ description = ""
 authors = ["Alissa Huskey <alissa.huskey@gmail.com>"]
 readme = "README.md"
 packages = [{include = "blueprint"}]
+include = [
+  { path = "sources", format = ["sdist", "wheel"] }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.10"

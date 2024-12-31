@@ -26,3 +26,4 @@
 2024-06-18 @bug fix or remove semi-broken PythonProject.venv_path (see: https://github.com/python-poetry/poetry/issues/9493)
 2024-06-18 @quality Refactor Project.run to ShellCommand class; use shutil.which to find command
 2024-06-18 @feature add --github-username; use this in README
+2024-06-18 @bare @feature add licence to README if present
