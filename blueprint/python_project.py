@@ -3,6 +3,7 @@
 from functools import cached_property
 from pathlib import Path
 from shutil import which
+from subprocess import CompletedProcess
 
 import toml
 
@@ -64,12 +65,12 @@ class PythonProject(Project):
 
     @classmethod
     @cached_property
-    def poetry_exe(cls):
+    def poetry_exe(cls) -> str:
         """Return the path to the poetry executable."""
         return which("poetry")
 
     @cached_property
-    def python_exe(self):
+    def python_exe(self) -> str:
         """Return the location to the correct python executable."""
         if not self.pyv:
             return
@@ -84,11 +85,34 @@ class PythonProject(Project):
         return f"{pyroot}/bin/python"
 
     @property
-    def pyproject(self):
+    def pyproject(self) -> Path:
         """Path to the pyproject.toml file."""
         return self.path / "pyproject.toml"
 
-    # methods
+    # general methods
+    # ---------------------------------------------------------------------------------
+
+    def poetry(self, cmd: list, cwd: Path = None, **kwargs) -> CompletedProcess:
+        """Execute a poetry command.
+
+        cmd (list): poetry command arguments
+        cwd (path, default=self.path): directory in which to execute command
+        kwargs: kwargs to send to subcommand run
+        """
+        cwd = cwd or self.path
+
+        if cwd:
+            kwargs["cwd"] = cwd
+
+        command = [
+            "poetry",
+            "--directory",
+            str(cwd),
+            *cmd
+        ]
+        return self.run(command, **kwargs)
+
+    # setup methods
     # ---------------------------------------------------------------------------------
 
     def create(self):
@@ -96,14 +120,11 @@ class PythonProject(Project):
         if self.path.exists():
             raise AccessError(f"Directory already exists: {self.path}")
         command = [
-            "poetry",
-            "--directory",
-            str(self.dest),
             "new",
             f"--name={self.dash_name}",
-            str(self.path)
+            str(self.path),
         ]
-        return self.run(command, cwd=self.dest)
+        return self.poetry(command, cwd=self.dest)
 
     def setup_dot_python_version(self):
         """Install the python version to .python-version file."""
@@ -119,32 +140,25 @@ class PythonProject(Project):
             return
 
         command = [
-            "poetry",
-            "--directory",
-            str(self.path),
             "env",
             "use",
             self.python_exe,
         ]
-        return self.run(command)
+        return self.poetry(command)
 
     def setup_poetry_install(self):
         """Install project and dependencies in venv."""
-        command = ["poetry", "--directory", str(self.path), "install"]
-        return self.run(command)
+        return self.poetry(["install"])
 
     def setup_dev_dependencies(self):
         """Install poetry dev dependencies."""
         command = [
-            "poetry",
-            "--directory",
-            str(self.path),
             "add",
             "--group",
             "dev",
             *self.DEV_DEPENDENCIES,
         ]
-        return self.run(command)
+        return self.poetry(command)
 
     def install_all(self):
         """Install all dotfiles from sources into the new project directory."""
@@ -159,9 +173,6 @@ class PythonProject(Project):
     def setup_poetry_init(self):
         """Generate initial pyproject.toml file."""
         command = [
-            "poetry",
-            "--directory",
-            str(self.path),
             "init",
             f"--name={self.dash_name}",
             f"--python={self.pyv_constraint}",
@@ -177,7 +188,7 @@ class PythonProject(Project):
         if self.pyproject.is_file():
             self.pyproject.unlink()
 
-        return self.run(command)
+        return self.poetry(command)
 
     def setup_pyproject(self):
         """Add more config info to pyproject.toml."""
