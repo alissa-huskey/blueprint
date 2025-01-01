@@ -1,7 +1,8 @@
 import toml
 from typer.testing import CliRunner
 
-from blueprint.cli import new
+from blueprint.cli import add, new
+from blueprint.python_project import PythonProject
 
 bp = breakpoint
 runner = CliRunner()
@@ -145,3 +146,29 @@ def test_new_python(tmp_path):
         assert d in specs["group"]["dev"]["dependencies"]
 
     assert (path / ".python-version").read_text().strip() == "3.10.2"
+
+
+def test_add_python_deps(tmp_path):
+    """
+    WHEN: `bp add python deps DEST`
+    THEN: the default dependencies should be added
+    """
+    project = PythonProject("myproject", dest=tmp_path)
+    project.create()
+    project.setup_poetry_init()
+    #  project.poetry(["add", "--group", "dev", "six"])
+
+    result = runner.invoke(add, [
+        "python",
+        "deps",
+        str(project.path)
+    ])
+
+    assert result.exit_code == 0
+
+    result = project.poetry([
+        "show",
+        PythonProject.DEV_DEPENDENCIES[0],
+    ])
+
+    assert result.returncode == 0

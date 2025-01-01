@@ -16,7 +16,6 @@ from blueprint.python_project import PythonProject
 console = Console()
 errors = Console(stderr=True)
 cli = Typer()
-new = Typer()
 Opts = Object()
 Global = namedtuple("Global", ["name", "param", "default"], defaults=[None])
 
@@ -50,6 +49,8 @@ def dest_exists(path: Path):
 
 # subcommand: new
 # =====================================================================================
+
+new = Typer()
 
 Opts.name = Global(
     "name",
@@ -138,6 +139,29 @@ def python(
 
 
 cli.add_typer(new, name="new")
+
+
+# subcommand: add
+# =====================================================================================
+
+add = Typer()
+python_cmd = Typer()
+add.add_typer(python_cmd, name="python")
+
+
+@python_cmd.command()
+def deps(dest: Path):
+    """Add the default dependencies to your current project."""
+    name = dest.stem
+    project = PythonProject(name, dest=dest)
+    for dep in PythonProject.DEV_DEPENDENCIES:
+        project.add(dep)
+
+
+cli.add_typer(add, name="add")
+
+
+# =====================================================================================
 
 
 @cli.callback()
