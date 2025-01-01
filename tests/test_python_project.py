@@ -205,3 +205,17 @@ def test_python_project_poetry_init(tmp_path):
     assert poetry["description"] == "My pytest project."
     assert poetry["license"] == "MIT"
     assert poetry["dependencies"]["python"] == ">=3.10.2"
+
+
+def test_add(tmp_path):
+    """
+    GIVEN: A poetry project
+    WHEN: you call .add(dependency)
+    THEN: the dependency should be added as a dev dependency
+    """
+    project = PythonProject("myproject", dest=tmp_path)
+    project.create()
+    project.setup_poetry_init()
+
+    res = project.add("six")
+    assert res.returncode == 0

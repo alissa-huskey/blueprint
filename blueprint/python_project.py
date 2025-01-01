@@ -112,6 +112,14 @@ class PythonProject(Project):
         ]
         return self.run(command, **kwargs)
 
+    def add(self, dependency):
+        """Add a poetry dev dependency."""
+        return self.poetry([
+            "add",
+            "--group", "dev",
+            dependency,
+        ])
+
     # setup methods
     # ---------------------------------------------------------------------------------
 
