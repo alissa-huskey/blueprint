@@ -30,3 +30,4 @@
 2024-06-18 @feature @python add bp generate(?) [test|class]
 2024-12-31 @feature @basic commit initial version to git (?)
 2024-12-31 @feature @python run `poetry install`
+2024-12-31 @feature @python in ~/.config/blueprint make a pyproject.toml file that sets the actual default settings for pyproject.toml (ie, pytest.ini_options, black, etc)

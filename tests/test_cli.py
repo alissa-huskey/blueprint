@@ -139,8 +139,6 @@ def test_new_python(tmp_path):
     assert specs["name"] == "my-project"
     assert specs["description"] == "My new project."
     assert specs["license"] == "MIT"
-    assert specs["name"] == "my-project"
-
     assert specs["dependencies"]["python"] == ">=3.10.2"
 
     for d in deps:

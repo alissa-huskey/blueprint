@@ -3,6 +3,8 @@
 from pathlib import Path
 from shutil import which
 
+import toml
+
 from blueprint import ROOT, AccessError
 from blueprint.project import Project
 
@@ -182,19 +184,26 @@ class PythonProject(Project):
 
     def setup_pyproject(self):
         """Add more config info to pyproject.toml."""
-        contents = self.pyproject.read_text()
+        with open(self.pyproject) as f:
+            specs = toml.load(f)
 
-        contents = contents.replace(
-            f'version = "{self.POETRY_PROJECT_VERSION}"',
-            f'version = "{self.PROJECT_VERSION}"'
-        )
+        # add/modify toml contents
+        specs["tool"]["poetry"]["version"] = self.PROJECT_VERSION
+        specs["tool"]["pytest"] = {}
+        specs["tool"]["black"] = {}
+        specs["tool"]["pytest"]["ini_options"] = {
+            "testpaths": ["tests"],
+            "addopts": "-vvx",
+        }
+        specs["tool"]["black"]["line-length"] = "88"
 
-        addons_file = self.SOURCES / "_pyproject.toml"
-        addon_contents = addons_file.read_text()
+        # put the sections in the correct order
+        order = [{"tool": {x: specs["tool"][x]}} for x in ("poetry", "pytest", "black")]
+        order.append({"build-system": specs["build-system"]})
 
-        contents = contents.replace(
-            "\n[build-system]\n",
-            addon_contents,
-        )
+        # convert sections to toml then join them together
+        sections = [toml.dumps(x) for x in order]
+        text = "\n".join(sections)
 
-        self.pyproject.write_text(contents)
+        # save the pyproject.toml file
+        self.pyproject.write_text(text)

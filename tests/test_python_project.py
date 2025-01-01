@@ -3,6 +3,7 @@ from re import search as re_search
 from subprocess import run
 
 import pytest
+import toml
 
 from blueprint.python_project import PythonProject
 
@@ -44,20 +45,35 @@ def test_python_project_create(tmp_path):
     assert (project.path / "pyproject.toml").is_file()
 
 
-def test_python_project_toml(tmp_path):
+def test_python_pyproject_toml(tmp_path):
     """
     WHEN: project.create is called
     THEN: A new project directory is created
     AND: The pyproject.toml file exists
     """
-    project = PythonProject("myproject", dest=tmp_path)
+    project = PythonProject(
+        "my_pytest_project",
+        dest=tmp_path,
+        pyv="3.10.2",
+        summary="My pytest project.",
+        license="MIT",
+    )
     project.create()
+    project.setup_poetry_init()
     project.setup_pyproject()
 
-    toml_contents = project.pyproject.read_text()
+    with open(project.path/"pyproject.toml") as f:
+        specs = toml.load(f)
+        poetry = specs["tool"]["poetry"]
 
-    assert '0.0.1' in toml_contents
-    assert 'tool.pytest.ini_options' in toml_contents
+    assert project.pyproject.is_file()
+    assert poetry["name"] == "my-pytest-project"
+    assert poetry["description"] == "My pytest project."
+    assert poetry["license"] == "MIT"
+    assert poetry["dependencies"]["python"] == ">=3.10.2"
+    assert specs["tool"]["pytest"]["ini_options"]["testpaths"] == ["tests"]
+    assert specs["tool"]["pytest"]["ini_options"]["addopts"] == "-vvx"
+    assert specs["tool"]["black"]["line-length"] == "88"
 
 
 def test_python_project_install_all(tmp_path):
@@ -169,13 +185,23 @@ def test_python_project_poetry_init(tmp_path):
     WHEN: project.setup_poetry_init() is called
     THEN: the pyproject.toml should be good
     """
-    project = PythonProject("my_pytest_project", dest=tmp_path, pyv="3.10.2")
+    project = PythonProject(
+        "my_pytest_project",
+        dest=tmp_path,
+        pyv="3.10.2",
+        summary="My pytest project.",
+        license="MIT",
+    )
     project.create()
     res = project.setup_poetry_init()
 
-    toml_contents = project.pyproject.read_text()
+    with open(project.path/"pyproject.toml") as f:
+        specs = toml.load(f)
+        poetry = specs["tool"]["poetry"]
 
     assert res.returncode == 0
     assert project.pyproject.is_file()
-    assert 'name = "my-pytest-project"' in toml_contents
-    assert 'python = ">=3.10.2"' in toml_contents
+    assert poetry["name"] == "my-pytest-project"
+    assert poetry["description"] == "My pytest project."
+    assert poetry["license"] == "MIT"
+    assert poetry["dependencies"]["python"] == ">=3.10.2"

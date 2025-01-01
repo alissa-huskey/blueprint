@@ -1,8 +1,0 @@
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "-vvx"
-
-[tool.black]
-line-length = "88"
-
-[build-system]

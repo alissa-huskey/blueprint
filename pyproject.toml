@@ -18,6 +18,7 @@ typer = {extras = ["all"], version = "^0.12.3"}
 rich = "^13.7.1"
 more-itertools = "^10.2.0"
 GitPython = "^3.1.43"
+toml = "^0.10.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
@@ -31,7 +32,6 @@ flake8-black = "^0.3.6"
 flake8-isort = "^6.1.1"
 flake8-docstrings = "^1.7.0"
 pylama = "^8.4.1"
-toml = "^0.10.2"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
