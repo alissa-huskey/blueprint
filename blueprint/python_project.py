@@ -1,5 +1,6 @@
 """Module for a new python project."""
 
+from functools import cached_property
 from pathlib import Path
 from shutil import which
 
@@ -44,11 +45,51 @@ class PythonProject(Project):
         self.pyv_constraint = pyv_constraint or self.DEFAULT_PYV_CONSTRAINT
         super().__init__(name, dest, **kwargs)
 
-    @classmethod
+    # properties
+    # ---------------------------------------------------------------------------------
+
     @property
+    def venv_path(self) -> Path:
+        """Return the path to this projects virtual environment."""
+        command = [
+            "poetry",
+            "--directory",
+            str(self.path),
+            "env",
+            "info",
+            "--path"
+        ]
+        res = self.run(command)
+        return Path(res.stdout.strip())
+
+    @classmethod
+    @cached_property
     def poetry_exe(cls):
         """Return the path to the poetry executable."""
         return which("poetry")
+
+    @cached_property
+    def python_exe(self):
+        """Return the location to the correct python executable."""
+        if not self.pyv:
+            return
+        command = [
+            "asdf",
+            "where",
+            "python",
+            self.pyv,
+        ]
+        res = self.run(command)
+        pyroot = res.stdout.strip()
+        return f"{pyroot}/bin/python"
+
+    @property
+    def pyproject(self):
+        """Path to the pyproject.toml file."""
+        return self.path / "pyproject.toml"
+
+    # methods
+    # ---------------------------------------------------------------------------------
 
     def create(self):
         """Create the project using poetry."""
@@ -72,24 +113,9 @@ class PythonProject(Project):
         dotfile = self.path / ".python-version"
         dotfile.write_text(f"{self.pyv}\n")
 
-    @property
-    def python_where(self):
-        """Return the location to the correct python executable."""
-        if not self.pyv:
-            return
-        command = [
-            "asdf",
-            "where",
-            "python",
-            self.pyv,
-        ]
-        res = self.run(command)
-        pyroot = res.stdout.strip()
-        return f"{pyroot}/bin/python"
-
     def setup_poetry_use(self):
         """Tell poetry which python executable to use."""
-        if not self.python_where:
+        if not self.python_exe:
             return
 
         command = [
@@ -98,7 +124,7 @@ class PythonProject(Project):
             str(self.path),
             "env",
             "use",
-            self.python_where,
+            self.python_exe,
         ]
         return self.run(command)
 
@@ -119,25 +145,6 @@ class PythonProject(Project):
             *self.DEV_DEPENDENCIES,
         ]
         return self.run(command)
-
-    @property
-    def pyproject(self):
-        """Path to the pyproject.toml file."""
-        return self.path / "pyproject.toml"
-
-    @property
-    def venv_path(self) -> Path:
-        """Return the path to this projects virtual environment."""
-        command = [
-            "poetry",
-            "--directory",
-            str(self.path),
-            "env",
-            "info",
-            "--path"
-        ]
-        res = self.run(command)
-        return Path(res.stdout.strip())
 
     def install_all(self):
         """Install all dotfiles from sources into the new project directory."""
@@ -172,16 +179,6 @@ class PythonProject(Project):
 
         return self.run(command)
 
-    def setup(self):
-        """Set up Python project."""
-        super().setup()
-        self.setup_dot_python_version()
-        self.setup_poetry_init()
-        self.setup_pyproject()
-        self.setup_dev_dependencies()
-        self.setup_poetry_use()
-        self.setup_poetry_install()
-
     def setup_pyproject(self):
         """Add more config info to pyproject.toml."""
         with open(self.pyproject) as f:
@@ -207,3 +204,13 @@ class PythonProject(Project):
 
         # save the pyproject.toml file
         self.pyproject.write_text(text)
+
+    def setup(self):
+        """Set up Python project."""
+        super().setup()
+        self.setup_dot_python_version()
+        self.setup_poetry_init()
+        self.setup_pyproject()
+        self.setup_dev_dependencies()
+        self.setup_poetry_use()
+        self.setup_poetry_install()
