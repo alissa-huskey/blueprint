@@ -27,3 +27,5 @@
 2024-06-18 @quality Refactor Project.run to ShellCommand class; use shutil.which to find command
 2024-06-18 @feature add --github-username; use this in README
 2024-06-18 @bare @feature add licence to README if present
+2024-06-18 @feature @python add bp generate(?) [test|class]
+2024-12-31 @feature @basic commit initial version to git (?)
