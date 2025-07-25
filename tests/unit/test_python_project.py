@@ -151,6 +151,9 @@ def test_python_project_setup_poetry_use(tmp_path):
     """
     project = PythonProject("my-pytest-project", dest=tmp_path)
     project.create()
+    project.setup_dot_python_version()
+    project.setup_poetry_init()
+    project.setup_pyproject()
     cmd_res = project.setup_poetry_use()
 
     verify = run(

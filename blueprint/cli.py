@@ -155,7 +155,7 @@ def deps(dest: Path):
     name = dest.stem
     project = PythonProject(name, dest=dest)
     for dep in PythonProject.DEV_DEPENDENCIES:
-        project.add(dep)
+        project.add(f"{dep}==*")
 
 
 cli.add_typer(add, name="add")
@@ -176,11 +176,10 @@ def run():
     except UserError as e:
         error(e.message)
         exit(e.status)
-    except UserError as e:
-        error(e.message)
-        exit(e.status)
-    except SystemExit:
-        ...
+    # NOTE: This prevents typer from exiting with
+    #       non-zero code on argument errors
+    #  except SystemExit:
+    #      ...
 
 
 if __name__ == "__main__":

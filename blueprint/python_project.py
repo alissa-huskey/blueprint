@@ -164,7 +164,7 @@ class PythonProject(Project):
             "add",
             "--group",
             "dev",
-            *self.DEV_DEPENDENCIES,
+            *[f"{d}==*" for d in self.DEV_DEPENDENCIES],
         ]
         return self.poetry(command)
 
@@ -205,6 +205,7 @@ class PythonProject(Project):
 
         # add/modify toml contents
         specs["tool"]["poetry"]["version"] = self.PROJECT_VERSION
+        specs["tool"]["poetry"]["dependencies"]["python"] = self.pyv_constraint
         specs["tool"]["pytest"] = {}
         specs["tool"]["black"] = {}
         specs["tool"]["pytest"]["ini_options"] = {
