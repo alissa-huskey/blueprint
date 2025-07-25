@@ -110,6 +110,7 @@ class PythonProject(Project):
             str(cwd),
             *cmd
         ]
+
         return self.run(command, **kwargs)
 
     def add(self, dependency):

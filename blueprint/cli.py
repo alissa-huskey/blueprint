@@ -13,6 +13,8 @@ from blueprint.app import App
 from blueprint.object import Object
 from blueprint.python_project import PythonProject
 
+bp = breakpoint
+
 console = Console()
 errors = Console(stderr=True)
 cli = Typer()
@@ -152,8 +154,7 @@ add.add_typer(python_cmd, name="python")
 @python_cmd.command()
 def deps(dest: Path):
     """Add the default dependencies to your current project."""
-    name = dest.stem
-    project = PythonProject(name, dest=dest)
+    project = PythonProject(dest.stem, dest=dest.parent)
     for dep in PythonProject.DEV_DEPENDENCIES:
         project.add(f"{dep}==*")
 
