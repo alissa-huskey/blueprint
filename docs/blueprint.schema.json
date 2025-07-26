@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Project Type",
+  "description": "Blueprint Project Type definition.",
+  "version": "0.1.0",
+  "type": "object",
+  "$defs": {
+    "constraint-nonEmptyString": {
+      "$anchor": "nonEmptyString",
+      "type": "string",
+      "minLength": 1
+    },
+    "executable-outfile": {
+      "$anchor": "Outfile",
+      "description": "Output filename.",
+      "$ref": "#nonEmptyString"
+    },
+    "executable-options": {
+        "$anchor": "Options",
+        "description": "Optional arguments to add to command or script only if variable in property name is defined",
+        "examples": [ { "{SUMMARY}": ["--description", "{SUMMARY}"] } ],
+        "type": "object",
+        "minProperties": 1,
+        "propertyNames": { "pattern": "^\\{[A-Z_]+\\}$" },
+        "additionalProperties": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        }
+    },
+    "executable-command": {
+      "description": "Shell command.",
+      "$anchor": "Command",
+      "type": "object",
+      "required": ["cmd"],
+      "properties": {
+        "cmd": {
+          "description": "Command to execute.",
+          "examples": [ ["git", "init"] ],
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "options": { "$ref": "#Options" },
+        "outfile": { "$ref": "#Outfile" }
+      }
+    },
+    "executable-script": {
+      "description": "Script to run.",
+      "examples": [[
+        { "script": "setup-pyproject", "arguments": ["{VERSION}", "{PYV_CONSTRAINT}"] }
+      ]],
+      "$anchor": "Script",
+      "type": "object",
+      "required": ["script"],
+      "properties": {
+        "script": {
+          "description": "Script to execute located in `scripts/` directory",
+          "examples": ["bootstrap.sh"],
+          "$ref": "#nonEmptyString"
+        },
+        "arguments": {
+          "description": "Arguments to send to script",
+          "examples": [
+            ["{PATH}", "{VERSION}"],
+            ["{CONFIG_ROOT}"]
+          ],
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "options": { "$ref": "#Options" },
+        "outfile": { "$ref": "#Outfile" }
+      }
+    },
+    "executable": {
+      "description": "Something to execute on the command line.",
+      "$anchor": "Executable",
+      "oneOf": [
+        { "$ref": "#Command" },
+        { "$ref": "#Script" }
+      ]
+    }
+  },
+  "required": ["name", "description", "version", "type"],
+  "properties": {
+    "name": {
+      "description": "The unique identifier for this Project Type.",
+      "examples": ["python-poetry", "phpbb-ext"],
+      "$ref": "#nonEmptyString"
+    },
+    "title": {
+      "description": "Human readable title.",
+      "examples": [
+        "Python Poetry Project",
+        "phpBB Extension"
+      ],
+      "$comment": "Annotation",
+      "$ref": "#nonEmptyString"
+    },
+    "description": {
+      "description": "Brief description.",
+      "examples": [
+        "Python project managed by Poetry",
+        "phpBB Extension"
+      ],
+      "$comment": "Annotation",
+      "$ref": "#nonEmptyString"
+    },
+    "version": {
+      "description": "Semantic version number.",
+      "examples": ["0.1.0"],
+      "$ref": "#nonEmptyString"
+    },
+    "type": {
+      "description": "Type",
+      "examples": ["language-toolstack"],
+      "$ref": "#nonEmptyString",
+      "enum": [
+        "language-toolstack",
+        "framework-application",
+        "extension",
+        "template",
+        "tooling",
+        "generic"
+      ]
+    },
+    "parent": {
+      "description": "Product Type to inherit from.",
+      "examples": ["basic"],
+      "$ref": "#nonEmptyString"
+    },
+    "requirements": {
+      "description": "Requirements that must be installed on system to work.",
+      "examples": [
+        ["php", "composer"],
+        ["python", "poetry", "asdf"]
+      ],
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#nonEmptyString" }
+    },
+    "stack": {
+      "description": "Toolstack specifications. (For type: language-toolstack)",
+      "$comment": "Annotations",
+      "type": "object",
+      "additionalProperties": { "$ref": "#nonEmptyString" },
+      "required": ["language"],
+      "properties": {
+        "language": {
+          "description": "Primary language this project is written in.",
+          "examples": ["python"],
+          "$ref": "#nonEmptyString"
+        },
+        "dependencies": {
+          "description": "Dependency management tool.",
+          "examples": ["poetry"],
+          "$ref": "#nonEmptyString"
+        },
+        "tests": {
+          "description": "Testing framework.",
+          "examples": ["pytest"],
+          "$ref": "#nonEmptyString"
+        },
+        "linter": {
+          "description": "Linter.",
+          "examples": ["flake8"],
+          "$ref": "#nonEmptyString"
+        },
+        "formatter": {
+          "description": "Formatter",
+          "examples": ["black"],
+          "$ref": "#nonEmptyString"
+        }
+      }
+    },
+    "config": {
+      "description": "Configuration files users can define.",
+      "type": "object",
+      "additonalProperties": {
+        "type": "object",
+        "required": ["file", "format"],
+        "properties": {
+          "description": {
+            "description": "Config file description.",
+            "examples": ["Dependencies to install by default."],
+            "$ref": "#nonEmptyString"
+          },
+          "file": {
+            "description": "Filename.",
+            "examples": ["dependencies.yml"],
+            "$ref": "#nonEmptyString"
+          },
+          "format": {
+            "description": "File format.",
+            "examples": ["yml"],
+            "$ref": "#nonEmptyString"
+          }
+        }
+      }
+    },
+    "variables": {
+      "description": "Variables to define.",
+      "examples": [
+        { "PYTHON_EXE": { "cmd": ["asdf", "where", "python", "{PYV}"] } }
+      ],
+      "type": "object",
+      "additionalProperties": { "$ref": "#Executable" }
+    },
+    "options": {
+      "description": "Additional command-line options a project can define.",
+      "$comment": "Click Options params.",
+      "examples": [
+        [ { "pyv": { "default": "3.10.2", "help": "Python version" } } ]
+      ],
+      "type": "object",
+      "properties": {
+        "choices": {
+          "description": "Allowed values.",
+          "examples": [ [ "yes", "no" ]],
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#nonEmptyString" }
+        }
+      }
+    },
+    "setup": {
+      "description": "Steps to set up this project.",
+      "examples": [[
+        { "cmd": ["git", "init"] },
+        { "script": "bootstrap.sh" },
+        {
+          "cmd": ["echo", "{PYV}"],
+          "out": ".python-version"
+        }
+      ]],
+      "type": "array",
+      "items": { "$ref": "#Executable" }
+    },
+    "after": {
+      "description": "Steps to take after skeleton has been installed.",
+      "examples": [
+        {
+          "cmd": [
+            "cp",
+            "{TYPE_ROOT}/after/CodeSniffer.conf",
+            "vendor/squizlabs/php_codesniffer/"
+          ]
+        }
+      ],
+      "type": "array",
+      "items": { "$ref": "#Executable" }
+    }
+  }
+}

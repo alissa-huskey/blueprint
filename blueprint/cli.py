@@ -1,30 +1,29 @@
 """Command Line Interface."""
 
-from collections import namedtuple
-from pathlib import Path
-from sys import exit as sys_exit
-from typing import Annotated
+from json import JSONDecodeError
 
+import click
+import rich_click as click  # noqa
 from rich.console import Console
-from typer import Argument, BadParameter, Context, Option, Typer, confirm
+from rich.table import Table
+from rich_click.rich_command import RichCommand
 
 from blueprint import BlueprintError, UserError
-from blueprint.app import App
-from blueprint.object import Object
-from blueprint.python_project import PythonProject
+#  from blueprint import UserError
+#  from blueprint.app import App
+#  from blueprint.object import Object
+from blueprint.project_type import ProjectType
+
+click.rich_click.USE_RICH_MARKUP = True
+click.rich_click.SHOW_ARGUMENTS = True
+click.rich_click.STYLE_OPTION = "bold cyan"
+click.rich_click.STYLE_USAGE = "bold green"
+click.rich_click.SHOW_METAVARS_COLUMN = True
 
 bp = breakpoint
 
 console = Console()
 errors = Console(stderr=True)
-cli = Typer()
-Opts = Object()
-Global = namedtuple("Global", ["name", "param", "default"], defaults=[None])
-
-
-def exit(status: int = 0):
-    """Exit with status code."""
-    raise sys_exit(int(status))
 
 
 def error(ex: Exception):
@@ -35,145 +34,67 @@ def error(ex: Exception):
     errors.print(f"[red]Error[/red] {ex}")
 
 
-def verify(app: App):
-    """Ask the user to confirm that they want to proceed."""
-    prompt = f"Create {app.project.type} project at '{app.project.path}'?"
-    if not confirm(prompt):
-        exit()
+@click.group()
+def blueprint():
+    """Project blueprints."""
 
 
-def dest_exists(path: Path):
-    """Confirm the destination directory exists."""
-    if not path.is_dir():
-        raise BadParameter(f"No such directory: {path}")
-    return path
+@blueprint.command()
+def types():
+    """List project types."""
+    table = Table("", "Name", "Title", "Description")
+
+    for t in ProjectType.types:
+        cells = [t.id]
+        try:
+            t.specs
+        except JSONDecodeError:
+            ...
+        else:
+            cells.append(t.specs.get("title", ""))
+            cells.append(t.specs.get("description", ""))
+
+        if not t.ok:
+            cells = [f"[dim]{text}" for text in cells]
+
+        table.add_row(("[red]E", "")[t.ok], *cells)
+
+    console.print(table)
 
 
-# subcommand: new
-# =====================================================================================
-
-new = Typer()
-
-Opts.name = Global(
-    "name",
-    Annotated[str, Argument(
-        help="Name of project to create.",
-        show_default=False,
-    )],
-)
-
-Opts.dest = Global(
-    "dest",
-    Annotated[Path, Option(
-        "--dest", "-d",
-        show_default=".",
-        help="Where to create the project.",
-        rich_help_panel="Project",
-        callback=dest_exists
-    )],
-    Path.cwd()
-)
-
-Opts.summary = Global(
-    "summary",
-    Annotated[str, Option(
-        "--summary", "-s",
-        show_default=False,
-        help="One line project description.",
-        rich_help_panel="Project",
-    )],
-)
-
-Opts.license = Global(
-    "license",
-    Annotated[str, Option(
-        "--license", "-l",
-        help="License of the package.",
-        rich_help_panel="Project",
-    )],
-    "MIT",
-)
+@blueprint.group()
+def new():
+    """Create a new project."""
 
 
-@new.command()
-def basic(
-    ctx: Context,
-    name: Opts.name.param,
-    dest: Opts.dest.param = Opts.dest.default,
-    summary: Opts.summary.param = Opts.summary.default,
-    license: Opts.license.param = Opts.license.default,
-):
-    """Create a basic new project."""
-    app = App(name, dest, summary=summary, license=license)
-    verify(app)
-    app.project.make()
+# Generate commands from project types
+for t in ProjectType.types:
+    if not t.ok:
+        continue
 
+    def _():
+        print("hello")
 
-@new.command()
-def python(
-    name: Opts.name.param,
-    dest: Opts.dest.param = Opts.dest.default,
-    summary: Opts.summary.param = Opts.summary.default,
-    license: Opts.license.param = Opts.license.default,
-    pyv: Annotated[str, Option(
-        "--pyv", "-P",
-        help="Python version to use.",
-        rich_help_panel="Project",
-    )] = PythonProject.DEFAULT_PYV,
-    pyv_constraint: Annotated[str, Option(
-        "--pyv-constraint", "-C",
-        help="Supported Python versions.",
-        rich_help_panel="Project",
-    )] = PythonProject.DEFAULT_PYV_CONSTRAINT,
-):
-    """Create Python project."""
-    app = App(
-        name,
-        dest,
-        summary=summary,
-        license=license,
-        pyv=pyv,
-        pyv_constraint=pyv_constraint,
-        python=True
+    params = []
+    for name, spec in t.specs.get("options", {}).items():
+        if (choices := spec.pop("choices", None)):
+            spec["type"] = click.Choice(choices)
+        option = click.Option([f"--{name}"], **spec)
+        params.append(option)
+
+    cmd = RichCommand(
+        name=t.id,
+        callback=_,
+        help=t.specs["description"],
+        params=params,
     )
-    verify(app)
-    app.project.make()
-
-
-cli.add_typer(new, name="new")
-
-
-# subcommand: add
-# =====================================================================================
-
-add = Typer()
-python_cmd = Typer()
-add.add_typer(python_cmd, name="python")
-
-
-@python_cmd.command()
-def deps(dest: Path):
-    """Add the default dependencies to your current project."""
-    project = PythonProject(dest.stem, dest=dest.parent)
-    for dep in PythonProject.DEV_DEPENDENCIES:
-        project.add(f"{dep}==*")
-
-
-cli.add_typer(add, name="add")
-
-
-# =====================================================================================
-
-
-@cli.callback()
-def default():
-    """Create a new project from a blueprint."""
+    new.add_command(cmd)
 
 
 def run():
     """Start the command line interface."""
     try:
-        cli()
+        blueprint()
     except UserError as e:
         error(e.message)
         exit(e.status)

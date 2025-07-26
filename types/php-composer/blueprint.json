@@ -1,0 +1,53 @@
+{
+  "name": "php-composer",
+  "description": "PHP project managed by Composer.",
+  "version": "0.1.0",
+  "type": "language-toolstack",
+  "parent": "basic",
+  "stack": {
+    "language": "php",
+    "dependencies": "composer",
+    "tests": "phpunit",
+    "linter": "phpcs"
+  },
+  "requirements": [ "php", "composer" ],
+  "options": {
+    "vendor": { 
+      "required": true,
+      "help": "Vendor.",
+      "metavar": "VENDOR"
+    },
+    "phpv": {
+      "default": "8.4",
+      "help": "PHP Version",
+      "metavar": "VERSION"
+    },
+    "php-constraint": {
+      "default": ">=5",
+      "help": "PHP Version Constraint",
+      "metavar": "CONSTRAINT"
+    },
+    "project-type": { 
+      "default": "project",
+      "help": "Composer project type",
+      "choices": [
+        "library",
+        "project",
+        "metapackage",
+        "composer-plugin"
+      ]
+    }
+  },
+  "setup": [
+    { "cmd": ["composer", "install"] }
+  ],
+  "after": [
+    {
+      "cmd": [
+        "cp",
+        "{TYPE_ROOT}/after/CodeSniffer.conf",
+        "vendor/squizlabs/php_codesniffer/"
+      ]
+    }
+  ]
+}

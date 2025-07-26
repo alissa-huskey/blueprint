@@ -1,0 +1,7 @@
+{
+  "name": "bats",
+  "title": "Bats",
+  "description": "Bats testing framework.",
+  "version": "0.1.0",
+  "type": "tooling"
+}

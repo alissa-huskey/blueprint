@@ -1,0 +1,9 @@
+{
+  "name": "Basic",
+  "description": "Generic project.",
+  "version": "0.1.0",
+  "type": "generic",
+  "setup": [
+    { "cmd": ["git", "init"]}
+  ]
+}

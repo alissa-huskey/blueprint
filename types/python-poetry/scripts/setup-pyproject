@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+
+"""Modify the pyproject.toml file."""
+
+from pathlib import Path
+from sys import argv
+
+import toml
+
+
+def main(project_path, project_version, pyv_constraint):
+    """Do the thing."""
+    pyproject = Path(project_path, "pyproject.toml")
+
+    with open(pyproject) as f:
+        specs = toml.load(f)
+
+    # add/modify toml contents
+    specs["tool"]["poetry"]["version"] = project_version
+    specs["tool"]["poetry"]["dependencies"]["python"] = pyv_constraint
+    specs["tool"]["pytest"] = {}
+    specs["tool"]["black"] = {}
+    specs["tool"]["pytest"]["ini_options"] = {
+        "testpaths": ["tests"],
+        "addopts": "-vvx",
+    }
+    specs["tool"]["black"]["line-length"] = "88"
+
+    # put the sections in the correct order
+    order = [
+        {"tool": {x: specs["tool"][x]}} for x in ("poetry", "pytest", "black")
+    ]
+
+    order.append({"build-system": specs["build-system"]})
+
+    # convert sections to toml then join them together
+    sections = [toml.dumps(x) for x in order]
+    text = "\n".join(sections)
+
+    # save the pyproject.toml file
+    pyproject.write_text(text)
+
+
+if __name__ == "__main__":
+    main(argv[1:])

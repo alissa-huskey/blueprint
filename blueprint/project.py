@@ -1,15 +1,14 @@
-"""Module for a new project."""
+"""Module for a Project."""
 
 from pathlib import Path
 from re import compile as re_compile
 from string import Template
 from subprocess import run
 
-from git import Repo
-
 from blueprint import ROOT, AccessError, ProgramError
 from blueprint.attr import attr
 from blueprint.object import Object
+from blueprint.project_type import ProjectType
 
 bp = breakpoint
 
@@ -18,13 +17,17 @@ class Project(Object):
     """A new project."""
 
     pascal_replacer = re_compile(r'[-]([a-z])')
-    SOURCES = ROOT / "sources" / "bare"
     PROJECT_VERSION = "0.0.1"
 
-    type: str = "basic"
-
-    def __init__(self, name=None, dest=None, summary="", license="", **kwargs):
+    def __init__(self,
+                 kind=None,
+                 name=None,
+                 dest=None,
+                 summary="",
+                 license="",
+                 **kwargs):
         """Create a new project object."""
+        self.type = kind
         self.name = name
         self.dest = dest
         self.summary = summary
@@ -32,8 +35,18 @@ class Project(Object):
 
         super().__init__(**kwargs)
 
+    @attr(method="setter")
+    def type(self, value):
+        """Set the project type."""
+        if not isinstance(value, ProjectType):
+            value = ProjectType(value)
+        self._type = value
+
     def _dest_setter(self, value):
-        """Validate and set dest."""
+        """Define self.dest property.
+
+        Validates and sets dest.
+        """
         if not value:
             return
 
@@ -85,30 +98,19 @@ class Project(Object):
         """
         return self.name.translate(str.maketrans("-_", "  ")).title()
 
-    def source_path(self, file):
-        """Return the path to a source file."""
-        for klass in self.__class__.mro():
-            if not issubclass(klass, Project):
-                break
-
-            path = klass.SOURCES / file
-            if path.exists():
-                return path
-
-        klass = self.__class__.__name__
-        raise ProgramError(f"Could not find source file: {file} in class: {klass}")
-
-    def install(self, file):
+    def install(self, path):
         """Copy a file or create an empty directory from the source to the dest."""
-        src = self.source_path(file)
-        dest_filename = Template(file).safe_substitute(self.substitutions)
+        if isinstance(path, str):
+            path = self.type.skeleton / path
+
+        dest_filename = Template(path.name).safe_substitute(self.substitutions)
         dest = self.path / dest_filename
 
-        if src.is_dir():
+        if path.is_dir():
             dest.mkdir(parents=True)
             return
 
-        src_text = src.read_text()
+        src_text = path.read_text()
         text = Template(src_text).safe_substitute(**self.substitutions)
         dest.write_text(text)
 
@@ -126,12 +128,15 @@ class Project(Object):
 
     def install_all(self):
         """Install all dotfiles from sources into the new project directory."""
-        self.install("README.md")
-        self.install(".todo")
+        for path in self.type.skeleton.iterdir():
+            self.install(path)
 
     def run(self, command: list, capture_output=True, text=True, **kwargs):
         """Run a CLI command."""
         cwd = kwargs.pop("cwd", self.path)
+
+        if kwargs.get("stdout"):
+            capture_output = False
 
         params = dict(
             capture_output=capture_output,
@@ -168,5 +173,12 @@ class Project(Object):
         self.install_all()
 
     def setup(self):
-        """Take setup steps."""
-        Repo.init(self.path)
+        """Execute setup steps."""
+        for step in self.type.specs.get("setup", []):
+            outfile = step.get("out")
+            if outfile:
+                path = self.path / outfile
+                with open(path, "w") as fp:
+                    self.run(step["cmd"], stdout=fp)
+            else:
+                self.run(step["cmd"])

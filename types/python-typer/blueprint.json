@@ -1,0 +1,7 @@
+{
+  "name": "python-typer",
+  "title": "Python: Typer CLI App",
+  "description": "A CLI application built on Typer.",
+  "version": "0.1.0",
+  "type": "framework-application"
+}

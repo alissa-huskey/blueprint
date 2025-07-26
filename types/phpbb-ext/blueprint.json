@@ -1,0 +1,7 @@
+{
+  "name": "phpbb-ext",
+  "title": "phpBB Extension",
+  "description": "phpBB Extension",
+  "version": "0.1.0",
+  "type": "extension"
+}

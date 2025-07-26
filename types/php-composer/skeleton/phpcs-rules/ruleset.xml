@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<ruleset name="CustomRules">
+    <description>PHP CodeSniffer Ruleset.</description>
+
+    <file>.</file>
+    <file>../tests</file>
+
+    <exclude-pattern>../tests/stubs</exclude-pattern>
+
+    <!-- Show progress of the run -->
+    <arg value= "p"/>
+
+    <!-- Show sniff codes in all reports -->
+    <arg value= "s"/>
+
+     <!-- Include the whole PEAR standard -->
+    <rule ref="PEAR"/>
+    <rule ref="PSR12"/>
+
+    <!-- Global excludes
+         ================================================================== -->
+    <rule ref="PEAR">
+      <exclude name="PEAR.Commenting.ClassComment.MissingAuthorTag"/>
+      <exclude name="PEAR.Commenting.ClassComment.MissingAuthorTag"/>
+      <exclude name="PEAR.Commenting.ClassComment.MissingCategoryTag"/>
+      <exclude name="PEAR.Commenting.ClassComment.MissingLicenseTag"/>
+      <exclude name="PEAR.Commenting.ClassComment.MissingLinkTag"/>
+      <exclude name="PEAR.Commenting.ClassComment.MissingPackageTag"/>
+      <exclude name="PEAR.Commenting.FileComment.InvalidAuthors"/>
+      <exclude name="PEAR.Commenting.FileComment.MissingLinkTag"/>
+      <exclude name="PEAR.Commenting.FunctionComment.ExtraParamComment"/>
+      <exclude name="PEAR.ControlStructures.MultiLineCondition.SpacingAfterOpenBrace"/>
+      <exclude name="PEAR.ControlStructures.MultiLineCondition.StartWithBoolean"/>
+      <exclude name="PEAR.NamingConventions.ValidClassName.Invalid"/>
+      <exclude name="PEAR.NamingConventions.ValidClassName.StartWithCapital"/>
+      <exclude name="PEAR.NamingConventions.ValidFunctionName.FunctionNameInvalid"/>
+      <exclude name="PEAR.NamingConventions.ValidFunctionName.FunctionNoCapital"/>
+      <exclude name="PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
+      <exclude name="PEAR.WhiteSpace.ScopeIndent.IncorrectExact"/>
+
+      <!-- 
+          Squiz isn't in this ruleset, so I don't know why this rule is being checked,
+          but if I put it under a <rule ref="Squiz">, then the rest of the Squiz ruleset
+          is included. Putting it here seems to exclude it without including the rest.
+       -->
+      <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps"/>
+    </rule>
+
+    <rule ref="PSR1">
+      <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps"/>
+    </rule>
+
+    <!-- directory excludes
+         ================================================================== -->
+
+    <rule ref="PEAR.Commenting.FileComment.Missing">
+      <exclude-pattern>../tests/*</exclude-pattern>
+    </rule>
+
+    <rule ref="PEAR.Commenting.ClassComment.Missing">
+      <exclude-pattern>../tests/*</exclude-pattern>
+      <exclude-pattern>../migrations/*</exclude-pattern>
+    </rule>
+
+    <rule ref="PEAR.Commenting.FunctionComment.MissingReturn">
+      <exclude-pattern>../tests/*</exclude-pattern>
+      <exclude-pattern>../migrations/*</exclude-pattern>
+    </rule>
+
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+      <exclude-pattern>../tests/*</exclude-pattern>
+    </rule>
+
+    <rule ref="PEAR.Commenting.FunctionComment.MissingParamTag">
+      <exclude-pattern>../tests/*</exclude-pattern>
+    </rule>
+</ruleset>

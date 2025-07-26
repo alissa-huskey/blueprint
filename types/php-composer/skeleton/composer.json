@@ -1,0 +1,33 @@
+{
+    "name": "${VENDOR}/{DASH_NAME}",
+    "description": "${SUMMARY}",
+    "version": "${VERSION}",
+    "type": "${PROJECT_TYPE}",
+    "license": "${LICENSE}",
+    "authors": [ { "name": "{AUTHOR}" } ],
+    "keywords": [],
+    "require": {
+        "php": "${PHP_CONSTRATINT}",
+        "composer/installers": "~1.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*",
+        "phpunit/phpunit": "^9.0.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true
+        }
+    },
+   "autoload": {
+     "psr-4": {
+       "${VENDOR}\\${SMOOSHED_NAME}\\": "./"
+     }
+   },
+   "autoload-dev": {
+     "psr-4": {
+       "${VENDOR}\\${SMOOSHED_NAME}\\tests\\": "tests/",
+       "phpbb\\": "tests/stubs/phpbb/"
+     }
+   }
+}
