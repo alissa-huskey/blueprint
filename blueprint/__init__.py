@@ -73,6 +73,12 @@ class AccessError(UserError):
     status: SysExit = SysExit.OSERR
 
 
+class TemplateError(UserError):
+    """Something is wrong with the template."""
+
+    status: SysExit = SysExit.DATAERR
+
+
 class ProgramError(BlueprintError):
     """An error in the programs code code."""
 

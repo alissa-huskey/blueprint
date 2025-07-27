@@ -1,9 +1,15 @@
+from subprocess import CompletedProcess
+from unittest.mock import Mock
+
 import pytest
 
 from blueprint import AccessError
-from blueprint.project import Project
+from blueprint import project as project_module
+from blueprint.object import Object
 from blueprint.template import Template
 from tests.unit import set_templates_root
+
+Project = project_module.Project
 
 bp = breakpoint
 
@@ -205,6 +211,98 @@ def test_project_setup(tmp_path):
     project.setup()
 
     assert (project.path / ".git").is_dir()
+
+
+def test_project_substitutions(fixtures_path):
+    """
+    GIVEN: A Project object
+    AND: A json file that includes variables and options
+    WHEN: .substitutuions is accessed
+    THEN: it should include keys for the default template variables (ie DASH_NAME)
+    AND: it should include keys the template options (ie PYV)
+    AND: it should include keys for the template variables (ie PYTHON_EXE)
+    """
+
+    with set_templates_root(fixtures_path):
+        project = Project("toolstack", "my project", pyv="3.10.2")
+
+    subs = project.substitutions
+
+    assert "DASH_NAME" in subs and subs["DASH_NAME"] == "my-project"
+    assert "PYV" in subs and subs["PYV"] == "3.10.2"
+    assert "PYTHON_EXE" in subs
+
+
+class RunParams(Object):
+    """."""
+
+    def __init__(self, **kwargs):
+        """."""
+        kwargs.setdefault("then", "it should work")
+
+        kwargs.setdefault("args", ["ls"])
+        kwargs.setdefault("kw", {})
+        kwargs.setdefault("ex_args", kwargs.get("args"))
+        kwargs.setdefault("ex_kw", dict(capture_output=True, text=True))
+        super().__init__(**kwargs)
+
+
+@pytest.mark.parametrize("params", [
+    RunParams(
+        when="options=OPTIONS",
+        then="present options should be added to command",
+        kw=dict(options={
+            "${DASH_NAME}": ["--name", "${DASH_NAME}"],
+            "${SUMMARY}": ["--summary", "${SUMMARY}"],
+        }),
+        ex_args=["ls", "--name", "my-project"]
+    ),
+    RunParams(
+        when="shell=true",
+        then="args should be a string",
+        kw=dict(shell=True),
+        ex_args="ls",
+        ex_kw=dict(capture_output=True, text=True, shell=True),
+    ),
+    RunParams(
+        when="stdout=True",
+        then="capture_output should be false",
+        kw=dict(stdout=True),
+        ex_kw=dict(capture_output=False, text=True, stdout=True),
+    ),
+    RunParams(
+        when="cwd=CWD",
+        then="cwd should be set",
+        kw=dict(cwd="abc"),
+        ex_kw=dict(capture_output=True, text=True, cwd="abc"),
+    ),
+    RunParams(when="basic args", then="should work", args=["abc"], ex_args=["abc"]),
+    RunParams(
+        when="substitute=True",
+        then="substitutions should be replaced in command",
+        args=["${DASH_NAME}"],
+        kw=dict(substitute=True),
+        ex_args=["my-project"],
+    ),
+])
+def test_project_run(monkeypatch, params):
+    subprocess_run = Mock(return_value=CompletedProcess(params.args, 0))
+
+    with monkeypatch.context() as m:
+        m.setattr(project_module, "run", subprocess_run)
+
+        project = Project(name="my project")
+        project.run(params.args, **params.kw)
+
+        call = subprocess_run.call_args_list[0]
+
+        message = (
+            f"When .run() is called with {params.when} then {params.then} "
+            f"({subprocess_run.call_args()})"
+        )
+
+        assert call.args == (params.ex_args,), message
+        assert call.kwargs == params.ex_kw, message
 
 
 def test_project_cmd():

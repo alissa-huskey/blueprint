@@ -19,7 +19,9 @@ class Project(Object):
 
     pascal_replacer = re_compile(r'[-]([a-z])')
     smoosh_replacer = re_compile(r'[-_ ]')
-    PROJECT_VERSION = "0.0.1"
+    DEFAULT_VERSION = "0.0.1"
+
+    _substitutions = {}
 
     def __init__(self,
                  template=None,
@@ -62,6 +64,8 @@ class Project(Object):
     @property
     def path(self):
         """Path to the project directory."""
+        if not self.dest:
+            return None
         return self.dest / self.dash_name
 
     def create(self):
@@ -127,32 +131,81 @@ class Project(Object):
     @property
     def substitutions(self):
         """Return a mapping of the file substitutions for installing files."""
-        return {
-            "DASH_NAME": self.dash_name,
-            "TITLE_NAME": self.title_name,
-            "SNAKE_NAME": self.snake_name,
-            "SMOOSHED_NAME": self.smooshed_name,
-            "PASCAL_NAME": self.pascal_name,
-            "VERSION": self.PROJECT_VERSION,
-            "SUMMARY": self.summary,
-            "LICENSE": self.license,
-            "TEMPLATE_ROOT": (self.template and self.template.root or ""),
-            "DEST": self.dest,
-            #  "CONFIG_ROOT": "",
-        }
+        if not self._substitutions:
+            self._substitutions = {
+                "DASH_NAME": self.dash_name,
+                "TITLE_NAME": self.title_name,
+                "SNAKE_NAME": self.snake_name,
+                "SMOOSHED_NAME": self.smooshed_name,
+                "PASCAL_NAME": self.pascal_name,
+                "VERSION": self.DEFAULT_VERSION,
+                "SUMMARY": self.summary,
+                "LICENSE": self.license,
+                "TEMPLATE_ROOT": (self.template and self.template.root or ""),
+                "DEST": self.dest,
+            }
 
-    def substitute(self, text) -> str:
+            if self.template:
+                # set the options defined in blueprint.json
+                for key in (self.template.options or {}):
+                    name = key.translate(str.maketrans("- ", "__"))
+                    self._substitutions[name.upper()] = getattr(self, name, "")
+
+                extra = {}
+                # set the variables defined in blueprint.json
+                for key, exe in (self.template.variables or {}).items():
+                    name = key.translate(str.maketrans("- ", "__"))
+
+                    # don't use self.run(..., substitute=True)
+                    # to avoid infinite recursion
+                    cmd = [self.substitute(x, self._substitutions) for x in exe["cmd"]]
+
+                    extra[name.upper()] = self.run(cmd)
+                self._substitutions.update(extra)
+
+        return self._substitutions
+
+    def substitute(self, text, variables=None) -> str:
         """Replace all substitutions with their variables."""
-        return TemplateString(text).safe_substitute(**self.substitutions)
+        variables = variables or self.substitutions
+        return TemplateString(text).safe_substitute(**variables)
 
     def install_all(self):
         """Install all dotfiles from sources into the new project directory."""
         for path in self.template.skeleton.iterdir():
             self.install(path)
 
-    def run(self, command: list, capture_output=True, text=True, **kwargs):
-        """Run a CLI command."""
+    def run(
+        self,
+        command: list,
+        substitute=False,
+        options=None,
+        capture_output=True,
+        text=True,
+        **kwargs
+    ):
+        """Run a CLI command.
+
+        Args:
+            * command (list): command to run
+            * substitute (bool, default=False): replace template variables in command?
+            * options (dict, default=None): maps template variable -> list of arguments
+                                            if template variable is present
+                                            add list of arguments after substitution
+            * capture_output (bool, default=True): if output should be captured
+            * text (bool, default=True): decode text in output?
+            * shell (bool, default=False): run in shell mode
+                                           sends command as joined string
+            * **kwargs: arguments to forward to subprocess.run
+        """
         cwd = kwargs.pop("cwd", self.path)
+
+        if substitute:
+            command = [self.substitute(x) for x in command]
+
+        for key, args in (options or {}).items():
+            if (self.substitute(key)):
+                command.extend([self.substitute(arg) for arg in args])
 
         if kwargs.get("stdout"):
             capture_output = False
@@ -193,12 +246,13 @@ class Project(Object):
 
     def setup(self):
         """Execute setup steps."""
-        for step in self.template.specs.get("setup", []):
-            cmd = [self.substitute(x) for x in step["cmd"]]
+        for step in (self.template.setup or []):
+            cmd = step["cmd"]
             outfile = step.get("out")
+            params = {"substitute": True, "options": step.get("options", {})}
             if outfile:
                 path = self.path / outfile
                 with open(path, "w") as fp:
-                    self.run(cmd, stdout=fp)
+                    self.run(cmd, stdout=fp, **params)
             else:
-                self.run(cmd)
+                self.run(cmd, **params)

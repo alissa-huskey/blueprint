@@ -42,7 +42,7 @@ def test_template_templates(tmp_path):
 
     for d in [abc, xyz]:
         d.mkdir(parents=True)
-        (d / "blueprint.json").touch()
+        (d / "blueprint.json").write_text("{}")
 
     with set_templates_root(templates_root):
         templates = Template.templates
@@ -51,28 +51,28 @@ def test_template_templates(tmp_path):
 
 
 def test_template_root(root):
-    project = Template("basic")
+    template = Template("basic")
     template_root = root / "templates" / "basic"
 
-    assert project.root == template_root
+    assert template.root == template_root
 
 
 def test_template_skeleton(root):
-    project = Template("basic")
+    template = Template("basic")
 
-    assert project.skeleton == root / "templates" / "basic" / "skeleton"
+    assert template.skeleton == root / "templates" / "basic" / "skeleton"
 
 
 def test_template_specs(root):
     """
     GIVEN: a blueprint.json file
-    WHEN: project.specs is accessed
+    WHEN: specs is accessed
     THEN: it should return the data parsed from the json file
     """
-    project = Template("basic")
+    template = Template("basic")
 
-    assert isinstance(project.specs, dict)
-    assert project.specs.get("name") == "Basic"
+    assert isinstance(template.specs, dict)
+    assert template.specs.get("name") == "Basic"
 
 
 def test_template_parent():
@@ -95,9 +95,9 @@ def test_template_ok_true(tmp_path, blueprint_json):
     bp_json.write_text(blueprint_json)
 
     with set_templates_root(tmp_path):
-        project = Template("project")
+        template = Template("project")
 
-        assert project.ok
+        assert template.ok
 
 
 def test_template_ok_false_missing_file(tmp_path):
@@ -105,9 +105,9 @@ def test_template_ok_false_missing_file(tmp_path):
     templatedir.mkdir()
 
     with set_templates_root(tmp_path):
-        project = Template("project")
+        template = Template("project")
 
-        assert not project.ok
+        assert not template.ok
 
 
 def test_template_ok_false_invalid_file(tmp_path, blueprint_json):
@@ -125,18 +125,144 @@ def test_template_ok_false_invalid_file(tmp_path, blueprint_json):
     """)
 
     with set_templates_root(tmp_path):
-        project = Template("project")
+        template = Template("project")
 
-        assert not project.ok
+        assert not template.ok
 
 
 def test_template_config():
     ...
 
 
-def test_template_variables():
-    ...
+def test_template_setup(fixtures_path):
+    """
+    GIVEN: A Template object
+    WHEN: `.setup =` is called
+    THEN: Each step should be run through ._process_exe()
+    """
+    with set_templates_root(fixtures_path):
+        template = Template()
+        template.id = "toolstack"
+        template.setup = [
+            {
+                "script": "do-thing",
+                "arguments": ["--a", "--b", "--c"],
+            }
+        ]
+
+        cmd = {
+            "cmd": [str(template.root / "scripts" / "do-thing"), "--a", "--b", "--c"],
+        }
+
+        assert template.setup == [cmd]
+
+
+def test_template_after(fixtures_path):
+    """
+    GIVEN: A Template object
+    WHEN: `.after =` is called
+    THEN: Each step should be run through ._process_exe()
+    """
+    with set_templates_root(fixtures_path):
+        template = Template()
+        template.id = "toolstack"
+        template.after = [
+            {
+                "script": "do-thing",
+                "arguments": ["--a", "--b", "--c"],
+            }
+        ]
+
+        cmd = {
+            "cmd": [str(template.root / "scripts" / "do-thing"), "--a", "--b", "--c"],
+        }
+
+        assert template.after == [cmd]
+
+
+def test_template_variables(fixtures_path):
+    """
+    GIVEN: A Template object
+    WHEN: `.variables =` is called
+    THEN: Each step should be run through ._process_exe()
+    """
+    with set_templates_root(fixtures_path):
+        template = Template()
+        template.id = "toolstack"
+        template.variables = {
+            "VARIABLE": {
+                "script": "do-thing",
+                "arguments": ["--a", "--b", "--c"],
+            }
+        }
+
+        cmd = {
+            "cmd": [str(template.root / "scripts" / "do-thing"), "--a", "--b", "--c"],
+        }
+
+        assert template.variables == {"VARIABLE": cmd}
+
+
+def test_template_process_exe(fixtures_path):
+    """
+    GIVEN: A Template object
+    AND: A spec that includes variables, steps, or after keys defined with
+        a script and optionally arguments
+    WHEN: Those keys are accessed
+    THEN: They should be converted into a single command
+    """
+    with set_templates_root(fixtures_path):
+        template = Template()
+        template.id = "toolstack"
+        result = template._process_exe({
+            "script": "do-thing",
+            "arguments": ["--a", "--b", "--c"],
+        })
+
+        cmd = {
+            "cmd": [str(template.root / "scripts" / "do-thing"), "--a", "--b", "--c"],
+        }
+
+        assert result == cmd
 
 
 def test_template_x():
     ...
+
+
+def test_template_spec_attrs(fixtures_path):
+    """
+    GIVEN: A Template object
+    AND: a blueprint.json file
+    WHEN: a key defined in the properties of blueprint.schema.json is accessed
+    THEN: it should return the attrdict for that key in the blueprint.json file
+
+    """
+    keys = [
+        "name",
+        "title",
+        "description",
+        "version",
+        "type",
+        "parent",
+        "requirements",
+        "stack",
+        "config",
+        "variables",
+        "options",
+        "setup",
+        "after",
+    ]
+
+    with set_templates_root(fixtures_path):
+        template = Template("toolstack")
+
+        for key in keys:
+            assert hasattr(template, key), f"The {key} attr should be set."
+
+        assert template.name == "python-poetry"
+        assert template.title == "Python: Poetry"
+        assert template.description == "Python project managed by poetry."
+        assert template.version == "0.1.0"
+        assert template.type == "language-toolstack"
+        assert template.parent == "basic"

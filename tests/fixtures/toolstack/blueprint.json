@@ -1,0 +1,63 @@
+{
+  "name": "python-poetry",
+  "title": "Python: Poetry",
+  "description": "Python project managed by poetry.",
+  "version": "0.1.0",
+  "parent": "basic",
+  "type": "language-toolstack",
+  "stack": {
+    "language": "python",
+    "dependencies": "poetry",
+    "tests": "pytest",
+    "linter": "flake8",
+    "formatter": "black"
+  },
+  "requirements": [ "python", "poetry", "asdf" ],
+  "options": {
+    "pyv": { 
+      "default": "3.10.2",
+      "metavar": "VERSION",
+      "help": "Python version"
+    },
+    "pyv-constraint": { 
+      "default": ">=3.10.2",
+      "metavar": "CONSTRAINT",
+      "help": "Python version constraint"
+    }
+  },
+  "config": {
+    "DEPENDENCIES": {
+      "file": "dependencies.toml",
+      "format": "toml"
+    }
+  },
+  "variables": {
+    "PYTHON_EXE": { "cmd": ["asdf", "where", "python", "${PYV}"] }
+  },
+  "setup": [
+    {
+      "cmd": ["echo", "${PYV}"],
+      "out": ".python-version"
+    },
+    {
+      "cmd": [
+        "poetry",
+        "init",
+        "--no-interaction",
+        "--name", "${DASH_NAME}",
+        "--directory", "${DEST}",
+        "--python", "${PYV_CONSTRAINT}"
+      ],
+      "options": {
+        "${SUMMARY}": ["--description", "${SUMMARY}", ""],
+        "${LICENSE}": ["--license", "${LICENSE}"]
+      }
+    },
+    {
+      "script": "do-thing",
+      "arguments": ["${DEST}", "${VERSION}", "${PYV_CONSTRAINT}"]
+    },
+    { "cmd": ["poetry", "env", "use", "${PYTHON_EXE}"] },
+    { "cmd": ["poetry", "install"] }
+  ]
+}
