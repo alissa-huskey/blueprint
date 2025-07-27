@@ -4,7 +4,6 @@ from functools import cached_property
 
 from blueprint.object import Object
 from blueprint.project import Project
-from blueprint.project_factory import ProjectFactory
 
 
 class App(Object):
@@ -12,14 +11,12 @@ class App(Object):
 
     NAME = "blueprint"
 
-    def __init__(self, name=None, dest=None, **kwargs):
+    def __init__(self, **kwargs):
         """Create object."""
-        self.kwargs = kwargs
-        self.name = name or self.NAME
-        self.dest = dest
         super().__init__(**kwargs)
+        self.name = kwargs.get("name") or self.NAME
 
     @cached_property
     def project(self) -> Project:
         """Project that is being created."""
-        return ProjectFactory(self.name, self.dest, **self.kwargs)
+        return Project(self.template, self.name, self.dest, **self.kwargs)
