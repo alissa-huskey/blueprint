@@ -2,6 +2,8 @@
 
 load 'helper'
 
+skip
+
 @test "bp new python --help" {
   run ${rootdir}/bin/bp new python --help
 

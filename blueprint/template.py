@@ -24,6 +24,8 @@ class Template(Object):
 
     TEMPLATES_ROOT = ROOT / "templates"
 
+    _ok = True
+
     def __init__(self, template_id: str = None, **kwargs):
         """Initialize object."""
         self.id = template_id
@@ -31,8 +33,11 @@ class Template(Object):
         super().__init__(**kwargs)
 
         for key, spec in self.SCHEMA.get("properties", {}).items():
-            value = (self.specs or {}).get(key)
-            setattr(self, key, value)
+            try:
+                value = (self.specs or {}).get(key)
+                setattr(self, key, value)
+            except TemplateError:
+                self._ok = False
 
     def __eq__(self, other):
         """Equality."""
@@ -106,6 +111,9 @@ class Template(Object):
     @property
     def ok(self):
         """Return True if the Template is valid."""
+        if self._ok is False:
+            return False
+
         if not self.blueprint.is_file():
             return False
 

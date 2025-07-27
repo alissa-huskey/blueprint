@@ -10,8 +10,8 @@ load 'helper'
   assert_output --partial "python"
 }
 
-@test "bp new python --help" {
-  run ${rootdir}/bin/bp new python --help
+@test "bp new python-poetry --help" {
+  run ${rootdir}/bin/bp new python-poetry --help
 
   assert_success
   assert_output --partial -- --dest
