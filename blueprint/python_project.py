@@ -169,15 +169,15 @@ class PythonProject(Project):
         ]
         return self.poetry(command)
 
-    def install_all(self):
-        """Install all dotfiles from sources into the new project directory."""
-        self.install(".env")
-        self.install("setup.cfg")
-        self.install("${SNAKE_NAME}/__init__.py")
-        self.install("${SNAKE_NAME}/object.py")
-        self.install("${SNAKE_NAME}/attr.py")
-        self.install("tests/test_${SNAKE_NAME}.py")
-        super().install_all()
+    #  def install_all(self):
+    #      """Install all dotfiles from sources into the new project directory."""
+    #      self.install(".env")
+    #      self.install("setup.cfg")
+    #      self.install("${SNAKE_NAME}/__init__.py")
+    #      self.install("${SNAKE_NAME}/object.py")
+    #      self.install("${SNAKE_NAME}/attr.py")
+    #      self.install("tests/test_${SNAKE_NAME}.py")
+    #      super().install_all()
 
     def setup_poetry_init(self):
         """Generate initial pyproject.toml file."""

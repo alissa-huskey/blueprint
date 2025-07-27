@@ -21,7 +21,7 @@
         "examples": [ { "{SUMMARY}": ["--description", "{SUMMARY}"] } ],
         "type": "object",
         "minProperties": 1,
-        "propertyNames": { "pattern": "^\\{[A-Z_]+\\}$" },
+        "propertyNames": { "pattern": "^[$]\\{[A-Z_]+\\}$" },
         "additionalProperties": {
           "type": "array",
           "minItems": 1,

@@ -8,11 +8,11 @@ Usage
 -----
 
 ```bash
-bp new TYPE [OPTIONS] NAME
+bp new TEMPLATE [OPTIONS] NAME
 
 Create a new project.
 
-TYPES
+TEMPLATES
     basic                 A basic project.
     python                A Python project.
 
@@ -27,7 +27,7 @@ OPTIONS
 
 ### Basic
 
-The basic project is the one that all other types inherit from.
+The basic project is the one that all other templates inherit from.
 
 Toolchain
 

@@ -2,8 +2,8 @@ import pytest
 
 from blueprint import AccessError
 from blueprint.project import Project
-from blueprint.project_type import ProjectType
-from tests.unit import set_types_root
+from blueprint.template import Template
+from tests.unit import set_templates_root
 
 bp = breakpoint
 
@@ -25,16 +25,23 @@ def test_project_dest_valid(tmp_path):
     assert project.dest == tmp_path
 
 
-def test_project_project_type():
+def test_project_template():
     project = Project("basic")
 
-    assert project.type == ProjectType("basic")
+    assert project.template == Template("basic")
 
 
 def test_project_path(tmp_path):
     project = Project(name="some-project")
     project.dest = tmp_path
     assert project.path == tmp_path/"some-project"
+
+
+def test_project_substitute():
+    project = Project(name="my-project")
+    text = project.substitute("${SMOOSHED_NAME}")
+
+    assert text == "myproject"
 
 
 def test_project_create(tmp_path):
@@ -56,6 +63,16 @@ def test_project_dash_name():
     project = Project(name="my_project")
 
     assert project.dash_name == "my-project"
+
+
+def test_project_smooshed_name():
+    """
+    WHEN: project.snake_name is accessed
+    THEN: it should return the snake tail version of that name
+    """
+    project = Project(name="my-project")
+
+    assert project.smooshed_name == "myproject"
 
 
 def test_project_snake_name():
@@ -111,12 +128,12 @@ def test_project_install_is_dir(tmp_path):
     proj_path = tmp_path / "project"
     proj_path.mkdir()
 
-    types_root = tmp_path / "types"
-    some_dir = types_root / "a_type" / "skeleton" / "some_dir"
+    templates_root = tmp_path / "templates"
+    some_dir = templates_root / "a_template" / "skeleton" / "some_dir"
     some_dir.mkdir(parents=True)
 
-    with set_types_root(types_root):
-        project = Project("a_type", "myproject", dest=proj_path)
+    with set_templates_root(templates_root):
+        project = Project("a_template", "myproject", dest=proj_path)
         project.create()
         project.install("some_dir")
 
@@ -133,12 +150,12 @@ def test_project_install_path_substitues(tmp_path):
     proj_path = tmp_path / "project"
     proj_path.mkdir()
 
-    types_root = tmp_path / "sources"
-    some_dir = types_root / "a_type" / "skeleton" / "${SNAKE_NAME}"
+    templates_root = tmp_path / "sources"
+    some_dir = templates_root / "a_template" / "skeleton" / "${SNAKE_NAME}"
     some_dir.mkdir(parents=True)
 
-    with set_types_root(types_root):
-        project = Project("a_type", "my-project", dest=tmp_path)
+    with set_templates_root(templates_root):
+        project = Project("a_template", "my-project", dest=tmp_path)
         project.create()
         project.install("${SNAKE_NAME}")
 
@@ -188,3 +205,39 @@ def test_project_setup(tmp_path):
     project.setup()
 
     assert (project.path / ".git").is_dir()
+
+
+def test_project_cmd():
+    ...
+
+
+def test_project_cmd_args():
+    ...
+
+
+def test_project_cmd_out():
+    ...
+
+
+def test_project_cmd_extra():
+    ...
+
+
+def test_project_cmd_substitutions():
+    ...
+
+
+def test_project_script():
+    ...
+
+
+def test_project_script_args():
+    ...
+
+
+def test_project_script_out():
+    ...
+
+
+def test_project_script_substitutions():
+    ...

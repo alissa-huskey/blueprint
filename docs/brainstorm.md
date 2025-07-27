@@ -1,0 +1,49 @@
+
+* model
+* template
+* blueprints
+* plan
+* archetype
+* formula
+* recipe
+* schematics
+* specifications
+* recipe
+* directions
+* strategies
+* design
+* mold
+* stencil
+* boilerplate
+* templet
+* format
+* configuration
+* architecture
+* diagram
+* sketch
+* definition
+* scaffolding
+* architecture
+* foundation
+
+* type
+* classification
+* category
+* kind
+* group
+* topic
+* domain
+* reason
+* purpose
+
+* project
+* product
+* program
+* output
+* yield
+* result
+* case
+* form
+* mode
+
+* scaffoloding

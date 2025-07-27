@@ -12,7 +12,7 @@ from blueprint import BlueprintError, UserError
 #  from blueprint import UserError
 #  from blueprint.app import App
 #  from blueprint.object import Object
-from blueprint.project_type import ProjectType
+from blueprint.template import Template
 
 click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.SHOW_ARGUMENTS = True
@@ -40,11 +40,11 @@ def blueprint():
 
 
 @blueprint.command()
-def types():
-    """List project types."""
+def templates():
+    """List templates."""
     table = Table("", "Name", "Title", "Description")
 
-    for t in ProjectType.types:
+    for t in Template.templates:
         cells = [t.id]
         try:
             t.specs
@@ -67,8 +67,8 @@ def new():
     """Create a new project."""
 
 
-# Generate commands from project types
-for t in ProjectType.types:
+# Generate commands from templates
+for t in Template.templates:
     if not t.ok:
         continue
 

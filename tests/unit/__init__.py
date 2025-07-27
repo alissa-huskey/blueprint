@@ -2,15 +2,15 @@
 
 from contextlib import contextmanager
 
-from blueprint.project_type import ProjectType
+from blueprint.template import Template
 
 bp = breakpoint
 
 
 @contextmanager
-def set_types_root(root):
-    """Temporarily modify the TYPES_ROOT directory of a Project class."""
-    orig = ProjectType.TYPES_ROOT
-    ProjectType.TYPES_ROOT = root
+def set_templates_root(root):
+    """Temporarily modify the TEMPLATES_ROOT directory of a Project class."""
+    orig = Template.TEMPLATES_ROOT
+    Template.TEMPLATES_ROOT = root
     yield
-    ProjectType.TYPES_ROOT = orig
+    Template.TEMPLATES_ROOT = orig

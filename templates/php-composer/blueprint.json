@@ -45,7 +45,7 @@
     {
       "cmd": [
         "cp",
-        "{TYPE_ROOT}/after/CodeSniffer.conf",
+        "${TEMPLATE_ROOT}/after/CodeSniffer.conf",
         "vendor/squizlabs/php_codesniffer/"
       ]
     }

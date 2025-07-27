@@ -14,35 +14,35 @@ bp = breakpoint
 
 
 @hasattrs
-class ProjectType(Object):
+class Template(Object):
     """A blueprint.json file."""
 
-    TYPES_ROOT = ROOT / "types"
+    TEMPLATES_ROOT = ROOT / "templates"
 
-    def __init__(self, type_id=None, **kwargs):
+    def __init__(self, template_id=None, **kwargs):
         """Create a new project object."""
-        self.id = type_id
+        self.id = template_id
 
         super().__init__(**kwargs)
 
     @classmethod
     @property
-    def types(cls):
-        """Return a list of types."""
+    def templates(cls):
+        """Return a list of templates."""
         return [
             cls(path.name)
-            for path in cls.TYPES_ROOT.iterdir()
+            for path in cls.TEMPLATES_ROOT.iterdir()
             if (path / "blueprint.json").is_file()
         ]
 
     @property
     def root(self) -> Path:
-        """Return the path to the source files for this project type."""
-        return self.TYPES_ROOT / self.id
+        """Return the path to the source files for this template."""
+        return self.TEMPLATES_ROOT / self.id
 
     @property
     def skeleton(self) -> Path:
-        """Return the path to the source files for this project type."""
+        """Return the path to the source files for this template."""
         return self.root / "skeleton"
 
     @attr(method="getter")
@@ -55,7 +55,7 @@ class ProjectType(Object):
 
     @property
     def ok(self):
-        """Return True if the ProjectType is valid."""
+        """Return True if the Template is valid."""
         if not (self.root / "blueprint.json").is_file():
             return False
 
