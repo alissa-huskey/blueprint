@@ -1,6 +1,6 @@
 import pytest
 
-#  from blueprint import AccessError
+from blueprint.config import Config
 from blueprint.template import Template
 from tests.unit import set_templates_root
 
@@ -266,3 +266,10 @@ def test_template_spec_attrs(fixtures_path):
         assert template.version == "0.1.0"
         assert template.type == "language-toolstack"
         assert template.parent == "basic"
+
+
+def test_template_config():
+    template = Template("basic")
+
+    assert isinstance(template.config, Config)
+    assert template.config.path == Config.BASE / "basic.yml"

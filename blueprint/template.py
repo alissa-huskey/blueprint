@@ -8,6 +8,7 @@ from jsonschema import ValidationError, validate
 
 from blueprint import ROOT, TemplateError
 from blueprint.attr import attr, hasattrs
+from blueprint.config import Config
 from blueprint.dict import Dict
 from blueprint.object import Object
 
@@ -35,7 +36,7 @@ class Template(Object):
         for key, spec in self.SCHEMA.get("properties", {}).items():
             try:
                 value = (self.specs or {}).get(key)
-                setattr(self, key, value)
+                setattr(self, key.replace("-", "_"), value)
             except TemplateError:
                 self._ok = False
 
@@ -136,3 +137,10 @@ class Template(Object):
             return False
 
         return True
+
+    @attr
+    def config(self) -> Config:
+        """Return the Config object for this template."""
+        if not self._config:
+            self._config = Config(self.id)
+        return self._config

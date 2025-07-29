@@ -174,31 +174,6 @@
         }
       }
     },
-    "config": {
-      "description": "Configuration files users can define.",
-      "type": "object",
-      "additonalProperties": {
-        "type": "object",
-        "required": ["file", "format"],
-        "properties": {
-          "description": {
-            "description": "Config file description.",
-            "examples": ["Dependencies to install by default."],
-            "$ref": "#nonEmptyString"
-          },
-          "file": {
-            "description": "Filename.",
-            "examples": ["dependencies.yml"],
-            "$ref": "#nonEmptyString"
-          },
-          "format": {
-            "description": "File format.",
-            "examples": ["yml"],
-            "$ref": "#nonEmptyString"
-          }
-        }
-      }
-    },
     "variables": {
       "description": "Variables to define.",
       "examples": [
@@ -251,6 +226,28 @@
       ],
       "type": "array",
       "items": { "$ref": "#Executable" }
+    },
+    "dependency-commands": {
+        "description": "Commands to add dependencies.",
+        "examples": [
+          {
+            "main": ["poerty", "add"],
+            "dev": ["poetry", "add", "--group", "dev"]
+          }
+        ],
+        "type": "object",
+        "properties": {
+          "main": {
+            "type": "array",
+            "items": {"$rev": "#nonEmptyString"},
+            "minItems": 1
+          },
+          "dev": {
+            "type": "array",
+            "items": {"$rev": "#nonEmptyString"},
+            "minItems": 1
+          }
+        }
     }
   }
 }

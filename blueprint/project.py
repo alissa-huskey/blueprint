@@ -45,14 +45,14 @@ class Project(Object):
         super().__init__(**kwargs)
 
     @attr(method="setter")
-    def template(self, value):
+    def template(self, value) -> Template:
         """Set the template."""
         if isinstance(value, str):
             value = Template(value)
         self._template = value
 
     @attr(method="setter")
-    def dest(self, value):
+    def dest(self, value) -> Path:
         """Define self.dest property.
 
         Validates and sets dest.
@@ -67,18 +67,14 @@ class Project(Object):
         self._dest = dest
 
     @property
-    def path(self):
+    def path(self) -> Path:
         """Path to the project directory."""
         if not self.dest:
             return None
         return self.dest / self.dash_name
 
-    def create(self):
-        """Create the project."""
-        self.path.mkdir(exist_ok=True)
-
     @property
-    def pascal_name(self):
+    def pascal_name(self) -> str:
         """Return the pascal version of the project name.
 
         Example: MyProject
@@ -86,7 +82,7 @@ class Project(Object):
         return self.title_name.replace(" ", "")
 
     @property
-    def dash_name(self):
+    def dash_name(self) -> str:
         """Return the dash version of the project name.
 
         Example: my-project
@@ -94,7 +90,7 @@ class Project(Object):
         return self.name.lower().translate(str.maketrans("_ ", "--"))
 
     @property
-    def snake_name(self):
+    def snake_name(self) -> str:
         """Return the snake tail version of the project name.
 
         Example: my_project
@@ -102,7 +98,7 @@ class Project(Object):
         return self.name.lower().translate(str.maketrans("- ", "__"))
 
     @property
-    def smooshed_name(self):
+    def smooshed_name(self) -> str:
         """Return the snake tail version of the project name.
 
         Example: my_project
@@ -110,12 +106,16 @@ class Project(Object):
         return self.smoosh_replacer.sub("", self.name.lower())
 
     @property
-    def title_name(self):
+    def title_name(self) -> str:
         """Return the title case version of the project name.
 
         Example: My Project
         """
         return self.name.translate(str.maketrans("-_", "  ")).title()
+
+    def create(self):
+        """Create the project."""
+        self.path.mkdir(exist_ok=True)
 
     def install(self, path, template=None):
         """Copy a file or create an empty directory from the source to the dest."""
@@ -175,7 +175,8 @@ class Project(Object):
                     cmd = [self.substitute(x, self._substitutions) for x in exe["cmd"]]
 
                     res = self.run(cmd)
-                    extra[key] = res.stdout.strip()
+                    if res.stdout:
+                        extra[key] = res.stdout.strip()
                 self._substitutions.update(extra)
 
         return self._substitutions
@@ -258,11 +259,23 @@ class Project(Object):
 
         return res
 
-    def make(self):
-        """Make the project end-to-end."""
-        self.create()
-        self.setup()
-        self.install_all()
+    def add_dependencies(self):
+        """Install all dependencies from the config file."""
+        if not (
+            (cmds := self.template.dependency_commands)
+            and self.template.config
+            and self.template.config.exists()
+            and self.template.config.read()
+            and (cfg := self.template.config.dependencies)
+        ):
+            return
+
+        for key in ["main", "dev"]:
+            if ((cmd := cmds.get(key)) and (deps := cfg.get(key))):
+                for dep in deps:
+                    c = cmd.copy()
+                    c.append(dep)
+                    self.run(c)
 
     def setup(self, template=None):
         """Execute setup steps."""
@@ -281,3 +294,10 @@ class Project(Object):
                     self.run(cmd, stdout=fp, **params)
             else:
                 self.run(cmd, **params)
+
+    def make(self):
+        """Make the project end-to-end."""
+        self.create()
+        self.setup()
+        self.install_all()
+        self.add_dependencies()

@@ -1,15 +1,10 @@
-from subprocess import CompletedProcess
-from unittest.mock import Mock
-
 import pytest
 
 from blueprint import AccessError
-from blueprint import project as project_module
 from blueprint.object import Object
+from blueprint.project import Project
 from blueprint.template import Template
-from tests.unit import set_templates_root
-
-Project = project_module.Project
+from tests.unit import set_config_base, set_templates_root
 
 bp = breakpoint
 
@@ -349,57 +344,37 @@ class RunParams(Object):
         ex_args=["my-project"],
     ),
 ])
-def test_project_run(monkeypatch, params):
-    subprocess_run = Mock(return_value=CompletedProcess(params.args, 0))
+def test_project_run(subprocess_run_mock, params):
+    mock = subprocess_run_mock
+    project = Project(name="my project")
+    project.run(params.args, **params.kw)
 
-    with monkeypatch.context() as m:
-        m.setattr(project_module, "run", subprocess_run)
+    call = mock.call_args_list[0]
 
-        project = Project(name="my project")
-        project.run(params.args, **params.kw)
+    message = (
+        f"When .run() is called with {params.when} then {params.then} "
+        f"({mock.call_args()})"
+    )
 
-        call = subprocess_run.call_args_list[0]
-
-        message = (
-            f"When .run() is called with {params.when} then {params.then} "
-            f"({subprocess_run.call_args()})"
-        )
-
-        assert call.args == (params.ex_args,), message
-        assert call.kwargs == params.ex_kw, message
+    assert call.args == (params.ex_args,), message
+    assert call.kwargs == params.ex_kw, message
 
 
-def test_project_cmd():
-    ...
+def test_project_add_dependencies(subprocess_run_mock, tmp_path, config_yml):
+    mock = subprocess_run_mock
+    file = tmp_path / "python-poetry.yml"
+    file.write_text(config_yml)
+
+    with set_config_base(tmp_path):
+        project = Project(name="my project", template="python-poetry")
+        project.add_dependencies()
+
+        calls = mock.call_args_list
+        dependencies = [call.args[0][-1] for call in calls]
+
+        assert calls[0].args[0] == ["poetry", "add", "--group", "dev", "pytest"]
+        assert dependencies == ["pytest", "pynvim", "pylama", "black"]
 
 
-def test_project_cmd_args():
-    ...
-
-
-def test_project_cmd_out():
-    ...
-
-
-def test_project_cmd_extra():
-    ...
-
-
-def test_project_cmd_substitutions():
-    ...
-
-
-def test_project_script():
-    ...
-
-
-def test_project_script_args():
-    ...
-
-
-def test_project_script_out():
-    ...
-
-
-def test_project_script_substitutions():
+def test_project_script_x():
     ...

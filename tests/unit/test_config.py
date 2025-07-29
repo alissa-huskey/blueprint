@@ -1,20 +1,11 @@
-from contextlib import contextmanager
 from pathlib import Path
 
 import pytest  # noqa
 
 from blueprint.config import Config
+from tests.unit import set_config_base
 
 bp = breakpoint
-
-
-@contextmanager
-def set_config_base(base):
-    """Temporarily modify the BASE directory of a Project class."""
-    orig = Config.BASE
-    Config.BASE = base
-    yield
-    Config.BASE = orig
 
 
 def test_config():
@@ -27,21 +18,15 @@ def test_config_path():
     assert cfg.path == (Path.home() / ".config/blueprint/python-poetry.yml")
 
 
-def test_config_read(tmp_path):
+def test_config_read(tmp_path, config_yml):
     with set_config_base(tmp_path):
         cfg = Config("python-poetry")
 
-        cfg.path.write_text("""
-dev-dependencies:
-  - a
-  - b
-  - c
-        """)
-
+        cfg.path.write_text(config_yml)
         cfg.read()
 
         data = {
-            "dev-dependencies": ["a", "b", "c"]
+            "dependencies": {"dev": ["pytest", "pynvim", "pylama", "black"]}
         }
 
         assert cfg.data == data

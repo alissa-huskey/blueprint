@@ -2,6 +2,7 @@
 
 from contextlib import contextmanager
 
+from blueprint.config import Config
 from blueprint.template import Template
 
 bp = breakpoint
@@ -14,3 +15,12 @@ def set_templates_root(root):
     Template.TEMPLATES_ROOT = root
     yield
     Template.TEMPLATES_ROOT = orig
+
+
+@contextmanager
+def set_config_base(base):
+    """Temporarily modify the BASE directory of a Project class."""
+    orig = Config.BASE
+    Config.BASE = base
+    yield
+    Config.BASE = orig

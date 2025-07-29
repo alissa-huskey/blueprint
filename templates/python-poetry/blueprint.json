@@ -25,12 +25,6 @@
       "help": "Python version constraint"
     }
   },
-  "config": {
-    "DEPENDENCIES": {
-      "file": "dependencies.toml",
-      "format": "toml"
-    }
-  },
   "variables": {
     "PYTHON_EXE": { "cmd": ["asdf", "where", "python", "${PYV}"] }
   },
@@ -59,5 +53,9 @@
     },
     { "cmd": ["poetry", "env", "use", "${PYTHON_EXE}/bin/python"] },
     { "cmd": ["poetry", "install"] }
-  ]
+  ],
+  "dependency-commands": {
+    "main": ["poetry", "add"],
+    "dev": ["poetry", "add", "--group", "dev"]
+  }
 }
