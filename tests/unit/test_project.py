@@ -61,6 +61,17 @@ def test_project_create(tmp_path):
     assert (tmp_path/"myproject").is_dir()
 
 
+def test_project_create_parent(tmp_path):
+    """
+    WHEN: project.create is called
+    THEN: A new project is created
+    """
+    project = Project("python-poetry", "myproject", dest=tmp_path)
+    project.create()
+
+    assert (tmp_path/"myproject").is_dir()
+
+
 def test_project_dash_name():
     """
     WHEN: project.dash_name is accessed
@@ -125,6 +136,20 @@ def test_project_install(tmp_path):
     assert (project.path / "README.md").is_file()
 
 
+def test_project_install_subdir(tmp_path):
+    """
+    GIVEN: a project object where create() has been called
+    WHEN: project.install() is called with a path that is in a subdirectory
+    THEN: The file should exist in the subdirectory of the new project
+    """
+    project = Project("python-poetry", "my project", dest=tmp_path)
+    project.create()
+
+    project.install("tests/test_${SNAKE_NAME}.py")
+
+    assert (project.path / "tests" / "test_my_project.py").is_file()
+
+
 def test_project_install_is_dir(tmp_path):
     """
     GIVEN: a project object where create() has been called
@@ -186,6 +211,19 @@ def test_project_install_file_subs(tmp_path):
     assert "My Project" in dest_contents
 
 
+def test_project_install_all_parent(tmp_path):
+    """
+    GIVEN: a Project object where create() has been called
+    WHEN: project.install_all() is called
+    THEN: The files should exist in the new project
+    """
+    project = Project("python-poetry", "myproject", dest=tmp_path)
+    project.create()
+    project.install_all()
+
+    assert (project.path / "README.md").is_file()
+
+
 def test_project_install_all(tmp_path):
     """
     GIVEN: a Project object where create() has been called
@@ -207,6 +245,32 @@ def test_project_setup(tmp_path):
     THEN: the project should be git init'd
     """
     project = Project("basic", "myproject", dest=tmp_path)
+    project.create()
+    project.setup()
+
+    assert (project.path / ".git").is_dir()
+
+
+def test_project_setup(tmp_path):
+    """
+    GIVEN: a project object where create() has been called
+    WHEN: project.setup() is called
+    THEN: the project should be git init'd
+    """
+    project = Project("basic", "myproject", dest=tmp_path)
+    project.create()
+    project.setup()
+
+    assert (project.path / ".git").is_dir()
+
+
+def test_project_setup_parent(tmp_path):
+    """
+    GIVEN: a project object where create() has been called
+    WHEN: project.setup() is called
+    THEN: the project should be git init'd
+    """
+    project = Project("python-poetry", "myproject", dest=tmp_path)
     project.create()
     project.setup()
 

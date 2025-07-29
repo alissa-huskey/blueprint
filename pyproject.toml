@@ -34,9 +34,9 @@ flake8-black = "^0.3.6"
 flake8-isort = "^6.1.1"
 flake8-docstrings = "^1.7.0"
 pylama = "^8.4.1"
+check-jsonschema = "^0.33.2"
 fancycompleter = "0.9.1"
 argcomplete = "^3.6.2"
-check-jsonschema = "^0.33.2"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

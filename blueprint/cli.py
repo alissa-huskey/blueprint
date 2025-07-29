@@ -84,7 +84,7 @@ def templates():
     console.print(table)
 
 
-def dest_exists(ctx, self, path: Path):
+def dest_should_exist(ctx, self, path: Path):
     """Confirm the destination directory exists."""
     if not path.is_dir():
         raise BadParameter(f"No such directory: {path}")
@@ -96,10 +96,35 @@ def new():
     """Create a new project."""
 
 
+new_options = {
+    "dest": click.Option(
+        ["--dest", "-d"],
+        help="Where to create the project.",
+        type=Path,
+        callback=dest_should_exist,
+        default=Path.cwd()
+    ),
+    "summary": click.Option(
+        ["--summary", "-s"],
+        help="One line project description.",
+    ),
+    "license": click.Option(
+        ["--license", "-l"],
+        default="MIT",
+        help="License of the package.",
+    ),
+}
+
+
 def _new_project_cmd(template):
     """Return a callback to create a new project."""
     def _(*args, **kwargs):
         app = App(*args, template=template, **kwargs)
+        if app.project.path.is_dir():
+            raise BadParameter(
+                f"Project directory already exists: {app.project.path}",
+                param=new_options["dest"],
+            )
         verify(app)
         app.project.make()
     return _
@@ -107,23 +132,7 @@ def _new_project_cmd(template):
 
 # Generate commands from templates
 for t in Template.templates:
-    params = [
-        click.Option(
-            ["--dest", "-d"],
-            help="Where to create the project.",
-            type=Path,
-            callback=dest_exists,
-            default=Path.cwd()
-        ),
-        click.Option(
-            ["--summary", "-s"],
-            help="One line project description.",
-        ),
-        click.Option(
-            ["--license", "-l"],
-            help="License of the package.",
-        ),
-    ]
+    params = list(new_options.values())
     for name, spec in (t.options or {}).items():
         if (choices := spec.pop("choices", None)):
             spec["type"] = click.Choice(choices)

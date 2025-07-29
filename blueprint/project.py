@@ -34,8 +34,13 @@ class Project(Object):
         self.template = template
         self.name = name
         self.dest = dest
-        self.summary = summary
-        self.license = license
+        self.summary = summary or ""
+        self.license = license or ""
+
+        if self.template:
+            for key, value in (self.template.options or {}).items():
+                key = key.replace("-", "_")
+                setattr(self, key, kwargs.pop(key, value.get("default", "")))
 
         super().__init__(**kwargs)
 
@@ -112,13 +117,21 @@ class Project(Object):
         """
         return self.name.translate(str.maketrans("-_", "  ")).title()
 
-    def install(self, path):
+    def install(self, path, template=None):
         """Copy a file or create an empty directory from the source to the dest."""
-        if isinstance(path, str):
-            path = self.template.skeleton / path
+        template = template or self.template
 
-        dest_filename = self.substitute(path.name)
-        dest = self.path / dest_filename
+        if isinstance(path, str):
+            path = template.skeleton / path
+
+        rel_path = Path(*[
+            self.substitute(p)
+            for p in path.relative_to(template.skeleton).parts
+        ])
+
+        dest = self.path / rel_path
+
+        dest.parent.mkdir(parents=True, exist_ok=True)
 
         if path.is_dir():
             dest.mkdir(parents=True)
@@ -143,6 +156,7 @@ class Project(Object):
                 "LICENSE": self.license,
                 "TEMPLATE_ROOT": (self.template and self.template.root or ""),
                 "DEST": self.dest,
+                "PATH": self.path,
             }
 
             if self.template:
@@ -160,7 +174,8 @@ class Project(Object):
                     # to avoid infinite recursion
                     cmd = [self.substitute(x, self._substitutions) for x in exe["cmd"]]
 
-                    extra[name.upper()] = self.run(cmd)
+                    res = self.run(cmd)
+                    extra[key] = res.stdout.strip()
                 self._substitutions.update(extra)
 
         return self._substitutions
@@ -170,10 +185,15 @@ class Project(Object):
         variables = variables or self.substitutions
         return TemplateString(text).safe_substitute(**variables)
 
-    def install_all(self):
+    def install_all(self, template=None):
         """Install all dotfiles from sources into the new project directory."""
-        for path in self.template.skeleton.iterdir():
-            self.install(path)
+        template = template or self.template
+
+        if template.parent:
+            self.install_all(Template(template.parent))
+
+        for path in template.skeleton.glob("**/*"):
+            self.install(path, template)
 
     def run(
         self,
@@ -216,7 +236,7 @@ class Project(Object):
         )
 
         if cwd:
-            params["cwd"] = cwd
+            params["cwd"] = str(cwd)
 
         params.update(kwargs)
 
@@ -244,9 +264,14 @@ class Project(Object):
         self.setup()
         self.install_all()
 
-    def setup(self):
+    def setup(self, template=None):
         """Execute setup steps."""
-        for step in (self.template.setup or []):
+        template = template or self.template
+
+        if template.parent:
+            self.setup(Template(template.parent))
+
+        for step in (template.setup or []):
             cmd = step["cmd"]
             outfile = step.get("out")
             params = {"substitute": True, "options": step.get("options", {})}

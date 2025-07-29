@@ -45,23 +45,19 @@
         "init",
         "--no-interaction",
         "--name", "${DASH_NAME}",
-        "--directory", "${DEST}",
+        "--directory", "${PATH}",
         "--python", "${PYV_CONSTRAINT}"
       ],
       "options": {
-        "${SUMMARY}": ["--description", "${SUMMARY}", ""],
+        "${SUMMARY}": ["--description", "${SUMMARY}"],
         "${LICENSE}": ["--license", "${LICENSE}"]
       }
     },
     {
       "script": "setup-pyproject",
-      "arguments": ["${DEST}", "${VERSION}", "${PYV_CONSTRAINT}"]
+      "arguments": ["${PATH}", "${VERSION}", "${PYV_CONSTRAINT}"]
     },
-    {
-      "script": "setup-poetry-add-dev",
-      "arguments": ["${CONFIG_ROOT}"]
-    },
-    { "cmd": ["poetry", "env", "use", "${PYTHON_EXE}"] },
+    { "cmd": ["poetry", "env", "use", "${PYTHON_EXE}/bin/python"] },
     { "cmd": ["poetry", "install"] }
   ]
 }
