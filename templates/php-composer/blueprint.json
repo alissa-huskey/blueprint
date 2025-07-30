@@ -37,10 +37,8 @@
     "vendor": {},
     "name": {}
   },
-  "setup": [
-    { "cmd": ["composer", "install"] }
-  ],
   "after": [
+    { "cmd": ["composer", "install"] },
     {
       "cmd": [
         "cp",

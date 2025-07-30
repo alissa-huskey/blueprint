@@ -3,12 +3,11 @@
     "type": "phpbb-extension",
     "description": "${SUMMARY}",
     "version": "0.1.0",
-    "time": "2025-06-23",
     "keywords": ["phpbb", "extension"],
     "license": "GPL-2.0-only",
-    "authors": [ { "name": "Chloe" } ],
+    "authors": [ { "name": "${AUTHOR}" } ],
     "require": {
-        "php": ">=5.4.0",
+        "php": "${PHP_CONSTRAINT}",
         "composer/installers": "~1.0"
     },
     "require-dev": {

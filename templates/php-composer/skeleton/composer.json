@@ -1,13 +1,13 @@
 {
-    "name": "${VENDOR}/{DASH_NAME}",
+    "name": "${VENDOR}/${DASH_NAME}",
     "description": "${SUMMARY}",
     "version": "${VERSION}",
     "type": "${PROJECT_TYPE}",
     "license": "${LICENSE}",
-    "authors": [ { "name": "{AUTHOR}" } ],
+    "authors": [ { "name": "${AUTHOR}" } ],
     "keywords": [],
     "require": {
-        "php": "${PHP_CONSTRATINT}",
+        "php": "${PHP_CONSTRAINT}",
         "composer/installers": "~1.0"
     },
     "require-dev": {

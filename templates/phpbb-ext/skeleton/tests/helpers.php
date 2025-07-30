@@ -3,7 +3,7 @@
 /**
  * Test helper file.
  *
- * PHP version ${PHP_VERSION}
+ * PHP version ${PHP_CONSTRAINT}
  *
  * @category Phpbb
  * @package  PhpBB_${VENDOR}_${PASCAL_NAME}_Tests

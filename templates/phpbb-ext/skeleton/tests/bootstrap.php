@@ -3,10 +3,10 @@
 /**
  * Test bootstrap file.
  *
- * PHP version ${PHP_VERSION}
+ * PHP version ${PHP_CONSTRAINT}
  *
  * @category Phpbb
- * @package  PhpBB_RA_${TITLE_SNAKE_NAME}_Tests
+ * @package  PhpBB_${VENDOR}_${PASCAL_NAME}_Tests
  * @author   ${AUTHOR}
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  */

@@ -134,7 +134,7 @@ class Project(Object):
         dest.parent.mkdir(parents=True, exist_ok=True)
 
         if path.is_dir():
-            dest.mkdir(parents=True)
+            dest.mkdir(parents=True, exist_ok=True)
             return
 
         src_text = path.read_text()

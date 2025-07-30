@@ -31,5 +31,11 @@
 2024-12-31 @feature @python run `poetry install`
 2024-12-31 @feature @python in ~/.config/blueprint make a pyproject.toml file that sets the actual default settings for pyproject.toml (ie, pytest.ini_options, black, etc)
 (A) 2025-07-29 @task Template: inherit options and args from parent.
-x 2025-07-29 2025-07-29 @task Schema: validate() and ok() -- check parent too
 (B) 2025-07-29 @quality Split cli.py into multiple files.
+(A) 2025-07-29 @task Project: Use template.project_dir if present.
+(A) 2025-07-29 @task Project: Execute 'after' steps.
+(A) 2025-07-29 @task Project.substititions: add arguments.
+(A) 2025-07-29 @task Project.substitutions: add AUTHOR.
+(A) 2025-07-29 @task @template php-composer: add a PHP file somewhere
+(A) 2025-07-29 @task Project.substitute: Handle .env and not substituting $PATH
+(C) 2025-07-29 @task @template phpbb-ext: Add --phpbb-version option.

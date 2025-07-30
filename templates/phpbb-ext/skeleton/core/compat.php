@@ -3,7 +3,7 @@
 /**
  * PHP 7-to-8 Compatibility
  *
- * PHP version ${PHP_VERSION}
+ * PHP version ${PHP_CONSTRAINT}
  *
  * @category Phpbb
  * @package  PhpBB_${VENDOR}_${PASCAL_NAME}
