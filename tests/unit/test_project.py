@@ -290,6 +290,7 @@ def test_project_substitutions(fixtures_path):
         assert "DASH_NAME" in subs and subs["DASH_NAME"] == "my-project"
         assert "PYV" in subs and subs["PYV"] == "3.10.2"
         assert "PYTHON_EXE" in subs
+        assert "ARG1" in subs
 
 
 class RunParams(Object):

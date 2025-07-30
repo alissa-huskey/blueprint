@@ -34,9 +34,10 @@
 (B) 2025-07-29 @quality Split cli.py into multiple files.
 (A) 2025-07-29 @task Project: Use template.project_dir if present.
 (A) 2025-07-29 @task Project: Execute 'after' steps.
-(A) 2025-07-29 @task Project.substititions: add arguments.
 (A) 2025-07-29 @task Project.substitutions: add AUTHOR.
 (A) 2025-07-29 @task @template php-composer: add a PHP file somewhere
 (A) 2025-07-29 @task Project.substitute: Handle .env and not substituting $PATH
 (C) 2025-07-29 @task @template phpbb-ext: Add --phpbb-version option.
 (A) 2025-07-29 @bug Template: phpbb-ext/blueprint.json is not raising an error even though the "stack" keyword is missing
+2025-07-30 @quality Extract formatting functions (snake_name, dash_name, etc) into helper functions.
+2025-07-30 Figure out some kind of filters. Maybe use jinja templates?

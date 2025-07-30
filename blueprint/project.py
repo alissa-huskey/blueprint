@@ -165,6 +165,11 @@ class Project(Object):
                     name = key.translate(str.maketrans("- ", "__"))
                     self._substitutions[name.upper()] = getattr(self, name, "")
 
+                # set the arguments defined in blueprint.json
+                for key in (self.template.arguments or {}):
+                    name = key.translate(str.maketrans("- ", "__"))
+                    self._substitutions[name.upper()] = getattr(self, name, "")
+
                 extra = {}
                 # set the variables defined in blueprint.json
                 for key, exe in (self.template.variables or {}).items():

@@ -25,6 +25,10 @@
       "help": "Python version constraint"
     }
   },
+  "arguments": {
+    "arg1": {},
+    "arg2": {}
+  },
   "config": {
     "DEPENDENCIES": {
       "file": "dependencies.toml",
