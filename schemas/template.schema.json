@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "template.schema.json",
+  "$ref": "base.schema.json",
+  "title": "Blueprint template schema.",
+  "required": ["name", "description", "version", "type"],
+  "properties": {
+    "type": { "constant": "template" },
+    "stack": {
+      "description": "Toolstack specifications.",
+      "$comment": "Annotations",
+      "type": "object",
+      "additionalProperties": { "$ref": "base.schema.json#nonEmptyString" },
+      "required": ["language"],
+      "properties": {
+        "language": {
+          "description": "Primary language this project is written in.",
+          "examples": ["python"],
+          "$ref": "base.schema.json#nonEmptyString"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tooling.schema.json",
+  "$ref": "base.schema.json",
+  "title": "Blueprint tooling schema.",
+  "required": ["name", "description", "version", "type", "stack"],
+  "properties": {
+    "type": { "constant": "tooling" },
+    "stack": {
+      "description": "Toolstack specifications.",
+      "$comment": "Annotations",
+      "type": "object",
+      "additionalProperties": { "$ref": "base.schema.json#nonEmptyString" },
+      "required": ["language", "category", "tool"],
+      "properties": {
+        "language": {
+          "description": "Primary language this project is written in.",
+          "examples": ["python"],
+          "$ref": "base.schema.json#nonEmptyString"
+        },
+        "category": {
+          "description": "What kind of tool this is.",
+          "examples": ["tests"],
+          "$ref": "base.schema.json#nonEmptyString"
+        },
+        "tool": {
+          "description": "Name of the tool.",
+          "examples": ["bats"],
+          "$ref": "base.schema.json#nonEmptyString"
+        }
+      }
+    }
+  }
+}

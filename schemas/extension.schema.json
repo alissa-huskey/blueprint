@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "extension.schema.json",
+  "$ref": "base.schema.json",
+  "title": "Blueprint extension schema.",
+  "properties": {
+    "type": { "constant": "generic" },
+    "stack": {
+      "description": "Toolstack specifications.",
+      "$comment": "Annotations",
+      "type": "object",
+      "additionalProperties": { "$ref": "base.schema.json#nonEmptyString" },
+      "required": ["language", "application"],
+      "properties": {
+        "language": {
+          "description": "Primary language this project is written in.",
+          "examples": ["python"],
+          "$ref": "base.schema.json#nonEmptyString"
+        },
+        "application": {
+          "description": "Application that this is an extension of.",
+          "examples": ["chrome"],
+          "$ref": "base.schema.json#nonEmptyString"
+        }
+      }
+    }
+  }
+}

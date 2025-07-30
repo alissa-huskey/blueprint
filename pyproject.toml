@@ -24,6 +24,8 @@ rich-click = "^1.8.9"
 platformdirs = "^4.3.8"
 xdg-base-dirs = "*"
 pyyaml = "^6.0.2"
+referencing = "^0.36.2"
+jsonref = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7"

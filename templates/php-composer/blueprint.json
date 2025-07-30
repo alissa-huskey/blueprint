@@ -12,18 +12,13 @@
   },
   "requirements": [ "php", "composer" ],
   "options": {
-    "vendor": { 
-      "required": true,
-      "help": "Vendor.",
-      "metavar": "VENDOR"
-    },
     "phpv": {
       "default": "8.4",
       "help": "PHP Version",
       "metavar": "VERSION"
     },
     "php-constraint": {
-      "default": ">=5",
+      "default": ">=7.3",
       "help": "PHP Version Constraint",
       "metavar": "CONSTRAINT"
     },
@@ -37,6 +32,10 @@
         "composer-plugin"
       ]
     }
+  },
+  "arguments": {
+    "vendor": {},
+    "name": {}
   },
   "setup": [
     { "cmd": ["composer", "install"] }

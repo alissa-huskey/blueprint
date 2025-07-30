@@ -3,6 +3,7 @@
 from contextlib import contextmanager
 
 from blueprint.config import Config
+from blueprint.schema import Schema
 from blueprint.template import Template
 
 bp = breakpoint
@@ -15,6 +16,15 @@ def set_templates_root(root):
     Template.TEMPLATES_ROOT = root
     yield
     Template.TEMPLATES_ROOT = orig
+
+
+@contextmanager
+def set_schemas_root(root):
+    """Temporarily modify the Schema.ROOT path."""
+    orig = Schema.ROOT
+    Schema.ROOT = root
+    yield
+    Schema.ROOT = orig
 
 
 @contextmanager

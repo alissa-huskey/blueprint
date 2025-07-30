@@ -37,8 +37,8 @@ class Project(Object):
         self.summary = summary or ""
         self.license = license or ""
 
-        if self.template:
-            for key, value in (self.template.options or {}).items():
+        if self.template and self.template.specs:
+            for key, value in (self.template.specs.get("options", {})).items():
                 key = key.replace("-", "_")
                 setattr(self, key, kwargs.pop(key, value.get("default", "")))
 
@@ -191,7 +191,7 @@ class Project(Object):
         template = template or self.template
 
         if template.parent:
-            self.install_all(Template(template.parent))
+            self.install_all(template.parent)
 
         for path in template.skeleton.glob("**/*"):
             self.install(path, template)
@@ -262,7 +262,7 @@ class Project(Object):
     def add_dependencies(self):
         """Install all dependencies from the config file."""
         if not (
-            (cmds := self.template.dependency_commands)
+            (cmds := self.template.specs.get("dependency-commands"))
             and self.template.config
             and self.template.config.exists()
             and self.template.config.read()
@@ -282,7 +282,7 @@ class Project(Object):
         template = template or self.template
 
         if template.parent:
-            self.setup(Template(template.parent))
+            self.setup(template.parent)
 
         for step in (template.setup or []):
             cmd = step["cmd"]

@@ -8,14 +8,12 @@ import rich_click as click  # noqa
 from click import confirm
 from rich.console import Console
 from rich.table import Table
+from rich.traceback import install as rich_tracebacks
 from rich_click import BadParameter
 from rich_click.rich_command import RichCommand
 
 from blueprint import BlueprintError, UserError
 from blueprint.app import App
-#  from blueprint import UserError
-#  from blueprint.app import App
-#  from blueprint.object import Object
 from blueprint.template import Template
 
 click.rich_click.USE_RICH_MARKUP = True
@@ -26,6 +24,7 @@ click.rich_click.SHOW_METAVARS_COLUMN = True
 
 bp = breakpoint
 
+rich_tracebacks(show_locals=True)
 console = Console()
 errors = Console(stderr=True)
 
@@ -66,20 +65,20 @@ def templates():
     """List templates."""
     table = Table("", "Name", "Title", "Description")
 
-    for t in Template.templates:
-        cells = [t.id]
+    for tpl in Template.templates:
+        cells = [tpl.id]
         try:
-            t.specs
+            tpl.specs
         except JSONDecodeError:
             ...
         else:
-            cells.append(t.specs.get("title", ""))
-            cells.append(t.specs.get("description", ""))
+            cells.append(tpl.specs.get("title", ""))
+            cells.append(tpl.specs.get("description", ""))
 
-        if not t.ok:
+        if not tpl.ok:
             cells = [f"[dim]{text}" for text in cells]
 
-        table.add_row(("[red]E", "")[t.ok], *cells)
+        table.add_row(("[red]E", "")[tpl.ok], *cells)
 
     console.print(table)
 
@@ -131,25 +130,36 @@ def _new_project_cmd(template):
 
 
 # Generate commands from templates
-for t in Template.templates:
+for tpl in Template.templates:
+    # generate options
     params = list(new_options.values())
-    for name, spec in (t.options or {}).items():
+    for name, spec in (tpl.options or {}).items():
         if (choices := spec.pop("choices", None)):
             spec["type"] = click.Choice(choices)
         option = click.Option([f"--{name}"], **spec)
         params.append(option)
 
-    params.append(
-        click.Argument(["name"])
-    )
+    # generate arguments
+    arguments = {"name": {}}
+    if tpl.arguments:
+        if "name" in tpl.arguments:
+            arguments.pop("name", None)
+        arguments.update(tpl.arguments)
 
+    for name, spec in arguments.items():
+        params.append(
+            click.Argument([name], **spec)
+        )
+
+    # create command
     cmd = RichCommand(
-        name=t.id,
-        callback=_new_project_cmd(t.id),
-        help=t.specs["description"],
+        name=tpl.id,
+        callback=_new_project_cmd(tpl.id),
+        help=tpl.specs["description"],
         params=params,
     )
 
+    # add subcommand to new
     new.add_command(cmd)
 
 
@@ -160,10 +170,8 @@ def run():
     except UserError as e:
         error(e.message)
         exit(e.status)
-    # NOTE: This prevents typer from exiting with
-    #       non-zero code on argument errors
-    #  except SystemExit:
-    #      ...
+    except SystemExit as ex:
+        exit(ex.code)
 
 
 if __name__ == "__main__":

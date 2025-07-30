@@ -73,6 +73,12 @@ class AccessError(UserError):
     status: SysExit = SysExit.OSERR
 
 
+class SchemaError(UserError):
+    """Something is wrong with the schema file."""
+
+    status: SysExit = SysExit.DATAERR
+
+
 class TemplateError(UserError):
     """Something is wrong with the template."""
 

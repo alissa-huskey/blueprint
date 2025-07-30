@@ -4,13 +4,12 @@ import json
 from json import JSONDecodeError
 from pathlib import Path
 
-from jsonschema import ValidationError, validate
-
 from blueprint import ROOT, TemplateError
 from blueprint.attr import attr, hasattrs
 from blueprint.config import Config
 from blueprint.dict import Dict
 from blueprint.object import Object
+from blueprint.schema import Schema
 
 bp = breakpoint
 
@@ -19,30 +18,29 @@ bp = breakpoint
 class Template(Object):
     """A blueprint.json file."""
 
-    SCHEMA_FILE = ROOT / "docs" / "blueprint.schema.json"
-
-    SCHEMA = json.loads(SCHEMA_FILE.read_text())
-
     TEMPLATES_ROOT = ROOT / "templates"
 
     _ok = True
+    _parent = None
 
     def __init__(self, template_id: str = None, **kwargs):
         """Initialize object."""
         self.id = template_id
 
-        super().__init__(**kwargs)
+        if self.schema and self.schema.properties:
+            for key, spec in self.schema.properties.items():
+                if key not in ["options", "arguments"]:
+                    try:
+                        value = (self.specs or {}).get(key)
+                        setattr(self, key.replace("-", "_"), value)
+                    except TemplateError:
+                        self._ok = False
 
-        for key, spec in self.SCHEMA.get("properties", {}).items():
-            try:
-                value = (self.specs or {}).get(key)
-                setattr(self, key.replace("-", "_"), value)
-            except TemplateError:
-                self._ok = False
+        super().__init__(**kwargs)
 
     def __eq__(self, other):
         """Equality."""
-        return self.id == other.id
+        return isinstance(other, Template) and self.id == other.id
 
     @classmethod
     @property
@@ -53,6 +51,13 @@ class Template(Object):
             for path in cls.TEMPLATES_ROOT.iterdir()
             if (path / "blueprint.json").is_file()
         ]
+
+    @attr
+    def schema(self):
+        """Return the data parsed from the schema JSON."""
+        if not self._schema and self.specs and (name := self.specs.get("type")):
+            self._schema = Schema(name)
+        return self._schema
 
     def _process_exe(self, exe) -> dict:
         """Process an #Executable from json.
@@ -88,9 +93,49 @@ class Template(Object):
             return
 
         if not self._specs:
-            with open(self.blueprint) as fp:
-                self._specs = Dict(json.load(fp))
+            try:
+                with open(self.blueprint) as fp:
+                    self._specs = Dict(json.load(fp))
+            except JSONDecodeError:
+                raise TemplateError(f"JSON parse error, template: {self.id}")
+
         return self._specs
+
+    @property
+    def parent(self) -> "Template":
+        """Set the parent template value."""
+        if not self._parent and self.specs and self.specs.get("parent"):
+            self._parent = Template(self.specs.parent)
+        return self._parent
+
+    @parent.setter
+    def parent(self, value):
+        """Set the parent template value."""
+        if isinstance(value, str):
+            value = Template(value)
+        self._parent = value
+
+    @attr
+    def options(self) -> Dict:
+        """Return the template options, recursive for parents."""
+        if not self._options:
+            self._options = Dict()
+            if self.parent and self.parent.options:
+                self._options.update(self.parent.options)
+            if self.specs:
+                self._options.update(self.specs.get("options", {}))
+        return self._options
+
+    @attr
+    def arguments(self) -> Dict:
+        """Return the template arguments, recursive for parents."""
+        if not self._arguments:
+            self._arguments = Dict()
+            if self.parent and self.parent.arguments:
+                self._arguments.update(self.parent.arguments)
+            if self.specs:
+                self._arguments.update(self.specs.get("arguments", {}))
+        return self._arguments
 
     @attr(method="setter")
     def setup(self, value) -> list:
@@ -109,34 +154,28 @@ class Template(Object):
             k: self._process_exe(step) for k, step in (value or {}).items()
         }
 
-    @property
     def ok(self):
         """Return True if the Template is valid."""
         if self._ok is False:
             return False
 
+        self.error = None
+
         if not self.blueprint.is_file():
+            self.error = f"No such blueprint file: {self.blueprint}"
             return False
 
         try:
             self.specs
-        except JSONDecodeError:
+        except TemplateError as ex:
+            self.error = ex.message
             return False
 
-        schema = ROOT / "docs" / "blueprint.schema.json"
+        is_valid = self.schema.validate(self.specs)
+        if not is_valid:
+            self.error = self.schema.error
 
-        with open(schema) as fp:
-            schema = json.load(fp)
-
-        try:
-            validate(
-                schema=schema,
-                instance=self.specs,
-            )
-        except ValidationError:
-            return False
-
-        return True
+        return is_valid
 
     @attr
     def config(self) -> Config:

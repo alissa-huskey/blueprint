@@ -1,7 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Project Type",
-  "description": "Blueprint Project Type definition.",
+  "$id": "base.schema.json",
+  "title": "Blueprint base schema",
+  "description": "Blueprint template definition.",
   "version": "0.1.0",
   "type": "object",
   "$defs": {
@@ -130,6 +131,11 @@
       "examples": ["basic"],
       "$ref": "#nonEmptyString"
     },
+    "project-dir": {
+      "description": "Pattern of what to name the base project directory.",
+      "examples": ["phpbb-${NAME}"],
+      "$ref": "#nonEmptyString"
+    },
     "requirements": {
       "description": "Requirements that must be installed on system to work.",
       "examples": [
@@ -139,40 +145,6 @@
       "type": "array",
       "uniqueItems": true,
       "items": { "$ref": "#nonEmptyString" }
-    },
-    "stack": {
-      "description": "Toolstack specifications. (For type: language-toolstack)",
-      "$comment": "Annotations",
-      "type": "object",
-      "additionalProperties": { "$ref": "#nonEmptyString" },
-      "required": ["language"],
-      "properties": {
-        "language": {
-          "description": "Primary language this project is written in.",
-          "examples": ["python"],
-          "$ref": "#nonEmptyString"
-        },
-        "dependencies": {
-          "description": "Dependency management tool.",
-          "examples": ["poetry"],
-          "$ref": "#nonEmptyString"
-        },
-        "tests": {
-          "description": "Testing framework.",
-          "examples": ["pytest"],
-          "$ref": "#nonEmptyString"
-        },
-        "linter": {
-          "description": "Linter.",
-          "examples": ["flake8"],
-          "$ref": "#nonEmptyString"
-        },
-        "formatter": {
-          "description": "Formatter",
-          "examples": ["black"],
-          "$ref": "#nonEmptyString"
-        }
-      }
     },
     "variables": {
       "description": "Variables to define.",
@@ -200,6 +172,12 @@
         }
       }
     },
+    "arguments": {
+      "description": "Arguments to use in addition to `name`. Keys are argument names, values are click.Argument kwargs.",
+      "comment": "The name argument can be included for argument order. Otherwise, arguments are listed after `name`.",
+      "examples": [{ "vendor": {}, "name": {} }],
+      "type": "object"
+    },
     "setup": {
       "description": "Steps to set up this project.",
       "examples": [[
@@ -226,28 +204,6 @@
       ],
       "type": "array",
       "items": { "$ref": "#Executable" }
-    },
-    "dependency-commands": {
-        "description": "Commands to add dependencies.",
-        "examples": [
-          {
-            "main": ["poerty", "add"],
-            "dev": ["poetry", "add", "--group", "dev"]
-          }
-        ],
-        "type": "object",
-        "properties": {
-          "main": {
-            "type": "array",
-            "items": {"$rev": "#nonEmptyString"},
-            "minItems": 1
-          },
-          "dev": {
-            "type": "array",
-            "items": {"$rev": "#nonEmptyString"},
-            "minItems": 1
-          }
-        }
     }
   }
 }

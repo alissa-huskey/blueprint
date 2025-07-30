@@ -11,3 +11,5 @@ x 2024-04-17 2024-04-17 python: add --pyversion-constraint
 x 2024-04-17 2024-04-17 python: make default pyversion PythonProject.PYTHON_VERSION
 x 2024-04-17 2024-04-17 add --desc option
 x 2024-04-17 2024-03-09 maybe add license
+x 2025-07-29 2024-04-17 @bug @python fix (in local install) fail to install dev deps due to wrong python version
+x 2025-07-29 2025-07-29 @task Schema: validate() and ok() -- check parent too

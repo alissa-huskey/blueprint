@@ -285,11 +285,11 @@ def test_project_substitutions(fixtures_path):
     with set_templates_root(fixtures_path):
         project = Project("toolstack", "my project", pyv="3.10.2")
 
-    subs = project.substitutions
+        subs = project.substitutions
 
-    assert "DASH_NAME" in subs and subs["DASH_NAME"] == "my-project"
-    assert "PYV" in subs and subs["PYV"] == "3.10.2"
-    assert "PYTHON_EXE" in subs
+        assert "DASH_NAME" in subs and subs["DASH_NAME"] == "my-project"
+        assert "PYV" in subs and subs["PYV"] == "3.10.2"
+        assert "PYTHON_EXE" in subs
 
 
 class RunParams(Object):

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "framework-application.schema.json",
+  "$ref": "base.schema.json",
+  "title": "Blueprint framework application schema.",
+  "required": ["name", "description", "version", "type", "stack"],
+  "properties": {
+    "type": { "constant": "framework-application" },
+    "stack": {
+      "description": "Toolstack specifications.",
+      "$comment": "Annotations",
+      "type": "object",
+      "additionalProperties": { "$ref": "base.schema.json#nonEmptyString" },
+      "required": ["language", "framework"],
+      "properties": {
+        "language": {
+          "description": "Primary language this project is written in.",
+          "examples": ["python"],
+          "$ref": "base.schema.json#nonEmptyString"
+        },
+        "framework": {
+          "description": "Framework that this project is built on.",
+          "examples": ["Ruby on Rails"],
+          "$ref": "base.schema.json#nonEmptyString"
+        }
+      }
+    }
+  }
+}

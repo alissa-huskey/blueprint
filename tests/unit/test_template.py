@@ -1,6 +1,9 @@
+import json
+
 import pytest
 
 from blueprint.config import Config
+from blueprint.schema import Schema
 from blueprint.template import Template
 from tests.unit import set_templates_root
 
@@ -16,7 +19,7 @@ def blueprint_json():
             "title": "Project Template",
             "description": "A project template.",
             "version": "0.1.0",
-            "type": "language-toolstack"
+            "type": "generic"
         }
     """
 
@@ -81,6 +84,8 @@ def test_template_parent():
     WHEN: .parent is accessed
     THEN: it should return the Template for that variable
     """
+    template = Template("python-poetry")
+    assert template.parent == Template("basic")
 
 
 def test_template_has_requirements():
@@ -97,20 +102,21 @@ def test_template_ok_true(tmp_path, blueprint_json):
     with set_templates_root(tmp_path):
         template = Template("project")
 
-        assert template.ok
+        assert template.ok() is True
 
 
-def test_template_ok_false_missing_file(tmp_path):
+def test_template_not_ok_missing_file(tmp_path):
     templatedir = tmp_path / "project"
     templatedir.mkdir()
 
     with set_templates_root(tmp_path):
         template = Template("project")
 
-        assert not template.ok
+        assert template.ok() is False
+        assert template.error == f"No such blueprint file: {template.blueprint}"
 
 
-def test_template_ok_false_invalid_file(tmp_path, blueprint_json):
+def test_template_not_ok_invalid_file(tmp_path, blueprint_json):
     templatedir = tmp_path / "project"
     templatedir.mkdir()
 
@@ -127,7 +133,8 @@ def test_template_ok_false_invalid_file(tmp_path, blueprint_json):
     with set_templates_root(tmp_path):
         template = Template("project")
 
-        assert not template.ok
+        assert template.ok() is False
+        assert template.error == "'description' is a required property"
 
 
 def test_template_config():
@@ -226,10 +233,6 @@ def test_template_process_exe(fixtures_path):
         assert result == cmd
 
 
-def test_template_x():
-    ...
-
-
 def test_template_spec_attrs(fixtures_path):
     """
     GIVEN: A Template object
@@ -249,7 +252,6 @@ def test_template_spec_attrs(fixtures_path):
         "stack",
         "config",
         "variables",
-        "options",
         "setup",
         "after",
     ]
@@ -265,7 +267,7 @@ def test_template_spec_attrs(fixtures_path):
         assert template.description == "Python project managed by poetry."
         assert template.version == "0.1.0"
         assert template.type == "language-toolstack"
-        assert template.parent == "basic"
+        assert template.parent == Template("basic")
 
 
 def test_template_config():
@@ -273,3 +275,131 @@ def test_template_config():
 
     assert isinstance(template.config, Config)
     assert template.config.path == Config.BASE / "basic.yml"
+
+
+def test_template_arguments(tmp_path, blueprint_json):
+    specs = json.loads(blueprint_json)
+    specs["arguments"] = {"a": {}}
+    (tmp_path / "basic").mkdir()
+    (tmp_path / "basic" / "blueprint.json").write_text(json.dumps(specs))
+
+    with set_templates_root(tmp_path):
+        template = Template("basic")
+
+        assert template.arguments == {"a": {}}
+
+
+def test_template_arguments_parents(tmp_path, blueprint_json):
+    templates = {
+        "base": {
+            "arguments": {
+                "a": {"help": "base a option"},
+                "b": {"help": "base b option"},
+                "c": {"help": "base c option"},
+            },
+        },
+        "php": {
+            "parent": "base",
+            "arguments": {
+                "b": {"help": "php b option"},
+                "c": {"help": "php c option"},
+            },
+        },
+        "phpbb-ext": {
+            "parent": "php",
+            "arguments": {
+                "c": {"help": "phpbb-ext c option"},
+                "d": {"help": "phpbb-ext d option"},
+            },
+        },
+    }
+    specs = json.loads(blueprint_json)
+
+    for name, cfg in templates.items():
+        tpl_specs = specs.copy()
+        tpl_specs["arguments"] = cfg["arguments"]
+        tpl_specs["parent"] = cfg.get("parent")
+        (tmp_path / name).mkdir()
+        (tmp_path / name / "blueprint.json").write_text(json.dumps(tpl_specs))
+
+    arguments = {
+        "a": templates["base"]["arguments"]["a"],
+        "b": templates["php"]["arguments"]["b"],
+        "c": templates["phpbb-ext"]["arguments"]["c"],
+        "d": templates["phpbb-ext"]["arguments"]["d"],
+    }
+
+    with set_templates_root(tmp_path):
+        template = Template("phpbb-ext")
+        template.arguments
+        assert template.arguments == arguments
+
+
+def test_template_options(tmp_path, blueprint_json):
+    specs = json.loads(blueprint_json)
+    specs["options"] = {"a": {}}
+    (tmp_path / "basic").mkdir()
+    (tmp_path / "basic" / "blueprint.json").write_text(json.dumps(specs))
+
+    with set_templates_root(tmp_path):
+        template = Template("basic")
+
+        assert template.options == {"a": {}}
+
+
+def test_template_options_parents(tmp_path, blueprint_json):
+    templates = {
+        "base": {
+            "options": {
+                "a": {"help": "base a option"},
+                "b": {"help": "base b option"},
+                "c": {"help": "base c option"},
+            },
+        },
+        "php": {
+            "parent": "base",
+            "options": {
+                "b": {"help": "php b option"},
+                "c": {"help": "php c option"},
+            },
+        },
+        "phpbb-ext": {
+            "parent": "php",
+            "options": {
+                "c": {"help": "phpbb-ext c option"},
+                "d": {"help": "phpbb-ext d option"},
+            },
+        },
+    }
+    specs = json.loads(blueprint_json)
+
+    for name, cfg in templates.items():
+        tpl_specs = specs.copy()
+        tpl_specs["options"] = cfg["options"]
+        tpl_specs["parent"] = cfg.get("parent")
+        (tmp_path / name).mkdir()
+        (tmp_path / name / "blueprint.json").write_text(json.dumps(tpl_specs))
+
+    options = {
+        "a": templates["base"]["options"]["a"],
+        "b": templates["php"]["options"]["b"],
+        "c": templates["phpbb-ext"]["options"]["c"],
+        "d": templates["phpbb-ext"]["options"]["d"],
+    }
+
+    with set_templates_root(tmp_path):
+        template = Template("phpbb-ext")
+        template.options
+        assert template.options == options
+
+
+def test_template_schema():
+    template = Template("basic")
+    schema = template.schema
+
+    assert isinstance(schema, Schema)
+    assert schema.id == "generic.schema.json"
+
+
+def test_template_x():
+    ...
