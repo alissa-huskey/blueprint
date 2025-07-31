@@ -2,10 +2,10 @@
 
 from pathlib import Path
 from re import compile as re_compile
-from string import Template as TemplateString
 from subprocess import run
 
-#  from blueprint import ROOT, AccessError, ProgramError
+from jinja2 import Template
+
 from blueprint import AccessError, ProgramError
 from blueprint.attr import attr
 from blueprint.object import Object
@@ -189,7 +189,9 @@ class Project(Object):
     def substitute(self, text, variables=None) -> str:
         """Replace all substitutions with their variables."""
         variables = variables or self.substitutions
-        return TemplateString(text).safe_substitute(**variables)
+
+        tpl = Template(text)
+        return tpl.render(**variables)
 
     def install_all(self, plan=None):
         """Install all dotfiles from sources into the new project directory."""

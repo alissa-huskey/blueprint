@@ -1,13 +1,13 @@
 {
-    "name": "${VENDOR}/${SMOOSHED_NAME}",
+    "name": "{{ VENDOR }}/{{ SMOOSHED_NAME }}",
     "type": "phpbb-extension",
-    "description": "${SUMMARY}",
+    "description": "{{ SUMMARY }}",
     "version": "0.1.0",
     "keywords": ["phpbb", "extension"],
     "license": "GPL-2.0-only",
-    "authors": [ { "name": "${AUTHOR}" } ],
+    "authors": [ { "name": "{{ AUTHOR }}" } ],
     "require": {
-        "php": "${PHP_CONSTRAINT}",
+        "php": "{{ PHP_CONSTRAINT }}",
         "composer/installers": "~1.0"
     },
     "require-dev": {
@@ -17,7 +17,7 @@
         "php-stubs/generator": "*"
     },
     "extra": {
-        "display-name": "${TITLE_NAME}",
+        "display-name": "{{ TITLE_NAME }}",
         "soft-require": {
             "phpbb/phpbb": "~3.2"
         }
@@ -29,12 +29,12 @@
     },
    "autoload": {
      "psr-4": {
-       "${VENDOR}\\${SMOOSHED_NAME}\\": "./"
+       "{{ VENDOR }}\\{{ SMOOSHED_NAME }}\\": "./"
      }
    },
    "autoload-dev": {
      "psr-4": {
-       "${VENDOR}\\${SMOOSHED_NAME}\\tests\\": "tests/",
+       "{{ VENDOR }}\\{{ SMOOSHED_NAME }}\\tests\\": "tests/",
        "phpbb\\": "tests/stubs/phpbb/"
      }
    }

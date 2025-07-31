@@ -1,7 +1,7 @@
-"""${SNAKE_NAME}."""
+"""{{ SNAKE_NAME }}."""
 
 from pathlib import Path
 
-__version__ = "0.0.1"
+__version__ = "{{ VESION }}"
 
 ROOT = Path(__file__).parent.parent

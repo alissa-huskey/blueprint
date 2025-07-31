@@ -42,7 +42,7 @@
     {
       "cmd": [
         "cp",
-        "${PLANS_ROOT}/after/CodeSniffer.conf",
+        "{{ PLANS_ROOT }}/after/CodeSniffer.conf",
         "vendor/squizlabs/php_codesniffer/"
       ]
     }

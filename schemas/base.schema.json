@@ -19,7 +19,7 @@
     "executable-options": {
         "$anchor": "Options",
         "description": "Optional arguments to add to command or script only if variable in property name is defined",
-        "examples": [ { "{SUMMARY}": ["--description", "{SUMMARY}"] } ],
+        "examples": [ { "{{ SUMMARY }}": ["--description", "{{ SUMMARY }}"] } ],
         "type": "object",
         "minProperties": 1,
         "propertyNames": { "pattern": "^[$]\\{[A-Z_]+\\}$" },
@@ -49,7 +49,7 @@
     "executable-script": {
       "description": "Script to run.",
       "examples": [[
-        { "script": "setup-pyproject", "arguments": ["{VERSION}", "{PYV_CONSTRAINT}"] }
+        { "script": "setup-pyproject", "arguments": ["{{ VERSION }}", "{{ PYV_CONSTRAINT }}"] }
       ]],
       "$anchor": "Script",
       "type": "object",
@@ -63,8 +63,8 @@
         "arguments": {
           "description": "Arguments to send to script",
           "examples": [
-            ["{PATH}", "{VERSION}"],
-            ["{CONFIG_ROOT}"]
+            ["{{PATH}}", "{{ VERSION }}"],
+            ["{{ CONFIG_ROOT }}"]
           ],
           "type": "array",
           "minItems": 1,
@@ -133,7 +133,7 @@
     },
     "project-dir": {
       "description": "Pattern of what to name the base project directory.",
-      "examples": ["phpbb-${NAME}"],
+      "examples": ["phpbb-{{ NAME }}"],
       "$ref": "#nonEmptyString"
     },
     "requirements": {

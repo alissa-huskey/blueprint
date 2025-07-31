@@ -3,11 +3,11 @@
 /**
  * PHP 7-to-8 Compatibility
  *
- * PHP version ${PHP_CONSTRAINT}
+ * PHP version {{ PHP_CONSTRAINT }}
  *
  * @category Phpbb
- * @package  PhpBB_${VENDOR}_${PASCAL_NAME}
- * @author   ${AUTHOR}
+ * @package  PhpBB_{{ VENDOR }}_{{ PASCAL_NAME }}
+ * @author   {{ AUTHOR }}
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
  */
 

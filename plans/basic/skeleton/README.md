@@ -1,6 +1,6 @@
-# ${TITLE_NAME}
+# {{ TITLE_NAME }}
 
-> ${SUMMARY}
+> {{ SUMMARY }}
 
 Status
 ------

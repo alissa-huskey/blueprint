@@ -40,7 +40,7 @@ def test_project_path(tmp_path):
 
 def test_project_substitute():
     project = Project(name="my-project")
-    text = project.substitute("${SMOOSHED_NAME}")
+    text = project.substitute("{{ SMOOSHED_NAME }}")
 
     assert text == "myproject"
 
@@ -124,11 +124,13 @@ def test_project_install(tmp_path):
           directory
     THEN: The file should exist in the new project
     """
-    project = Project("basic", "myproject", dest=tmp_path)
+    project = Project("basic", "my project", dest=tmp_path)
     project.create()
     project.install("README.md")
+    path = project.path / "README.md"
 
-    assert (project.path / "README.md").is_file()
+    assert path.is_file()
+    assert "# My Project" in path.read_text()
 
 
 def test_project_install_subdir(tmp_path):
@@ -140,7 +142,7 @@ def test_project_install_subdir(tmp_path):
     project = Project("python-poetry", "my project", dest=tmp_path)
     project.create()
 
-    project.install("tests/test_${SNAKE_NAME}.py")
+    project.install("tests/test_{{SNAKE_NAME}}.py")
 
     assert (project.path / "tests" / "test_my_project.py").is_file()
 
@@ -177,13 +179,13 @@ def test_project_install_path_substitues(tmp_path):
     proj_path.mkdir()
 
     plans_root = tmp_path / "sources"
-    some_dir = plans_root / "a_plan" / "skeleton" / "${SNAKE_NAME}"
+    some_dir = plans_root / "a_plan" / "skeleton" / "{{SNAKE_NAME}}"
     some_dir.mkdir(parents=True)
 
     with set_plans_root(plans_root):
         project = Project("a_plan", "my-project", dest=tmp_path)
         project.create()
-        project.install("${SNAKE_NAME}")
+        project.install("{{SNAKE_NAME}}")
 
     assert (project.path / "my_project").is_dir()
 
@@ -312,8 +314,8 @@ class RunParams(Object):
         when="options=OPTIONS",
         then="present options should be added to command",
         kw=dict(options={
-            "${DASH_NAME}": ["--name", "${DASH_NAME}"],
-            "${SUMMARY}": ["--summary", "${SUMMARY}"],
+            "{{DASH_NAME}}": ["--name", "{{DASH_NAME}}"],
+            "{{SUMMARY}}": ["--summary", "{{SUMMARY}}"],
         }),
         ex_args=["ls", "--name", "my-project"]
     ),
@@ -340,7 +342,7 @@ class RunParams(Object):
     RunParams(
         when="substitute=True",
         then="substitutions should be replaced in command",
-        args=["${DASH_NAME}"],
+        args=["{{DASH_NAME}}"],
         kw=dict(substitute=True),
         ex_args=["my-project"],
     ),
@@ -377,5 +379,5 @@ def test_project_add_dependencies(subprocess_run_mock, tmp_path, config_yml):
         assert dependencies == ["pytest", "pynvim", "pylama", "black"]
 
 
-def test_project_script_x():
+def test_project_x():
     ...

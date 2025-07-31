@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "type": "extension",
   "parent": "php-composer",
-  "project-dir": "phpbb-${DASH_NAME}",
+  "project-dir": "phpbb-{{ DASH_NAME }}",
   "options": {
     "phpv": {
       "default": "7.4.33",

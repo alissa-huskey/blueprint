@@ -1,13 +1,13 @@
 {
-    "name": "${VENDOR}/${DASH_NAME}",
-    "description": "${SUMMARY}",
-    "version": "${VERSION}",
-    "type": "${PROJECT_TYPE}",
-    "license": "${LICENSE}",
-    "authors": [ { "name": "${AUTHOR}" } ],
+    "name": "{{ VENDOR }}/{{ DASH_NAME }}",
+    "description": "{{ SUMMARY }}",
+    "version": "{{ VERSION }}",
+    "type": "{{ PROJECT_TYPE }}",
+    "license": "{{ LICENSE }}",
+    "authors": [ { "name": "{{ AUTHOR }}" } ],
     "keywords": [],
     "require": {
-        "php": "${PHP_CONSTRAINT}",
+        "php": "{{ PHP_CONSTRAINT }}",
         "composer/installers": "~1.0"
     },
     "require-dev": {
@@ -21,12 +21,12 @@
     },
    "autoload": {
      "psr-4": {
-       "${VENDOR}\\${SMOOSHED_NAME}\\": "./"
+       "{{ VENDOR }}\\{{ SMOOSHED_NAME }}\\": "./"
      }
    },
    "autoload-dev": {
      "psr-4": {
-       "${VENDOR}\\${SMOOSHED_NAME}\\tests\\": "tests/",
+       "{{ VENDOR }}\\{{ SMOOSHED_NAME }}\\tests\\": "tests/",
        "phpbb\\": "tests/stubs/phpbb/"
      }
    }
