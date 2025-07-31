@@ -38,7 +38,7 @@
         "poetry",
         "init",
         "--no-interaction",
-        "--name", "{{ DASH_NAME }}",
+        "--name", "{{ NAME | to_kebab_case }}",
         "--directory", "{{ PATH }}",
         "--python", "{{ PYV_CONSTRAINT }}"
       ],

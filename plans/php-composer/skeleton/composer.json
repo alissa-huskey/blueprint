@@ -1,5 +1,5 @@
 {
-    "name": "{{ VENDOR }}/{{ DASH_NAME }}",
+    "name": "{{ VENDOR | to_kebab_case }}/{{ NAME | to_kebab_case }}",
     "description": "{{ SUMMARY }}",
     "version": "{{ VERSION }}",
     "type": "{{ PROJECT_TYPE }}",
@@ -21,12 +21,12 @@
     },
    "autoload": {
      "psr-4": {
-       "{{ VENDOR }}\\{{ SMOOSHED_NAME }}\\": "./"
+       "{{ VENDOR | to_pascal_case }}\\{{ NAME | to_pascal_case }}\\": "./src"
      }
    },
    "autoload-dev": {
      "psr-4": {
-       "{{ VENDOR }}\\{{ SMOOSHED_NAME }}\\tests\\": "tests/",
+       "{{ VENDOR | to_pascal_case | to_pascal_case }}\\{{ NAME | to_pascal_case }}\\Tests\\": "tests/",
        "phpbb\\": "tests/stubs/phpbb/"
      }
    }

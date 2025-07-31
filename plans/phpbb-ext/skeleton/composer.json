@@ -1,5 +1,5 @@
 {
-    "name": "{{ VENDOR }}/{{ SMOOSHED_NAME }}",
+    "name": "{{ VENDOR | to_smooshed_case }}/{{ NAME | to_smooshed_case }}",
     "type": "phpbb-extension",
     "description": "{{ SUMMARY }}",
     "version": "0.1.0",
@@ -17,7 +17,7 @@
         "php-stubs/generator": "*"
     },
     "extra": {
-        "display-name": "{{ TITLE_NAME }}",
+        "display-name": "{{ NAME | to_title_case }}",
         "soft-require": {
             "phpbb/phpbb": "~3.2"
         }
@@ -29,12 +29,12 @@
     },
    "autoload": {
      "psr-4": {
-       "{{ VENDOR }}\\{{ SMOOSHED_NAME }}\\": "./"
+       "{{ VENDOR | to_smooshed_case }}\\{{ NAME | to_smooshed_case }}\\": "./"
      }
    },
    "autoload-dev": {
      "psr-4": {
-       "{{ VENDOR }}\\{{ SMOOSHED_NAME }}\\tests\\": "tests/",
+       "{{ VENDOR | to_smooshed_case }}\\{{ NAME | to_smooshed_case }}\\tests\\": "tests/",
        "phpbb\\": "tests/stubs/phpbb/"
      }
    }

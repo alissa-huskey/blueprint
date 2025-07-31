@@ -2,8 +2,8 @@ BUILD_DIR=build
 DIST_DIR=releases
 INSTALL_DIR=$(HOME)/projects/phpbb/forum/ext
 
-VENDOR={{ VENDOR }}
-EXTENSION={{ SMOOSHED_NAME }}
+VENDOR={{ VENDOR | to_smooshed_case }}
+EXTENSION={{ NAME | to_smooshed_case }}
 VERSION=0.1.0
 
 EXT_ROOT=$(BUILD_DIR)/$(VENDOR)/$(EXTENSION)

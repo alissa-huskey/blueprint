@@ -42,7 +42,7 @@ load 'helper'
   assert_file_contains "${dest}/.python-version" "3.10.2"
 
   assert_file_contains "${dest}/pyproject.toml" '^name = "my-project"$'
-  assert_file_contains "${dest}/pyproject.toml" '^version = "0.0.1"$'
+  assert_file_contains "${dest}/pyproject.toml" '^version = "0.1.0"$'
   assert_file_contains "${dest}/pyproject.toml" '^description = "My new project."$'
   assert_file_contains "${dest}/pyproject.toml" '^license = "MIT"$'
   assert_file_contains "${dest}/pyproject.toml" '^python = ">=3.10.2"$'

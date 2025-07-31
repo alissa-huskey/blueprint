@@ -1,43 +1,26 @@
-(C) 2024-04-17 @feature @python add type: python-cli
-(Z) 2024-04-17 @feature @commands add command: list, for project types  @later
-(B) 2024-04-17 @feature @python make pyv (python version) come from envvar & configurable
-(M) 2024-04-17 @feature @python add --line-length (for flake8, etc) option
-(B) 2024-04-17 @feature @general add config file for defaults
-(D) 2024-04-17 @feature @cli @basic add: --proj-version option
-(B) 2024-04-17 @qa @python validate pyv
-(B) 2024-04-17 @qa @python try/except around `asdf where` in case version is not installed
-(A) 2024-04-17 @qa @python add step to verify that it worked
-(M) 2024-04-17 @feature @python @commands add change command (ie, `change pyv`)
-(M) 2024-04-17 @feature @basic expand README
-(B) 2024-04-17 @code-quality @basic rename sources/bare -> sources/basic
-(M) 2024-04-17 @code-quality @basic make a BasicProject subclass of Project @maybe
-(C) 2024-04-17 @code-quality move all project [sub/]classes into a projects dir
-(M) 2024-04-17 @feature @commands bash script template
-(M) 2024-04-17 @cli @commands rename new->proj
-(M) 2024-04-17 @feature @commands add command: file, ie `bp file bash`, `bp file pytest` to create new file
-(M) 2024-04-17 @feature @types add type: git-crypt
-(M) 2024-04-17 @feature @python add vscode settings
-(M) 2024-05-14 @feature @basic add license to as template var and to readme
-(M) 2024-05-14 @code-quality @sources add sources subdirs prefixed with "--" or soemthing for partial and meta files
-(M) 2024-06-01 @feature @basic add project name to .git/description file
-2024-06-16 @qa @python in tests set poetry virtualenvs.path to a test dir
-2024-06-16 @qa make sure requirements are installed (ie poetry)
-2024-06-18 @bug fix or remove semi-broken PythonProject.venv_path (see: https://github.com/python-poetry/poetry/issues/9493)
+(M) 2024-04-17 @blueprint @python-poetry add --line-length option (for flake8, etc) option (maybe global)
+(D) 2024-04-17 @feature add: --proj-version option
+(M) 2024-04-17 @feature add: "command" blueprint.json keyword (ie, `bp python-poetry change pyv`)
+(M) 2024-04-17 @blueprint add: bash-script
+(M) 2024-04-17 @feature add command: install, ie `bp file bash`, `bp file pytest` to create new file
+(M) 2024-04-17 @blueprint add: git-crypt
+(M) 2024-05-14 @blueprint @basic add license to to readme if present
+(M) 2024-06-01 @blueprint @basic add project name to .git/description file
 2024-06-18 @quality Refactor Project.run to ShellCommand class; use shutil.which to find command
-2024-06-18 @feature add --github-username; use this in README
 2024-06-18 @bare @feature add licence to README if present
 2024-06-18 @feature @python add bp generate(?) [test|class]
-2024-12-31 @feature @basic commit initial version to git (?)
-2024-12-31 @feature @python run `poetry install`
-2024-12-31 @feature @python in ~/.config/blueprint make a pyproject.toml file that sets the actual default settings for pyproject.toml (ie, pytest.ini_options, black, etc)
-(A) 2025-07-29 @task Plan: inherit options and args from parent.
-(B) 2025-07-29 @quality Split cli.py into multiple files.
 (A) 2025-07-29 @task Project: Use plan.project_dir if present.
 (A) 2025-07-29 @task Project: Execute 'after' steps.
-(A) 2025-07-29 @task Project.substitutions: add AUTHOR.
-(A) 2025-07-29 @task @plan php-composer: add a PHP file somewhere
-(A) 2025-07-29 @task Project.substitute: Handle .env and not substituting $PATH
-(C) 2025-07-29 @task @plan phpbb-ext: Add --phpbb-version option.
-(A) 2025-07-29 @bug Plan: phpbb-ext/blueprint.json is not raising an error even though the "stack" keyword is missing
-2025-07-30 @quality Extract formatting functions (snake_name, dash_name, etc) into helper functions.
-2025-07-30 Figure out some kind of filters. Maybe use jinja templates?
+(A) 2025-07-29 @task Get AUTHOR from github or make configurable
+(C) 2025-07-29 @blueprint @php-composer @bug phpunit is currently not working
+(C) 2025-07-29 @blueprint @phpbb-ext add: --phpbb-version option
+(C) 2025-07-29 @bug @blueprint @phpbb-ext not raising an error even though the "stack" keyword is missing
+(A) 2025-07-30 @task Add an "exclude" key to schema base, to skip parent files.
+(M) 2025-07-31 @config Add 'defaults' section to config files.
+(C) 2025-07-31 @blueprint finish: bats
+(B) 2025-07-31 @blueprint @php-composer @phpbb-ext Figure out how to search for backslash regexes
+(B) 2025-07-31 @blueprint @phpbb-ext add: --dirs option (cron, event, etc); Link to script that will create all of the directories.
+(M) 2025-07-31 @blueprint @python-typer Finish this.
+(M) 2025-07-31 @blueprint add: python-click
+(B) 2025-07-31 @housekeeping Update README.md
+(C) 2025-07-31 @blueprints Do something about SNAKE_NAME etc in file/directory names.

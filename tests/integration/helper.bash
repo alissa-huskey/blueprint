@@ -1,6 +1,6 @@
 #bash
 
-rootdir="$( cd -P "${BATS_TEST_DIRNAME}/../.." && echo "$PWD" )"
+: "${rootdir:="$( cd -P "${BATS_TEST_DIRNAME}/../.." && echo "$PWD" )"}"
 bindir="${rootdir}/bin"
 
 for lib in support assert file; do

@@ -1,4 +1,4 @@
-"""{{ SNAKE_NAME }}."""
+"""{{ NAME | to_snake_case }}."""
 
 from pathlib import Path
 

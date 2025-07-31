@@ -1,13 +1,15 @@
 """Module for a Project."""
 
 from pathlib import Path
-from re import compile as re_compile
 from subprocess import run
 
-from jinja2 import Template
+from jinja2 import Environment
 
 from blueprint import AccessError, ProgramError
 from blueprint.attr import attr
+from blueprint.formatters import (to_camel_case, to_kebab_case, to_pascal_case,
+                                  to_smooshed_case, to_snake_case,
+                                  to_title_case)
 from blueprint.object import Object
 from blueprint.plan import Plan
 
@@ -17,10 +19,9 @@ bp = breakpoint
 class Project(Object):
     """A new project."""
 
-    pascal_replacer = re_compile(r'[-]([a-z])')
-    smoosh_replacer = re_compile(r'[-_ ]')
-    DEFAULT_VERSION = "0.0.1"
+    DEFAULT_VERSION = "0.1.0"
 
+    _jinja_ = None
     _substitutions = {}
 
     def __init__(self,
@@ -79,7 +80,7 @@ class Project(Object):
 
         Example: MyProject
         """
-        return self.title_name.replace(" ", "")
+        return to_pascal_case(self.title_name)
 
     @property
     def dash_name(self) -> str:
@@ -87,7 +88,7 @@ class Project(Object):
 
         Example: my-project
         """
-        return self.name.lower().translate(str.maketrans("_ ", "--"))
+        return to_kebab_case(self.name)
 
     @property
     def snake_name(self) -> str:
@@ -95,7 +96,7 @@ class Project(Object):
 
         Example: my_project
         """
-        return self.name.lower().translate(str.maketrans("- ", "__"))
+        return to_snake_case(self.name)
 
     @property
     def smooshed_name(self) -> str:
@@ -103,7 +104,7 @@ class Project(Object):
 
         Example: my_project
         """
-        return self.smoosh_replacer.sub("", self.name.lower())
+        return to_smooshed_case(self.name)
 
     @property
     def title_name(self) -> str:
@@ -111,7 +112,7 @@ class Project(Object):
 
         Example: My Project
         """
-        return self.name.translate(str.maketrans("-_", "  ")).title()
+        return to_title_case(self.name)
 
     def create(self):
         """Create the project."""
@@ -146,6 +147,7 @@ class Project(Object):
         """Return a mapping of the file substitutions for installing files."""
         if not self._substitutions:
             self._substitutions = {
+                "NAME": self.name,
                 "DASH_NAME": self.dash_name,
                 "TITLE_NAME": self.title_name,
                 "SNAKE_NAME": self.snake_name,
@@ -186,11 +188,26 @@ class Project(Object):
 
         return self._substitutions
 
+    @property
+    def _jinja(self) -> Environment:
+        """Return a Jinja Environment object with filters added."""
+        if not self._jinja_:
+            self._jinja_ = Environment()
+            self._jinja_.filters.update({
+                "to_camel_case": to_camel_case,
+                "to_kebab_case": to_kebab_case,
+                "to_pascal_case": to_pascal_case,
+                "to_smooshed_case": to_smooshed_case,
+                "to_snake_case": to_snake_case,
+                "to_title_case": to_title_case,
+            })
+        return self._jinja_
+
     def substitute(self, text, variables=None) -> str:
         """Replace all substitutions with their variables."""
         variables = variables or self.substitutions
 
-        tpl = Template(text)
+        tpl = self._jinja.from_string(text)
         return tpl.render(**variables)
 
     def install_all(self, plan=None):

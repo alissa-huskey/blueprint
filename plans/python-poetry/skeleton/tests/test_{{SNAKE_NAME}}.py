@@ -1,4 +1,4 @@
-from {{ SNAKE_NAME }} import __version__
+from {{ NAME | to_snake_case }} import __version__
 
 
 def test_version():

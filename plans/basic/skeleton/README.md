@@ -1,6 +1,8 @@
-# {{ TITLE_NAME }}
+# {{ NAME | to_title_case }}
 
+{% if SUMMARY %}
 > {{ SUMMARY }}
+{% endif %}
 
 Status
 ------

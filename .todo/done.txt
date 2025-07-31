@@ -14,3 +14,14 @@ x 2024-04-17 2024-03-09 maybe add license
 x 2025-07-29 2024-04-17 @bug @python fix (in local install) fail to install dev deps due to wrong python version
 x 2025-07-29 2025-07-29 @task Schema: validate() and ok() -- check parent too
 x 2025-07-30 2025-07-29 @task Project.substititions: add arguments.
+x 2025-07-30 2025-07-29 @task Project.substitute: Handle .env and not substituting $PATH
+x 2025-07-31 2025-07-30 @quality Extract formatting functions (snake_name, dash_name, etc) into helper functions.
+x 2025-07-31 2024-04-17 @qa @python add step to verify that it worked
+x 2025-07-31 2025-07-30 Figure out some kind of filters. Maybe use jinja templates?
+x 2025-07-31 2024-12-31 @feature @python run `poetry install`
+x 2025-07-31 2024-04-17 @code-quality @basic rename sources/bare -> sources/basic
+x 2025-07-31 2024-04-17 @feature @general add config file for defaults
+x 2025-07-31 2024-12-31 @feature @python in ~/.config/blueprint make a pyproject.toml file that sets the actual default settings for pyproject.toml (ie, pytest.ini_options, black, etc)
+x 2025-07-31 2024-04-17 @feature @commands add command: list, for project types  @later
+x 2025-07-31 2025-07-29 @task Plan: inherit options and args from parent.
+x 2025-07-31 2025-07-29 @quality Split cli.py into multiple files.
