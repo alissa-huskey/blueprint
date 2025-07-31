@@ -33,7 +33,7 @@ load 'helper'
   assert_dir_exists "${dest}/src"
   assert_dir_exists "${dest}/tests"
   assert_dir_exists "${dest}/phpcs-rules"
-  # assert_dir_exists "${dest}/vendor"
+  assert_dir_exists "${dest}/vendor"
 
   assert_file_exists "${dest}/.env"
   assert_file_exists "${dest}/.ackrc"
@@ -45,7 +45,7 @@ load 'helper'
   assert_file_exists "${dest}/README.md"
   assert_file_exists "${dest}/src/MyProject.php"
   assert_file_exists "${dest}/tests/MyProjectTest.php"
-  # assert_file_exists "${dest}/vendor/squizlabs/php_codesniffer/CodeSniffer.conf"
+  assert_file_exists "${dest}/vendor/squizlabs/php_codesniffer/CodeSniffer.conf"
 
   assert_file_contains "${dest}/.env" 'export PATH="./vendor/bin:${PATH}"'
 

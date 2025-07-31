@@ -248,17 +248,20 @@ def test_project_setup(tmp_path):
     assert (project.path / ".git").is_dir()
 
 
-def test_project_setup(tmp_path):
+def test_project_after(tmp_path, fixtures_path):
     """
     GIVEN: a project object where create() has been called
     WHEN: project.setup() is called
     THEN: the project should be git init'd
     """
-    project = Project("basic", "myproject", dest=tmp_path)
-    project.create()
-    project.setup()
+    with set_plans_root(fixtures_path):
+        project = Project("composer", "my project", dest=tmp_path)
+        project.create()
+        project.setup()
+        project.install_all()
+        project.setup(steps="after")
 
-    assert (project.path / ".git").is_dir()
+        assert (project.path / "vendor").is_dir()
 
 
 def test_project_setup_parent(tmp_path):

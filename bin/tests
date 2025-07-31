@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#
+# Run tests
+
+pytest tests/unit \
+  && bats tests/integration \
+  && bats plans/*/tests

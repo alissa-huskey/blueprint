@@ -25,3 +25,4 @@ x 2025-07-31 2024-12-31 @feature @python in ~/.config/blueprint make a pyproject
 x 2025-07-31 2024-04-17 @feature @commands add command: list, for project types  @later
 x 2025-07-31 2025-07-29 @task Plan: inherit options and args from parent.
 x 2025-07-31 2025-07-29 @quality Split cli.py into multiple files.
+x 2025-07-31 2025-07-29 @task Project: Execute 'after' steps.

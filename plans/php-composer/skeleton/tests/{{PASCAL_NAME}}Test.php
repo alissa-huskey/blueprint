@@ -5,7 +5,7 @@ namespace {{ VENDOR | to_pascal_case }}\{{ NAME | to_pascal_case }}\Tests;
 use {{ VENDOR | to_pascal_case }}\{{ NAME | to_pascal_case }}\{{ NAME | to_pascal_case }};
 use PHPUnit\Framework\TestCase;
 
-final class Test{{ NAME | to_pascal_case }} extends TestCase
+final class {{ NAME | to_pascal_case }}Test extends TestCase
 {
     public function testVersion(): void
     {

@@ -301,14 +301,14 @@ class Project(Object):
                     c.append(dep)
                     self.run(c)
 
-    def setup(self, plan=None):
+    def setup(self, plan=None, steps="setup"):
         """Execute setup steps."""
         plan = plan or self.plan
 
         if plan.parent:
-            self.setup(plan.parent)
+            self.setup(plan.parent, steps=steps)
 
-        for step in (plan.setup or []):
+        for step in plan.specs.get(steps, []):
             cmd = step["cmd"]
             outfile = step.get("out")
             params = {"substitute": True, "options": step.get("options", {})}
@@ -325,3 +325,4 @@ class Project(Object):
         self.setup()
         self.install_all()
         self.add_dependencies()
+        self.setup(steps="after")

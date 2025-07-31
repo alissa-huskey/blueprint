@@ -1,0 +1,8 @@
+{
+  "name": "After",
+  "description": "Generic project with 'after' setup steps.",
+  "version": "0.1.0",
+  "type": "generic",
+  "after": [ { "cmd": ["composer", "install"] }
+  ]
+}
