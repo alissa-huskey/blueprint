@@ -1,7 +1,7 @@
 {
-  "name": "template",
-  "title": "Template",
-  "description": "A project template.",
+  "name": "blueprint",
+  "title": "Blueprint",
+  "description": "A project Blueprint.",
   "version": "0.1.0",
   "type": "language-toolstack"
 }

@@ -79,8 +79,8 @@ class SchemaError(UserError):
     status: SysExit = SysExit.DATAERR
 
 
-class TemplateError(UserError):
-    """Something is wrong with the template."""
+class PlanError(UserError):
+    """Something is wrong with the plan."""
 
     status: SysExit = SysExit.DATAERR
 

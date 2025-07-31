@@ -4,7 +4,7 @@ import json
 from json import JSONDecodeError
 from pathlib import Path
 
-from blueprint import ROOT, TemplateError
+from blueprint import ROOT, PlanError
 from blueprint.attr import attr, hasattrs
 from blueprint.config import Config
 from blueprint.dict import Dict
@@ -15,17 +15,17 @@ bp = breakpoint
 
 
 @hasattrs
-class Template(Object):
+class Plan(Object):
     """A blueprint.json file."""
 
-    TEMPLATES_ROOT = ROOT / "templates"
+    ROOT = ROOT / "plans"
 
     _ok = True
     _parent = None
 
-    def __init__(self, template_id: str = None, **kwargs):
+    def __init__(self, plan_id: str = None, **kwargs):
         """Initialize object."""
-        self.id = template_id
+        self.id = plan_id
 
         if self.schema and self.schema.properties:
             for key, spec in self.schema.properties.items():
@@ -33,22 +33,22 @@ class Template(Object):
                     try:
                         value = (self.specs or {}).get(key)
                         setattr(self, key.replace("-", "_"), value)
-                    except TemplateError:
+                    except PlanError:
                         self._ok = False
 
         super().__init__(**kwargs)
 
     def __eq__(self, other):
         """Equality."""
-        return isinstance(other, Template) and self.id == other.id
+        return isinstance(other, Plan) and self.id == other.id
 
     @classmethod
     @property
-    def templates(cls):
-        """Return a list of templates."""
+    def plans(cls):
+        """Return a list of plans."""
         return [
             cls(path.name)
-            for path in cls.TEMPLATES_ROOT.iterdir()
+            for path in cls.ROOT.iterdir()
             if (path / "blueprint.json").is_file()
         ]
 
@@ -67,14 +67,14 @@ class Template(Object):
         if (script := exe.pop("script", None)):
             path = self.root / "scripts" / script
             if not path.is_file():
-                raise TemplateError(f"No such script: {path}")
+                raise PlanError(f"No such script: {path}")
             exe["cmd"] = [str(path), *exe.pop("arguments", [])]
         return exe
 
     @property
     def root(self) -> Path:
-        """Return the path to the source files for this template."""
-        return self.TEMPLATES_ROOT / self.id
+        """Return the path to the source files for this plan."""
+        return self.ROOT / self.id
 
     @property
     def blueprint(self) -> Path:
@@ -83,7 +83,7 @@ class Template(Object):
 
     @property
     def skeleton(self) -> Path:
-        """Return the path to the source files for this template."""
+        """Return the path to the source files for this plan."""
         return self.root / "skeleton"
 
     @attr
@@ -97,27 +97,27 @@ class Template(Object):
                 with open(self.blueprint) as fp:
                     self._specs = Dict(json.load(fp))
             except JSONDecodeError:
-                raise TemplateError(f"JSON parse error, template: {self.id}")
+                raise PlanError(f"JSON parse error, plan: {self.id}")
 
         return self._specs
 
     @property
-    def parent(self) -> "Template":
-        """Set the parent template value."""
+    def parent(self) -> "Plan":
+        """Set the parent plan value."""
         if not self._parent and self.specs and self.specs.get("parent"):
-            self._parent = Template(self.specs.parent)
+            self._parent = Plan(self.specs.parent)
         return self._parent
 
     @parent.setter
     def parent(self, value):
-        """Set the parent template value."""
+        """Set the parent plan value."""
         if isinstance(value, str):
-            value = Template(value)
+            value = Plan(value)
         self._parent = value
 
     @attr
     def options(self) -> Dict:
-        """Return the template options, recursive for parents."""
+        """Return the plan options, recursive for parents."""
         if not self._options:
             self._options = Dict()
             if self.parent and self.parent.options:
@@ -128,7 +128,7 @@ class Template(Object):
 
     @attr
     def arguments(self) -> Dict:
-        """Return the template arguments, recursive for parents."""
+        """Return the plan arguments, recursive for parents."""
         if not self._arguments:
             self._arguments = Dict()
             if self.parent and self.parent.arguments:
@@ -155,7 +155,7 @@ class Template(Object):
         }
 
     def ok(self):
-        """Return True if the Template is valid."""
+        """Return True if the Plan is valid."""
         if self._ok is False:
             return False
 
@@ -167,7 +167,7 @@ class Template(Object):
 
         try:
             self.specs
-        except TemplateError as ex:
+        except PlanError as ex:
             self.error = ex.message
             return False
 
@@ -179,7 +179,7 @@ class Template(Object):
 
     @attr
     def config(self) -> Config:
-        """Return the Config object for this template."""
+        """Return the Config object for this plan."""
         if not self._config:
             self._config = Config(self.id)
         return self._config

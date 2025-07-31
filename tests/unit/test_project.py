@@ -2,9 +2,9 @@ import pytest
 
 from blueprint import AccessError
 from blueprint.object import Object
+from blueprint.plan import Plan
 from blueprint.project import Project
-from blueprint.template import Template
-from tests.unit import set_config_base, set_templates_root
+from tests.unit import set_config_base, set_plans_root
 
 bp = breakpoint
 
@@ -26,10 +26,10 @@ def test_project_dest_valid(tmp_path):
     assert project.dest == tmp_path
 
 
-def test_project_template():
+def test_project_plan():
     project = Project("basic")
 
-    assert project.template == Template("basic")
+    assert project.plan == Plan("basic")
 
 
 def test_project_path(tmp_path):
@@ -154,12 +154,12 @@ def test_project_install_is_dir(tmp_path):
     proj_path = tmp_path / "project"
     proj_path.mkdir()
 
-    templates_root = tmp_path / "templates"
-    some_dir = templates_root / "a_template" / "skeleton" / "some_dir"
+    plans_root = tmp_path / "plans"
+    some_dir = plans_root / "a_plan" / "skeleton" / "some_dir"
     some_dir.mkdir(parents=True)
 
-    with set_templates_root(templates_root):
-        project = Project("a_template", "myproject", dest=proj_path)
+    with set_plans_root(plans_root):
+        project = Project("a_plan", "myproject", dest=proj_path)
         project.create()
         project.install("some_dir")
 
@@ -169,19 +169,19 @@ def test_project_install_is_dir(tmp_path):
 def test_project_install_path_substitues(tmp_path):
     """
     GIVEN: a Project object where create() has been called
-    AND: a file or directory exists with a template variable
+    AND: a file or directory exists with a plan variable
     WHEN: project.install() is called with that filename
     THEN: The variable name should be replaced with the right value
     """
     proj_path = tmp_path / "project"
     proj_path.mkdir()
 
-    templates_root = tmp_path / "sources"
-    some_dir = templates_root / "a_template" / "skeleton" / "${SNAKE_NAME}"
+    plans_root = tmp_path / "sources"
+    some_dir = plans_root / "a_plan" / "skeleton" / "${SNAKE_NAME}"
     some_dir.mkdir(parents=True)
 
-    with set_templates_root(templates_root):
-        project = Project("a_template", "my-project", dest=tmp_path)
+    with set_plans_root(plans_root):
+        project = Project("a_plan", "my-project", dest=tmp_path)
         project.create()
         project.install("${SNAKE_NAME}")
 
@@ -277,12 +277,12 @@ def test_project_substitutions(fixtures_path):
     GIVEN: A Project object
     AND: A json file that includes variables and options
     WHEN: .substitutuions is accessed
-    THEN: it should include keys for the default template variables (ie DASH_NAME)
-    AND: it should include keys the template options (ie PYV)
-    AND: it should include keys for the template variables (ie PYTHON_EXE)
+    THEN: it should include keys for the default plan variables (ie DASH_NAME)
+    AND: it should include keys the plan options (ie PYV)
+    AND: it should include keys for the plan variables (ie PYTHON_EXE)
     """
 
-    with set_templates_root(fixtures_path):
+    with set_plans_root(fixtures_path):
         project = Project("toolstack", "my project", pyv="3.10.2")
 
         subs = project.substitutions
@@ -294,7 +294,7 @@ def test_project_substitutions(fixtures_path):
 
 
 class RunParams(Object):
-    """."""
+    """Parameters for test_project_run()."""
 
     def __init__(self, **kwargs):
         """."""
@@ -367,7 +367,7 @@ def test_project_add_dependencies(subprocess_run_mock, tmp_path, config_yml):
     file.write_text(config_yml)
 
     with set_config_base(tmp_path):
-        project = Project(name="my project", template="python-poetry")
+        project = Project(name="my project", plan="python-poetry")
         project.add_dependencies()
 
         calls = mock.call_args_list

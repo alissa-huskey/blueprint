@@ -15,17 +15,17 @@ class Config(Object):
 
     data = {}
 
-    def __init__(self, template: str = None, read: bool = False, **kwargs):
+    def __init__(self, plan: str = None, read: bool = False, **kwargs):
         """Initialize object."""
-        self.template = template
+        self.plan = plan
 
         if read:
             self.read()
 
     @property
     def path(self):
-        """Path to this template's config file."""
-        return self.BASE / f"{self.template}.yml"
+        """Path to this plan's config file."""
+        return self.BASE / f"{self.plan}.yml"
 
     def exists(self):
         """Return True if config file exists."""
@@ -33,7 +33,7 @@ class Config(Object):
 
     def read(self) -> bool:
         """Read the config file."""
-        if not (self.template and self.path.is_file()):
+        if not (self.plan and self.path.is_file()):
             return False
 
         with open(self.path) as fp:

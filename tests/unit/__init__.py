@@ -3,19 +3,19 @@
 from contextlib import contextmanager
 
 from blueprint.config import Config
+from blueprint.plan import Plan
 from blueprint.schema import Schema
-from blueprint.template import Template
 
 bp = breakpoint
 
 
 @contextmanager
-def set_templates_root(root):
-    """Temporarily modify the TEMPLATES_ROOT directory of a Project class."""
-    orig = Template.TEMPLATES_ROOT
-    Template.TEMPLATES_ROOT = root
+def set_plans_root(root):
+    """Temporarily modify the Plan.ROOT directory of a Project class."""
+    orig = Plan.ROOT
+    Plan.ROOT = root
     yield
-    Template.TEMPLATES_ROOT = orig
+    Plan.ROOT = orig
 
 
 @contextmanager

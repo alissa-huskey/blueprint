@@ -30,14 +30,14 @@
 2024-12-31 @feature @basic commit initial version to git (?)
 2024-12-31 @feature @python run `poetry install`
 2024-12-31 @feature @python in ~/.config/blueprint make a pyproject.toml file that sets the actual default settings for pyproject.toml (ie, pytest.ini_options, black, etc)
-(A) 2025-07-29 @task Template: inherit options and args from parent.
+(A) 2025-07-29 @task Plan: inherit options and args from parent.
 (B) 2025-07-29 @quality Split cli.py into multiple files.
-(A) 2025-07-29 @task Project: Use template.project_dir if present.
+(A) 2025-07-29 @task Project: Use plan.project_dir if present.
 (A) 2025-07-29 @task Project: Execute 'after' steps.
 (A) 2025-07-29 @task Project.substitutions: add AUTHOR.
-(A) 2025-07-29 @task @template php-composer: add a PHP file somewhere
+(A) 2025-07-29 @task @plan php-composer: add a PHP file somewhere
 (A) 2025-07-29 @task Project.substitute: Handle .env and not substituting $PATH
-(C) 2025-07-29 @task @template phpbb-ext: Add --phpbb-version option.
-(A) 2025-07-29 @bug Template: phpbb-ext/blueprint.json is not raising an error even though the "stack" keyword is missing
+(C) 2025-07-29 @task @plan phpbb-ext: Add --phpbb-version option.
+(A) 2025-07-29 @bug Plan: phpbb-ext/blueprint.json is not raising an error even though the "stack" keyword is missing
 2025-07-30 @quality Extract formatting functions (snake_name, dash_name, etc) into helper functions.
 2025-07-30 Figure out some kind of filters. Maybe use jinja templates?

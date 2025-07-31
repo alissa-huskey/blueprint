@@ -9,7 +9,7 @@ from subprocess import run
 from blueprint import AccessError, ProgramError
 from blueprint.attr import attr
 from blueprint.object import Object
-from blueprint.template import Template
+from blueprint.plan import Plan
 
 bp = breakpoint
 
@@ -24,32 +24,32 @@ class Project(Object):
     _substitutions = {}
 
     def __init__(self,
-                 template=None,
+                 plan=None,
                  name=None,
                  dest=None,
                  summary="",
                  license="",
                  **kwargs):
         """Create a new project object."""
-        self.template = template
+        self.plan = plan
         self.name = name
         self.dest = dest
         self.summary = summary or ""
         self.license = license or ""
 
-        if self.template and self.template.specs:
-            for key, value in (self.template.specs.get("options", {})).items():
+        if self.plan and self.plan.specs:
+            for key, value in (self.plan.specs.get("options", {})).items():
                 key = key.replace("-", "_")
                 setattr(self, key, kwargs.pop(key, value.get("default", "")))
 
         super().__init__(**kwargs)
 
     @attr(method="setter")
-    def template(self, value) -> Template:
-        """Set the template."""
+    def plan(self, value) -> Plan:
+        """Set the plan."""
         if isinstance(value, str):
-            value = Template(value)
-        self._template = value
+            value = Plan(value)
+        self._plan = value
 
     @attr(method="setter")
     def dest(self, value) -> Path:
@@ -117,16 +117,16 @@ class Project(Object):
         """Create the project."""
         self.path.mkdir(exist_ok=True)
 
-    def install(self, path, template=None):
+    def install(self, path, plan=None):
         """Copy a file or create an empty directory from the source to the dest."""
-        template = template or self.template
+        plan = plan or self.plan
 
         if isinstance(path, str):
-            path = template.skeleton / path
+            path = plan.skeleton / path
 
         rel_path = Path(*[
             self.substitute(p)
-            for p in path.relative_to(template.skeleton).parts
+            for p in path.relative_to(plan.skeleton).parts
         ])
 
         dest = self.path / rel_path
@@ -154,25 +154,25 @@ class Project(Object):
                 "VERSION": self.DEFAULT_VERSION,
                 "SUMMARY": self.summary,
                 "LICENSE": self.license,
-                "TEMPLATE_ROOT": (self.template and self.template.root or ""),
+                "PLANS_ROOT": (self.plan and self.plan.root or ""),
                 "DEST": self.dest,
                 "PATH": self.path,
             }
 
-            if self.template:
+            if self.plan:
                 # set the options defined in blueprint.json
-                for key in (self.template.options or {}):
+                for key in (self.plan.options or {}):
                     name = key.translate(str.maketrans("- ", "__"))
                     self._substitutions[name.upper()] = getattr(self, name, "")
 
                 # set the arguments defined in blueprint.json
-                for key in (self.template.arguments or {}):
+                for key in (self.plan.arguments or {}):
                     name = key.translate(str.maketrans("- ", "__"))
                     self._substitutions[name.upper()] = getattr(self, name, "")
 
                 extra = {}
                 # set the variables defined in blueprint.json
-                for key, exe in (self.template.variables or {}).items():
+                for key, exe in (self.plan.variables or {}).items():
                     name = key.translate(str.maketrans("- ", "__"))
 
                     # don't use self.run(..., substitute=True)
@@ -191,15 +191,15 @@ class Project(Object):
         variables = variables or self.substitutions
         return TemplateString(text).safe_substitute(**variables)
 
-    def install_all(self, template=None):
+    def install_all(self, plan=None):
         """Install all dotfiles from sources into the new project directory."""
-        template = template or self.template
+        plan = plan or self.plan
 
-        if template.parent:
-            self.install_all(template.parent)
+        if plan.parent:
+            self.install_all(plan.parent)
 
-        for path in template.skeleton.glob("**/*"):
-            self.install(path, template)
+        for path in plan.skeleton.glob("**/*"):
+            self.install(path, plan)
 
     def run(
         self,
@@ -214,9 +214,9 @@ class Project(Object):
 
         Args:
             * command (list): command to run
-            * substitute (bool, default=False): replace template variables in command?
-            * options (dict, default=None): maps template variable -> list of arguments
-                                            if template variable is present
+            * substitute (bool, default=False): replace plan variables in command?
+            * options (dict, default=None): maps plan variable -> list of arguments
+                                            if plan variable is present
                                             add list of arguments after substitution
             * capture_output (bool, default=True): if output should be captured
             * text (bool, default=True): decode text in output?
@@ -267,11 +267,11 @@ class Project(Object):
     def add_dependencies(self):
         """Install all dependencies from the config file."""
         if not (
-            (cmds := self.template.specs.get("dependency-commands"))
-            and self.template.config
-            and self.template.config.exists()
-            and self.template.config.read()
-            and (cfg := self.template.config.dependencies)
+            (cmds := self.plan.specs.get("dependency-commands"))
+            and self.plan.config
+            and self.plan.config.exists()
+            and self.plan.config.read()
+            and (cfg := self.plan.config.dependencies)
         ):
             return
 
@@ -282,14 +282,14 @@ class Project(Object):
                     c.append(dep)
                     self.run(c)
 
-    def setup(self, template=None):
+    def setup(self, plan=None):
         """Execute setup steps."""
-        template = template or self.template
+        plan = plan or self.plan
 
-        if template.parent:
-            self.setup(template.parent)
+        if plan.parent:
+            self.setup(plan.parent)
 
-        for step in (template.setup or []):
+        for step in (plan.setup or []):
             cmd = step["cmd"]
             outfile = step.get("out")
             params = {"substitute": True, "options": step.get("options", {})}

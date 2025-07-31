@@ -14,7 +14,7 @@ from rich_click.rich_command import RichCommand
 
 from blueprint import BlueprintError, UserError
 from blueprint.app import App
-from blueprint.template import Template
+from blueprint.plan import Plan
 
 click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.SHOW_ARGUMENTS = True
@@ -50,7 +50,7 @@ def shorten_path(path):
 def verify(app: App):
     """Ask the user to confirm that they want to proceed."""
     path = shorten_path(app.project.path)
-    prompt = f"Create {app.project.template.name} project at '{path}'?"
+    prompt = f"Create {app.project.plan.name} project at '{path}'?"
     if not confirm(prompt):
         exit()
 
@@ -61,11 +61,11 @@ def blueprint(*args, **kwargs):
 
 
 @blueprint.command()
-def templates():
-    """List templates."""
-    table = Table("", "Name", "Title", "Description")
+def blueprints():
+    """List blueprints."""
+    table = Table("OK", "Name", "Title", "Description")
 
-    for tpl in Template.templates:
+    for tpl in Plan.plans:
         cells = [tpl.id]
         try:
             tpl.specs
@@ -75,10 +75,10 @@ def templates():
             cells.append(tpl.specs.get("title", ""))
             cells.append(tpl.specs.get("description", ""))
 
-        if not tpl.ok:
+        if not tpl.ok():
             cells = [f"[dim]{text}" for text in cells]
 
-        table.add_row(("[red]E", "")[tpl.ok], *cells)
+        table.add_row(("[red]☒", "[green]☑")[tpl.ok()], *cells)
 
     console.print(table)
 
@@ -115,10 +115,10 @@ new_options = {
 }
 
 
-def _new_project_cmd(template):
+def _new_project_cmd(plan):
     """Return a callback to create a new project."""
     def _(*args, **kwargs):
-        app = App(*args, template=template, **kwargs)
+        app = App(*args, plan=plan, **kwargs)
         if app.project.path.is_dir():
             raise BadParameter(
                 f"Project directory already exists: {app.project.path}",
@@ -129,8 +129,8 @@ def _new_project_cmd(template):
     return _
 
 
-# Generate commands from templates
-for tpl in Template.templates:
+# Generate commands from plans
+for tpl in Plan.plans:
     # generate options
     params = list(new_options.values())
     for name, spec in (tpl.options or {}).items():

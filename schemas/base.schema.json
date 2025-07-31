@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "base.schema.json",
   "title": "Blueprint base schema",
-  "description": "Blueprint template definition.",
+  "description": "Schema for a project blueprint.",
   "version": "0.1.0",
   "type": "object",
   "$defs": {

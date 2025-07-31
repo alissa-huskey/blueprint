@@ -8,11 +8,11 @@ Usage
 -----
 
 ```bash
-bp new TEMPLATE [OPTIONS] NAME
+bp new BLUEPRINT [OPTIONS] NAME
 
 Create a new project.
 
-TEMPLATES
+BLUEPRINTS
     basic                 A basic project.
     python                A Python project.
 
@@ -27,7 +27,7 @@ OPTIONS
 
 ### Basic
 
-The basic project is the one that all other templates inherit from.
+The basic project is the one that all other blueprints inherit from.
 
 Toolchain
 
@@ -69,10 +69,10 @@ OPTIONS
     --pyv-constraint  -C  Supported Python versions.
 ```
 
-Templates
----------
+Blueprints
+----------
 
-Templates are stored in the sources directory. Variables in the form of
+Blueprints are stored in the sources directory. Variables in the form of
 `${VAR}` can be used in the names of directories and files themselves or their
 contents. Variables include:
 

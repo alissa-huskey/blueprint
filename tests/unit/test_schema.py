@@ -148,7 +148,7 @@ def test_schema_ok(tmp_path):
             "$schema": "https://json-schema.org/draft/2020-12/schema",
             "$id": "base.schema.json",
             "title": "Blueprint base schema",
-            "description": "Blueprint template definition.",
+            "description": "Blueprint definition.",
             "version": "0.1.0",
             "type": "object"
         }
@@ -188,7 +188,7 @@ def test_schema_not_ok_parse_error(tmp_path):
             "$schema": "https://json-schema.org/draft/2020-12/schema",
             "$id": "base.schema.json",
             "title": "Blueprint base schema",
-            "description": "Blueprint template definition.",
+            "description": "Blueprint definition.",
             "version": "0.1.0",
             "type": "object",
         }
@@ -218,7 +218,7 @@ def test_schema_not_ok_jsonschema_schema_error(tmp_path):
             "$schema": "https://json-schema.org/draft/2020-12/schema",
             "$id": "base.schema.json",
             "title": "Blueprint base schema",
-            "description": "Blueprint template definition.",
+            "description": "Blueprint definition.",
             "version": "0.1.0",
             "properties": 1
         }

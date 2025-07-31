@@ -20,5 +20,5 @@ class App(Object):
     @cached_property
     def project(self) -> Project:
         """Project that is being created."""
-        self.kwargs.pop("template", None)
-        return Project(self.template, self.name, **self.kwargs)
+        self.kwargs.pop("plan", None)
+        return Project(self.plan, self.name, **self.kwargs)
