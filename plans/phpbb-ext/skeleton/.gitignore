@@ -1,0 +1,4 @@
+/vendor
+.phpunit.cache
+!vendor/squizlabs/php_codesniffer/CodeSniffer.conf
+/build

@@ -18,6 +18,8 @@ bp = breakpoint
 class Plan(Object):
     """A blueprint.json file."""
 
+    _NO_REPR = ["_specs"]
+
     ROOT = ROOT / "plans"
 
     _ok = True

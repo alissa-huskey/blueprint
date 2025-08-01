@@ -4,23 +4,28 @@
   "description": "phpBB Extension",
   "version": "0.1.0",
   "type": "extension",
-  "parent": "php-composer",
-  "project-dir": "phpbb-{{ NAME | to_kabab_case }}",
+  "parent": "basic",
+  "stack": {
+    "language": "php",
+    "application": "phpBB",
+    "dependencies": "composer",
+    "tests": "phpunit",
+    "linter": "phpcs"
+  },
+  "requirements": [ "php", "composer" ],
+  "project-dir": "phpbb-{{ NAME | to_kebab_case }}",
   "options": {
     "phpv": {
       "default": "7.4.33",
-      "help": "PHP Version",
-      "hidden": true
+      "help": "PHP Version"
     },
     "php-constraint": {
       "default": ">=7.3",
-      "help": "PHP Version Constraint",
-      "hidden": true
-    },
-    "project-type": { 
-      "default": "phpbb-extension",
-      "help": "Composer project type",
-      "hidden": true
+      "help": "PHP Version Constraint"
     }
+  },
+  "arguments": {
+    "vendor": {},
+    "name": {}
   }
 }

@@ -47,13 +47,26 @@ def test_project_substitute():
 
 def test_project_create(tmp_path):
     """
-    WHEN: project.create is called
+    WHEN: project.create() is called
     THEN: A new project is created
     """
     project = Project("basic", "myproject", dest=tmp_path)
     project.create()
 
     assert (tmp_path/"myproject").is_dir()
+
+
+def test_project_path_with_project_dir(tmp_path, fixtures_path):
+    """
+    GIVEN: A blueprint.json file with a "project-dir" value set
+    WHEN: project.create() is called
+    THEN: the new project directory will be named matching that pattern
+    """
+    with set_plans_root(fixtures_path):
+        project = Project("chrome", "my project", dest=tmp_path)
+        project.plan.project_dir = "chrome-{{ NAME | to_kebab_case }}"
+
+        assert project.path == (tmp_path/"chrome-my-project")
 
 
 def test_project_create_parent(tmp_path):

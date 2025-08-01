@@ -19,6 +19,8 @@ bp = breakpoint
 class Project(Object):
     """A new project."""
 
+    _NO_REPR = ["_specs", "_dest"]
+
     DEFAULT_VERSION = "0.1.0"
 
     _jinja_ = None
@@ -72,7 +74,13 @@ class Project(Object):
         """Path to the project directory."""
         if not self.dest:
             return None
-        return self.dest / self.dash_name
+
+        name = self.dash_name
+
+        if self.plan and self.plan.specs and self.plan.specs.get("project-dir"):
+            name = self.substitute(self.plan.project_dir, variables={"NAME": self.name})
+
+        return self.dest / name
 
     @property
     def pascal_name(self) -> str:

@@ -14,14 +14,13 @@ load 'helper'
   assert_output --partial -- --summary
   assert_output --partial -- --license
 
-  refute_output --partial -- --phpv
-  refute_output --partial -- --php-constraint
-  refute_output --partial -- --project-type
+  assert_output --partial -- --phpv
+  assert_output --partial -- --php-constraint
 }
 
 # bats test_tags=tag:fs
 @test "bp new phpbb-ext [OPTIONS] NAME" {
-  dest="$TEST_DIR/my-project"
+  dest="$TEST_DIR/phpbb-my-project"
 
   run bp_y new phpbb-ext     \
     --dest "$TEST_DIR"           \

@@ -4,6 +4,8 @@
 class Object():
     """Arbitrary object class."""
 
+    _NO_REPR = []
+
     def __init__(self, **kwargs):
         """Set all keyword args as attributes."""
         for k, v in kwargs.items():
@@ -11,8 +13,13 @@ class Object():
 
     def __repr__(self):
         """Object(attr='value')."""
-        attrs = ", ".join([f"{k}={v!r}" for k, v in self.__dict__.items()])
-        return f"{self.__class__.__name__}({attrs})"
+        attrs = [
+            f"{k.lstrip('_')}={v!r}"
+            for k, v in self.__dict__.items()
+            if k not in self._NO_REPR
+        ]
+        text = ", ".join(attrs)
+        return f"{self.__class__.__name__}({text})"
 
     def __eq__(self, other):
         """Provide comparison oprators."""

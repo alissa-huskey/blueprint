@@ -23,6 +23,11 @@
           "examples": ["poetry"],
           "$ref": "base.schema.json#nonEmptyString"
         },
+        "build": {
+          "description": "Build tool",
+          "examples": ["make", "poetry", "gulp"],
+          "$ref": "base.schema.json#nonEmptyString"
+        },
         "tests": {
           "description": "Testing framework.",
           "examples": ["pytest"],

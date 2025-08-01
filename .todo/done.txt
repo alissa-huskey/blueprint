@@ -26,3 +26,6 @@ x 2025-07-31 2024-04-17 @feature @commands add command: list, for project types 
 x 2025-07-31 2025-07-29 @task Plan: inherit options and args from parent.
 x 2025-07-31 2025-07-29 @quality Split cli.py into multiple files.
 x 2025-07-31 2025-07-29 @task Project: Execute 'after' steps.
+x 2025-08-01 2025-07-29 @task Project: Use plan.project_dir if present.
+x 2025-08-01 2025-07-29 @task Get AUTHOR from github or make configurable
+x 2025-08-01 2025-07-31 @blueprint @phpbb-exe Don't rely on php-composer. It's too complicated.

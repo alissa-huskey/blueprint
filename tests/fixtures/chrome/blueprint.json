@@ -1,0 +1,14 @@
+{
+  "name": "Chrome Extension",
+  "description": "Google chrome extension.",
+  "version": "0.1.0",
+  "type": "extension",
+  "project-dir": "chrome-{{ NAME | to_kebab }}",
+  "stack": {
+    "language": "js",
+    "application": "google-chrome",
+    "tests": "jest",
+    "depencencies": "node",
+    "build": "gulp"
+  }
+}

@@ -22,6 +22,8 @@ bp = breakpoint
 class Schema(Object):
     """JSON Schema files."""
 
+    _NO_REPR = ["_data_raw", "_data", "_properties", "_path"]
+
     ROOT = ROOT / "schemas"
 
     _registry = None
