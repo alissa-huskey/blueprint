@@ -149,6 +149,7 @@ class Project(Object):
         """Return a mapping of the file substitutions for installing files."""
         if not self._substitutions:
             self._substitutions = {
+                "DOT": ".",
                 "NAME": self.name,
                 "DASH_NAME": self.dash_name,
                 "TITLE_NAME": self.title_name,

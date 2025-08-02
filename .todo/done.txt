@@ -32,3 +32,4 @@ x 2025-08-01 2025-07-31 @blueprint @phpbb-exe Don't rely on php-composer. It's t
 x 2025-08-01 2024-06-18 @quality Refactor Project.run to ShellCommand class; use shutil.which to find command
 x 2025-08-02 2025-08-01 @feature @blueprints Add templates dir, and add any files found there as variables with name TPL_FILENAME
 x 2025-08-02 2025-07-31 @task Project.run(): add path kwarg, and add env= to final command. (Pass os.environ, but change PATH to prefix path args.)
+x 2025-08-02 2025-08-01 @blueprints In skeleton, rename .gitigonre to _gitignore and handle seperately so that it is not used as ignore file in this project.
