@@ -3,6 +3,7 @@ import json
 import pytest
 
 from blueprint.config import Config
+from blueprint.jinja import Jinja
 from blueprint.plan import Plan
 from blueprint.schema import Schema
 from tests.unit import set_plans_root
@@ -401,5 +402,20 @@ def test_plan_schema():
     assert schema.id == "generic.schema.json"
 
 
-def test_plan_x():
+def test_plan_jinja():
+    plan = Plan("basic")
+
+    searchpaths = [
+        str(plan.root / "skeleton"),
+        str(plan.root / "optional"),
+        str(plan.root / "templates"),
+    ]
+
+    engine = plan.jinja
+
+    assert isinstance(engine, Jinja)
+    assert engine.fs and engine.fs.searchpath == searchpaths
+
+
+def test_plan_():
     ...

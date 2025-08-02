@@ -8,6 +8,7 @@ from blueprint import ROOT, PlanError
 from blueprint.attr import attr, hasattrs
 from blueprint.config import Config
 from blueprint.dict import Dict
+from blueprint.jinja import Jinja
 from blueprint.object import Object
 from blueprint.schema import Schema
 
@@ -178,6 +179,18 @@ class Plan(Object):
             self.error = self.schema.error
 
         return is_valid
+
+    @attr
+    def jinja(self) -> Jinja:
+        """Return a Jinja templating engine."""
+        if not self._jinja:
+            paths = [
+                self.root / "skeleton",
+                self.root / "optional",
+                self.root / "templates",
+            ]
+            self._jinja = Jinja(paths)
+        return self._jinja
 
     @attr
     def config(self) -> Config:

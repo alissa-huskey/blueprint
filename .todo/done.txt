@@ -30,3 +30,4 @@ x 2025-08-01 2025-07-29 @task Project: Use plan.project_dir if present.
 x 2025-08-01 2025-07-29 @task Get AUTHOR from github or make configurable
 x 2025-08-01 2025-07-31 @blueprint @phpbb-exe Don't rely on php-composer. It's too complicated.
 x 2025-08-01 2024-06-18 @quality Refactor Project.run to ShellCommand class; use shutil.which to find command
+x 2025-08-02 2025-08-01 @feature @blueprints Add templates dir, and add any files found there as variables with name TPL_FILENAME

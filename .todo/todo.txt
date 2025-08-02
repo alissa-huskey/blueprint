@@ -27,5 +27,4 @@
 (A) 2025-07-31 @blueprints Add .ignore files so you can keep directories.
 (B) 2025-08-01 @blueprints In skeleton, rename .gitigonre to _gitignore and handle seperately so that it is not used as ignore file in this project.
 (C) 2025-08-01 @feature @blueprints If stack is present in blueprint.json, add to README.md
-(B) 2025-08-01 @feature @blueprints Add templates dir, and add any files found there as variables with name TPL_FILENAME
 (B) 2025-08-01 @blueprint @phpbb-ext Add options for notifications/events/etc

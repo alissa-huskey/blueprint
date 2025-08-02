@@ -14,6 +14,7 @@ from rich_click.rich_command import RichCommand
 
 from blueprint import BlueprintError, UserError
 from blueprint.app import App
+from blueprint.formatters import ppath
 from blueprint.plan import Plan
 
 click.rich_click.USE_RICH_MARKUP = True
@@ -86,6 +87,7 @@ def blueprints():
 def dest_should_exist(ctx, self, path: Path):
     """Confirm the destination directory exists."""
     if not path.is_dir():
+        path = ppath(path)
         raise BadParameter(f"No such directory: {path}")
     return path
 
@@ -120,8 +122,9 @@ def _new_project_cmd(plan):
     def _(*args, **kwargs):
         app = App(*args, plan=plan, **kwargs)
         if app.project.path.is_dir():
+            path = ppath(app.project.path)
             raise BadParameter(
-                f"Project directory already exists: {app.project.path}",
+                f"Project directory already exists: {path}",
                 param=new_options["dest"],
             )
         verify(app)

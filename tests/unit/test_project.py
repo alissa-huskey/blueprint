@@ -140,6 +140,7 @@ def test_project_install(tmp_path):
     project = Project("basic", "my project", dest=tmp_path)
     project.create()
     project.install("README.md")
+
     path = project.path / "README.md"
 
     assert path.is_file()

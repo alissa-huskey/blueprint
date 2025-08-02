@@ -131,12 +131,9 @@ class Project(Object):
         if isinstance(path, str):
             path = plan.skeleton / path
 
-        rel_path = Path(*[
-            self.substitute(p)
-            for p in path.relative_to(plan.skeleton).parts
-        ])
+        rel_path = path.relative_to(plan.skeleton)
 
-        dest = self.path / rel_path
+        dest = self.path / self.substitute(str(rel_path))
 
         dest.parent.mkdir(parents=True, exist_ok=True)
 
@@ -144,8 +141,7 @@ class Project(Object):
             dest.mkdir(parents=True, exist_ok=True)
             return
 
-        src_text = path.read_text()
-        text = self.substitute(src_text)
+        text = plan.jinja.render(file=str(rel_path), **self.substitutions)
         dest.write_text(text)
 
     @property
@@ -198,7 +194,10 @@ class Project(Object):
         """Replace all substitutions with their variable values."""
         variables = variables or self.substitutions
 
-        return Template(text, **variables).render()
+        if self.plan and self.plan.jinja:
+            return self.plan.jinja.render(text, **variables)
+        else:
+            return Template(text, **variables).render()
 
     def install_all(self, plan=None):
         """Install all dotfiles from sources into the new project directory."""

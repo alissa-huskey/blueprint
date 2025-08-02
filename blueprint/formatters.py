@@ -1,9 +1,21 @@
 """String formatting functions."""
 
+from os import environ
+from pathlib import Path
 from re import compile as re_compile
+
+bp = breakpoint
 
 pascal_replacer = re_compile(r'[-]([a-z])')
 smoosh_replacer = re_compile(r'[-_ ]')
+
+path_replacers = {
+    Path.cwd(): ".",
+    Path.home(): "~",
+}
+
+if (tmpdir := environ.get("TMPDIR")):
+    path_replacers[Path(tmpdir)] = "$TMPDIR"
 
 
 def to_title_case(text: str) -> str:
@@ -35,3 +47,18 @@ def to_camel_case(text: str) -> str:
 def to_smooshed_case(text: str) -> str:
     """Convert text to smooshedcase."""
     return smoosh_replacer.sub("", text.lower())
+
+
+def ppath(path: str | Path) -> str:
+    """Pretty path.
+
+    Replace home, cwd and tmppath with their shortened versions.
+    """
+    if isinstance(path, str):
+        path = Path(path)
+
+    for p, text in path_replacers.items():
+        if path.is_relative_to(p):
+            relpath = path.relative_to(p)
+            return f"{text}/{relpath}"
+    return str(path)

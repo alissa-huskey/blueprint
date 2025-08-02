@@ -3,12 +3,7 @@
 /**
  * PHP 7-to-8 Compatibility
  *
- * PHP version {{ PHP_CONSTRAINT }}
- *
- * @category Phpbb
- * @package  PhpBB_{{ VENDOR | to_pascal_case }}_{{ NAME | to_pascal_case }}
- * @author   {{ AUTHOR }}
- * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
+ {% include "header.php.jinja" %}
  */
 
 if (!function_exists("str_contains")) {
