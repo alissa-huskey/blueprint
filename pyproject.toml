@@ -54,7 +54,7 @@ markers = ["todo"]
 line-length = "88"
 
 [tool.poetry.scripts]
-bp = "blueprint.cli:run"
+bp = "blueprint.cli.cli:run"
 
 [build-system]
 requires = ["poetry-core"]

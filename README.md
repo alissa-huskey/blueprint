@@ -1,8 +1,7 @@
 Blueprint
 =========
 
-A personal project for creating new projects from blueprints, mostly for Python
-projects.
+A personal project for creating new projects from blueprints.
 
 Usage
 -----

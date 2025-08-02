@@ -1,6 +1,8 @@
 """Blueprint tests."""
 
+import json
 from contextlib import contextmanager
+from pathlib import Path
 from re import compile as re_compile
 
 from blueprint.config import Config
@@ -11,6 +13,53 @@ bp = breakpoint
 
 
 stripper = re_compile(r'.*/')
+
+
+def make_blueprint(
+    path: Path,
+    name: str,
+    specs: str | dict | bool = None,
+    files: dict = None
+) -> Path:
+    """Create a blueprint directory.
+
+    Args:
+        path (Path): Plans root directory
+        name (str): Name of plan
+        specs (str|dict|bool): blueprint.json contents or False to not create
+        files (dict, default=None): files to create
+                                    (file path (str) ->
+                                        contents (str)
+                                        or dir to create dir
+                                    )
+
+    Returns:
+        (Path) Path to plan directory
+    """
+    files = files or {}
+
+    plan_dir = path / name
+    specs_file = plan_dir / "blueprint.json"
+
+    plan_dir.mkdir(parents=True)
+
+    if specs is not False:
+        if isinstance(specs, dict):
+            specs = json.dumps(specs)
+
+        specs = specs or {}
+        specs_file.write_text(specs)
+
+    for file, contents in files.items():
+        p = plan_dir / file
+
+        if contents == dir:
+            p.mkdir(parents=True, exist_ok=True)
+            continue
+
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(contents)
+    return plan_dir
 
 
 def cmd_strip_prefix(cmd: list | str) -> list | str:

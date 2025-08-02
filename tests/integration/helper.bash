@@ -42,5 +42,5 @@ bats::on_failure() {
 # Run bp with <<< y
 # (needed because `run bp ... <<< y` does not work as expected)
 bp_y() {
-  run ${rootdir}/bin/bp "$@" <<< y
+  ${rootdir}/bin/bp "$@" <<< y
 }

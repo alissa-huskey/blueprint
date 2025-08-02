@@ -43,6 +43,24 @@
           "items": { "type": "string" }
         }
     },
+    "executable-install": {
+      "description": "Install a file.",
+      "$anchor": "Install",
+      "type": "object",
+      "required": ["install"],
+      "properties": {
+        "install": {
+          "description": "File to install",
+          "examples": [ "after/git-description" ],
+          "type": "#nonEmptyString"
+        },
+        "dest": {
+          "description": "Path relative to project directory to install file, inclusing filename.",
+          "examples": [".git/description"],
+          "type": "#nonEmptyString"
+        }
+      }
+    },
     "executable-command": {
       "description": "Shell command.",
       "$anchor": "Command",
@@ -93,10 +111,11 @@
       }
     },
     "executable": {
-      "description": "Something to execute on the command line.",
+      "description": "A step to execute.",
       "$anchor": "Executable",
       "oneOf": [
         { "$ref": "#Command" },
+        { "$ref": "#Install" },
         { "$ref": "#Script" }
       ]
     }

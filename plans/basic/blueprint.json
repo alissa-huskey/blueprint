@@ -5,5 +5,11 @@
   "type": "generic",
   "setup": [
     { "cmd": ["git", "init"]}
+  ],
+  "after": [
+    {
+      "install": "git-description",
+      "dest": ".git/description"
+    }
   ]
 }

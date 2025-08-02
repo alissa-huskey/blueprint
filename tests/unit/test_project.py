@@ -4,7 +4,8 @@ from blueprint import AccessError
 from blueprint.object import Object
 from blueprint.plan import Plan
 from blueprint.project import Project
-from tests.unit import cmd_strip_prefix, set_config_base, set_plans_root
+from tests.unit import (cmd_strip_prefix, make_blueprint, set_config_base,
+                        set_plans_root)
 
 bp = breakpoint
 
@@ -147,6 +148,23 @@ def test_project_install(tmp_path):
     assert "# My Project" in path.read_text()
 
 
+def test_project_install_dest(tmp_path):
+    """
+    GIVEN: a project object where create() has been called
+    WHEN: project.install() is called with a valid filename from the sources
+          directory
+    THEN: The file should exist in the new project
+    """
+    project = Project("basic", "my project", dest=tmp_path)
+    project.create()
+    project.install("README.md", "docs/README.md")
+
+    path = project.path / "docs/README.md"
+
+    assert path.is_file()
+    assert "# My Project" in path.read_text()
+
+
 def test_project_install_subdir(tmp_path):
     """
     GIVEN: a project object where create() has been called
@@ -171,15 +189,19 @@ def test_project_install_is_dir(tmp_path):
     proj_path.mkdir()
 
     plans_root = tmp_path / "plans"
-    some_dir = plans_root / "a_plan" / "skeleton" / "some_dir"
-    some_dir.mkdir(parents=True)
 
+    plan_root = make_blueprint(
+        plans_root,
+        "a_plan",
+        False,
+        {"skeleton/some_dir": dir},
+    )
     with set_plans_root(plans_root):
         project = Project("a_plan", "myproject", dest=proj_path)
         project.create()
         project.install("some_dir")
 
-    assert some_dir.is_dir()
+    assert (plan_root / "skeleton" / "some_dir").is_dir()
 
 
 def test_project_install_path_substitues(tmp_path):
@@ -189,19 +211,15 @@ def test_project_install_path_substitues(tmp_path):
     WHEN: project.install() is called with that filename
     THEN: The variable name should be replaced with the right value
     """
-    proj_path = tmp_path / "project"
-    proj_path.mkdir()
-
-    plans_root = tmp_path / "sources"
-    some_dir = plans_root / "a_plan" / "skeleton" / "{{SNAKE_NAME}}"
-    some_dir.mkdir(parents=True)
+    plans_root = tmp_path / "plans"
+    make_blueprint(plans_root, "a_plan", False, {"skeleton/{{SNAKE_NAME}}": dir})
 
     with set_plans_root(plans_root):
         project = Project("a_plan", "my-project", dest=tmp_path)
         project.create()
         project.install("{{SNAKE_NAME}}")
 
-    assert (project.path / "my_project").is_dir()
+        assert (project.path / "my_project").is_dir()
 
 
 def test_project_install_file_subs(tmp_path):
@@ -260,6 +278,28 @@ def test_project_setup(tmp_path):
     project.setup()
 
     assert (project.path / ".git").is_dir()
+
+
+def test_project_setup_install(tmp_path, blueprint_json):
+    """
+    GIVEN: a project object where create() has been called
+    AND:   a blueprint file with a setup that includes a "install" step
+    WHEN:  project.setup() is called
+    THEN:  the file should be installed
+    """
+    plans_root = tmp_path / "plans"
+
+    blueprint_json["setup"] = [
+        {"install": "dot-file", "dest": ".file"}
+    ]
+    make_blueprint(plans_root, "basic", blueprint_json, {"after/dot-file": ""})
+
+    with set_plans_root(plans_root):
+        project = Project("basic", "my project", dest=tmp_path)
+        project.setup()
+
+        path = project.path / ".file"
+        assert path.is_file()
 
 
 def test_project_after(tmp_path, fixtures_path):

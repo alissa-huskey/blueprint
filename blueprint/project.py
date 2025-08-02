@@ -124,7 +124,7 @@ class Project(Object):
         """Create the project."""
         self.path.mkdir(exist_ok=True)
 
-    def install(self, path, plan=None):
+    def install(self, path, dest=None, plan=None):
         """Copy a file or create an empty directory from the source to the dest."""
         plan = plan or self.plan
 
@@ -133,7 +133,10 @@ class Project(Object):
 
         rel_path = path.relative_to(plan.skeleton)
 
-        dest = self.path / self.substitute(str(rel_path))
+        if dest:
+            dest = self.path / self.substitute(str(dest))
+        else:
+            dest = self.path / self.substitute(str(rel_path))
 
         dest.parent.mkdir(parents=True, exist_ok=True)
 
@@ -208,7 +211,7 @@ class Project(Object):
             self.install_all(plan.parent)
 
         for path in plan.skeleton.glob("**/*"):
-            self.install(path, plan)
+            self.install(path, plan=plan)
 
     def run(
         self,
@@ -270,6 +273,9 @@ class Project(Object):
             self.setup(plan.parent, steps=steps)
 
         for step in plan.specs.get(steps, []):
+            if (src := step.get("install")):
+                self.install(src, step.get("dest"), plan)
+                continue
             cmd = step["cmd"]
             outfile = step.get("out")
             params = {

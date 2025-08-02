@@ -1,18 +1,15 @@
 """Command Line Interface."""
 
-from json import JSONDecodeError
 from pathlib import Path
 
 import click
 import rich_click as click  # noqa
 from click import confirm
 from rich.console import Console
-from rich.table import Table
 from rich.traceback import install as rich_tracebacks
 from rich_click import BadParameter
 from rich_click.rich_command import RichCommand
 
-from blueprint import BlueprintError, UserError
 from blueprint.app import App
 from blueprint.formatters import ppath
 from blueprint.plan import Plan
@@ -30,48 +27,12 @@ console = Console()
 errors = Console(stderr=True)
 
 
-def error(ex: Exception):
-    """Print an error message."""
-    if isinstance(ex, BlueprintError):
-        ex = ex.message
-
-    errors.print(f"[red]Error[/red] {ex}")
-
-
 def verify(app: App):
     """Ask the user to confirm that they want to proceed."""
     path = ppath(app.project.path)
     prompt = f"Create {app.project.plan.name} project at '{path}'?"
     if not confirm(prompt):
         exit()
-
-
-@click.group(context_settings=dict(help_option_names=["-h", "--help"]))
-def blueprint(*args, **kwargs):
-    """Project blueprints."""
-
-
-@blueprint.command()
-def blueprints():
-    """List blueprints."""
-    table = Table("OK", "Name", "Title", "Description")
-
-    for tpl in Plan.plans:
-        cells = [tpl.id]
-        try:
-            tpl.specs
-        except JSONDecodeError:
-            ...
-        else:
-            cells.append(tpl.specs.get("title", ""))
-            cells.append(tpl.specs.get("description", ""))
-
-        if not tpl.ok():
-            cells = [f"[dim]{text}" for text in cells]
-
-        table.add_row(("[red]☒", "[green]☑")[tpl.ok()], *cells)
-
-    console.print(table)
 
 
 def dest_should_exist(ctx, self, path: Path):
@@ -82,7 +43,7 @@ def dest_should_exist(ctx, self, path: Path):
     return path
 
 
-@blueprint.group()
+@click.group()
 def new():
     """Create a new project."""
 
@@ -154,18 +115,3 @@ for tpl in Plan.plans:
 
     # add subcommand to new
     new.add_command(cmd)
-
-
-def run():
-    """Start the command line interface."""
-    try:
-        blueprint()
-    except UserError as e:
-        error(e.message)
-        exit(e.status)
-    except SystemExit as ex:
-        exit(ex.code)
-
-
-if __name__ == "__main__":
-    run()

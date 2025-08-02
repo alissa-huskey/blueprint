@@ -44,3 +44,15 @@ dependencies:
     - pylama
     - black
 """
+
+
+@pytest.fixture
+def blueprint_json():
+    """Return the contents of a barebones blueprint.json file."""
+    return {
+        "name": "plan",
+        "title": "Project Plan",
+        "description": "A project plan.",
+        "version": "0.1.0",
+        "type": "generic"
+    }

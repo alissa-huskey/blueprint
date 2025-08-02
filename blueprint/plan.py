@@ -185,8 +185,9 @@ class Plan(Object):
         """Return a Jinja templating engine."""
         if not self._jinja:
             paths = [
-                self.root / "skeleton",
+                self.root / "after",
                 self.root / "optional",
+                self.root / "skeleton",
                 self.root / "templates",
             ]
             self._jinja = Jinja(paths)

@@ -1,28 +1,10 @@
-import json
-
-import pytest
-
 from blueprint.config import Config
 from blueprint.jinja import Jinja
 from blueprint.plan import Plan
 from blueprint.schema import Schema
-from tests.unit import set_plans_root
+from tests.unit import make_blueprint, set_plans_root
 
 bp = breakpoint
-
-
-@pytest.fixture
-def blueprint_json():
-    """Return the contents of a barebones blueprint.json file."""
-    return """
-        {
-            "name": "plan",
-            "title": "Project Plan",
-            "description": "A project plan.",
-            "version": "0.1.0",
-            "type": "generic"
-        }
-    """
 
 
 def test_plan():
@@ -39,16 +21,10 @@ def test_plan_plans(tmp_path):
     THEN: it should return a list of Plan objects for each of those
           subdirectories
     """
-    plans_root = tmp_path
+    make_blueprint(tmp_path, "abc", {})
+    make_blueprint(tmp_path, "xyz", {})
 
-    abc = tmp_path / "abc"
-    xyz = tmp_path / "xyz"
-
-    for d in [abc, xyz]:
-        d.mkdir(parents=True)
-        (d / "blueprint.json").write_text("{}")
-
-    with set_plans_root(plans_root):
+    with set_plans_root(tmp_path):
         plans = Plan.plans
 
     assert plans == [Plan("abc"), Plan("xyz")]
@@ -89,16 +65,8 @@ def test_plan_parent():
     assert plan.parent == Plan("basic")
 
 
-def test_plan_has_requirements():
-    ...
-
-
 def test_plan_ok_true(tmp_path, blueprint_json):
-    plandir = tmp_path / "project"
-    plandir.mkdir()
-
-    bp_json = plandir / "blueprint.json"
-    bp_json.write_text(blueprint_json)
+    make_blueprint(tmp_path, "project", blueprint_json)
 
     with set_plans_root(tmp_path):
         plan = Plan("project")
@@ -107,8 +75,7 @@ def test_plan_ok_true(tmp_path, blueprint_json):
 
 
 def test_plan_not_ok_missing_file(tmp_path):
-    plandir = tmp_path / "project"
-    plandir.mkdir()
+    make_blueprint(tmp_path, "project", False)
 
     with set_plans_root(tmp_path):
         plan = Plan("project")
@@ -117,19 +84,17 @@ def test_plan_not_ok_missing_file(tmp_path):
         assert plan.error == f"No such blueprint file: {plan.blueprint}"
 
 
-def test_plan_not_ok_invalid_file(tmp_path, blueprint_json):
-    plandir = tmp_path / "project"
-    plandir.mkdir()
-
-    bp_json = plandir / "blueprint.json"
-    bp_json.write_text("""
+def test_plan_not_ok_invalid_file(tmp_path):
+    # invalid because it's missing "type" key
+    contents = """
         {
             "name": "plan",
             "title": "Project Plan",
             "version": "0.1.0",
             "type": "language-toolstack"
         }
-    """)
+    """
+    make_blueprint(tmp_path, "project", contents)
 
     with set_plans_root(tmp_path):
         plan = Plan("project")
@@ -279,10 +244,9 @@ def test_plan_config():
 
 
 def test_plan_arguments(tmp_path, blueprint_json):
-    specs = json.loads(blueprint_json)
-    specs["arguments"] = {"a": {}}
-    (tmp_path / "basic").mkdir()
-    (tmp_path / "basic" / "blueprint.json").write_text(json.dumps(specs))
+    blueprint_json["arguments"] = {"a": {}}
+
+    make_blueprint(tmp_path, "basic", blueprint_json)
 
     with set_plans_root(tmp_path):
         plan = Plan("basic")
@@ -314,14 +278,11 @@ def test_plan_arguments_parents(tmp_path, blueprint_json):
             },
         },
     }
-    specs = json.loads(blueprint_json)
-
     for name, cfg in plans.items():
-        tpl_specs = specs.copy()
-        tpl_specs["arguments"] = cfg["arguments"]
-        tpl_specs["parent"] = cfg.get("parent")
-        (tmp_path / name).mkdir()
-        (tmp_path / name / "blueprint.json").write_text(json.dumps(tpl_specs))
+        specs = blueprint_json.copy()
+        specs["arguments"] = cfg["arguments"]
+        specs["parent"] = cfg.get("parent")
+        make_blueprint(tmp_path, name, specs)
 
     arguments = {
         "a": plans["base"]["arguments"]["a"],
@@ -337,10 +298,8 @@ def test_plan_arguments_parents(tmp_path, blueprint_json):
 
 
 def test_plan_options(tmp_path, blueprint_json):
-    specs = json.loads(blueprint_json)
-    specs["options"] = {"a": {}}
-    (tmp_path / "basic").mkdir()
-    (tmp_path / "basic" / "blueprint.json").write_text(json.dumps(specs))
+    blueprint_json["options"] = {"a": {}}
+    make_blueprint(tmp_path, "basic", blueprint_json)
 
     with set_plans_root(tmp_path):
         plan = Plan("basic")
@@ -372,14 +331,11 @@ def test_plan_options_parents(tmp_path, blueprint_json):
             },
         },
     }
-    specs = json.loads(blueprint_json)
-
     for name, cfg in plans.items():
-        tpl_specs = specs.copy()
-        tpl_specs["options"] = cfg["options"]
-        tpl_specs["parent"] = cfg.get("parent")
-        (tmp_path / name).mkdir()
-        (tmp_path / name / "blueprint.json").write_text(json.dumps(tpl_specs))
+        specs = blueprint_json.copy()
+        specs["options"] = cfg["options"]
+        specs["parent"] = cfg.get("parent")
+        make_blueprint(tmp_path, name, specs)
 
     options = {
         "a": plans["base"]["options"]["a"],
@@ -406,8 +362,9 @@ def test_plan_jinja():
     plan = Plan("basic")
 
     searchpaths = [
-        str(plan.root / "skeleton"),
+        str(plan.root / "after"),
         str(plan.root / "optional"),
+        str(plan.root / "skeleton"),
         str(plan.root / "templates"),
     ]
 

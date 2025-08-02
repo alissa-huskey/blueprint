@@ -34,11 +34,8 @@
       "env_path": ["/opt/homebrew/opt/php@7.4/bin"]
     },
     {
-      "cmd": [
-        "cp",
-        "{{ PLANS_ROOT }}/after/CodeSniffer.conf",
-        "vendor/squizlabs/php_codesniffer/"
-      ]
+      "install": "CodeSniffer.conf",
+      "dest": "vendor/squizlabs/php_codesniffer/CodeSniffer.conf"
     }
   ]
 }
