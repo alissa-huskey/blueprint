@@ -6,7 +6,6 @@
 (M) 2024-04-17 @blueprint add: git-crypt
 (M) 2024-05-14 @blueprint @basic add license to to readme if present
 (M) 2024-06-01 @blueprint @basic add project name to .git/description file
-2024-06-18 @quality Refactor Project.run to ShellCommand class; use shutil.which to find command
 2024-06-18 @bare @feature add licence to README if present
 2024-06-18 @feature @python add bp generate(?) [test|class]
 (C) 2025-07-29 @blueprint @php-composer @bug phpunit is currently not working

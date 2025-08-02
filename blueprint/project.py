@@ -1,7 +1,6 @@
 """Module for a Project."""
 
 from pathlib import Path
-from subprocess import run
 
 from jinja2 import Environment
 
@@ -12,6 +11,7 @@ from blueprint.formatters import (to_camel_case, to_kebab_case, to_pascal_case,
                                   to_title_case)
 from blueprint.object import Object
 from blueprint.plan import Plan
+from blueprint.shell_command import ShellCommand
 
 bp = breakpoint
 
@@ -211,7 +211,7 @@ class Project(Object):
             })
         return self._jinja_
 
-    def substitute(self, text, variables=None) -> str:
+    def substitute(self, text, variables: dict = None) -> str:
         """Replace all substitutions with their variables."""
         variables = variables or self.substitutions
 
@@ -233,8 +233,6 @@ class Project(Object):
         command: list,
         substitute=False,
         options=None,
-        capture_output=True,
-        text=True,
         **kwargs
     ):
         """Run a CLI command.
@@ -245,14 +243,8 @@ class Project(Object):
             * options (dict, default=None): maps plan variable -> list of arguments
                                             if plan variable is present
                                             add list of arguments after substitution
-            * capture_output (bool, default=True): if output should be captured
-            * text (bool, default=True): decode text in output?
-            * shell (bool, default=False): run in shell mode
-                                           sends command as joined string
-            * **kwargs: arguments to forward to subprocess.run
+            * **kwargs: keyword arguments to forward to ShellCommand()
         """
-        cwd = kwargs.pop("cwd", self.path)
-
         if substitute:
             command = [self.substitute(x) for x in command]
 
@@ -260,33 +252,12 @@ class Project(Object):
             if (self.substitute(key)):
                 command.extend([self.substitute(arg) for arg in args])
 
-        if kwargs.get("stdout"):
-            capture_output = False
+        cmd = ShellCommand(*command, cwd=kwargs.pop("cwd", self.path), **kwargs)
+        res = cmd.exec()
 
-        params = dict(
-            capture_output=capture_output,
-            text=text,
-        )
-
-        if cwd:
-            params["cwd"] = str(cwd)
-
-        params.update(kwargs)
-
-        # if keyword arg shell=True is passed to run()
-        # the command must be a simple string
-        if params.get("shell"):
-            command = " ".join(command)
-
-        res = run(command, **params)
-
-        if res.returncode:
-            cmd = " ".join(command)
-            err = ""
-            if hasattr(res, "stderr"):
-                err = res.stderr
+        if not cmd.ok():
             raise ProgramError(
-                f"Failed CLI command [{res.returncode}] {cmd!r}: {err!r}"
+                f"Failed CLI command [{res.code}] {cmd!r}: {res.err!r}"
             )
 
         return res

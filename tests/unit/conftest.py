@@ -6,7 +6,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from blueprint import project as project_module
+from blueprint import shell_command
 
 bp = breakpoint
 
@@ -29,7 +29,7 @@ def subprocess_run_mock(monkeypatch):
     subprocess_run = Mock(return_value=CompletedProcess([], 0))
 
     with monkeypatch.context() as m:
-        m.setattr(project_module, "run", subprocess_run)
+        m.setattr(shell_command, "run", subprocess_run)
         yield subprocess_run
 
 

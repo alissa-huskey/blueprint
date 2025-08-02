@@ -29,3 +29,4 @@ x 2025-07-31 2025-07-29 @task Project: Execute 'after' steps.
 x 2025-08-01 2025-07-29 @task Project: Use plan.project_dir if present.
 x 2025-08-01 2025-07-29 @task Get AUTHOR from github or make configurable
 x 2025-08-01 2025-07-31 @blueprint @phpbb-exe Don't rely on php-composer. It's too complicated.
+x 2025-08-01 2024-06-18 @quality Refactor Project.run to ShellCommand class; use shutil.which to find command

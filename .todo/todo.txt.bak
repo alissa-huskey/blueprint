@@ -6,7 +6,7 @@
 (M) 2024-04-17 @blueprint add: git-crypt
 (M) 2024-05-14 @blueprint @basic add license to to readme if present
 (M) 2024-06-01 @blueprint @basic add project name to .git/description file
-2024-06-18 @quality Refactor Project.run to ShellCommand class; use shutil.which to find command
+x 2025-08-01 2024-06-18 @quality Refactor Project.run to ShellCommand class; use shutil.which to find command
 2024-06-18 @bare @feature add licence to README if present
 2024-06-18 @feature @python add bp generate(?) [test|class]
 (C) 2025-07-29 @blueprint @php-composer @bug phpunit is currently not working
@@ -23,7 +23,7 @@
 (C) 2025-07-31 @blueprints Do something about SNAKE_NAME etc in file/directory names.
 (B) 2025-07-31 @task Validate requirements from blueprint.json files.
 (A) 2025-07-31 @task Project.run(): add path kwarg, and add env= to final command. (Pass os.environ, but change PATH to prefix path args.)
-(A) 2025-07-31 @task @blueprint executable: add 'name' key
+(C) 2025-07-31 @task @blueprint executable: add 'name' key
 (C) 2025-07-31 @task Project.setup(): let child executable override parents by name. (ie. php-composer/phpbb-ext composer-install)
 (A) 2025-07-31 @blueprints Add .ignore files so you can keep directories.
 (B) 2025-08-01 @blueprints In skeleton, rename .gitigonre to _gitignore and handle seperately so that it is not used as ignore file in this project.
