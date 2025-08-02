@@ -2,16 +2,15 @@
 
 from pathlib import Path
 
-from jinja2 import Environment
-
 from blueprint import AccessError, ProgramError
 from blueprint.attr import attr
-from blueprint.formatters import (to_camel_case, to_kebab_case, to_pascal_case,
+from blueprint.formatters import (to_kebab_case, to_pascal_case,
                                   to_smooshed_case, to_snake_case,
                                   to_title_case)
 from blueprint.object import Object
 from blueprint.plan import Plan
 from blueprint.shell_command import ShellCommand
+from blueprint.template import Template
 
 bp = breakpoint
 
@@ -23,7 +22,6 @@ class Project(Object):
 
     DEFAULT_VERSION = "0.1.0"
 
-    _jinja_ = None
     _substitutions = {}
 
     def __init__(self,
@@ -196,27 +194,11 @@ class Project(Object):
 
         return self._substitutions
 
-    @property
-    def _jinja(self) -> Environment:
-        """Return a Jinja Environment object with filters added."""
-        if not self._jinja_:
-            self._jinja_ = Environment()
-            self._jinja_.filters.update({
-                "to_camel_case": to_camel_case,
-                "to_kebab_case": to_kebab_case,
-                "to_pascal_case": to_pascal_case,
-                "to_smooshed_case": to_smooshed_case,
-                "to_snake_case": to_snake_case,
-                "to_title_case": to_title_case,
-            })
-        return self._jinja_
-
     def substitute(self, text, variables: dict = None) -> str:
-        """Replace all substitutions with their variables."""
+        """Replace all substitutions with their variable values."""
         variables = variables or self.substitutions
 
-        tpl = self._jinja.from_string(text)
-        return tpl.render(**variables)
+        return Template(text, **variables).render()
 
     def install_all(self, plan=None):
         """Install all dotfiles from sources into the new project directory."""
