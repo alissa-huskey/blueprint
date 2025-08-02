@@ -7,12 +7,7 @@ def test_template():
     assert isinstance(tpl, Template)
 
 
-def test_template__jinja():
-    """
-    GIVEN: ...
-    WHEN:  ...
-    THEN:  ...
-    """
+def test_template_jinja():
     tpl = Template()
 
     assert "to_camel_case" in tpl._jinja.filters
