@@ -15,17 +15,15 @@
 (M) 2025-07-31 @config Add 'defaults' section to config files.
 (C) 2025-07-31 @blueprint finish: bats
 (B) 2025-07-31 @blueprint @php-composer @phpbb-ext Figure out how to search for backslash regexes
-(B) 2025-07-31 @blueprint @phpbb-ext add: --dirs option (cron, event, etc); Link to script that will create all of the directories.
+(A) 2025-07-31 @blueprint @phpbb-ext add: --dirs option (cron, event, etc); Link to script that will create all of the directories.
 (M) 2025-07-31 @blueprint @python-typer Finish this.
 (M) 2025-07-31 @blueprint add: python-click
 (B) 2025-07-31 @housekeeping Update README.md
 (C) 2025-07-31 @blueprints Do something about SNAKE_NAME etc in file/directory names.
 (B) 2025-07-31 @task Validate requirements from blueprint.json files.
-(A) 2025-07-31 @task Project.run(): add path kwarg, and add env= to final command. (Pass os.environ, but change PATH to prefix path args.)
 (C) 2025-07-31 @task @blueprint executable: add 'name' key
 (C) 2025-07-31 @task Project.setup(): let child executable override parents by name. (ie. php-composer/phpbb-ext composer-install)
 (A) 2025-07-31 @blueprints Add .ignore files so you can keep directories.
-(B) 2025-08-01 @blueprints In skeleton, rename .gitigonre to _gitignore and handle seperately so that it is not used as ignore file in this project.
+(A) 2025-08-01 @blueprints In skeleton, rename .gitigonre to _gitignore and handle seperately so that it is not used as ignore file in this project.
 (C) 2025-08-01 @feature @blueprints If stack is present in blueprint.json, add to README.md
-x 2025-08-02 2025-08-01 @feature @blueprints Add templates dir, and add any files found there as variables with name TPL_FILENAME
-(B) 2025-08-01 @blueprint @phpbb-ext Add options for notifications/events/etc
+(A) 2025-08-01 @blueprint @phpbb-ext Add options for notifications/events/etc

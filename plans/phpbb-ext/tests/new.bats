@@ -33,7 +33,7 @@ load 'helper'
   assert_dir_exists "${dest}/core"
   assert_dir_exists "${dest}/tests"
   assert_dir_exists "${dest}/phpcs-rules"
-  # assert_dir_exists "${dest}/vendor"
+  assert_dir_exists "${dest}/vendor"
 
   assert_file_exists "${dest}/.ackrc"
   assert_file_exists "${dest}/.editorconfig"
@@ -43,7 +43,7 @@ load 'helper'
   assert_file_exists "${dest}/phpcs-rules/ruleset.xml"
   assert_file_exists "${dest}/README.md"
   assert_file_exists "${dest}/core/compat.php"
-  # assert_file_exists "${dest}/vendor/squizlabs/php_codesniffer/CodeSniffer.conf"
+  assert_file_exists "${dest}/vendor/squizlabs/php_codesniffer/CodeSniffer.conf"
 
   assert_file_contains "${dest}/composer.json" '"name": "acme/myproject",'
   assert_file_contains "${dest}/composer.json" '"description": "My new project.",'

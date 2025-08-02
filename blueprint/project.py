@@ -184,8 +184,8 @@ class Project(Object):
                     cmd = [self.substitute(x, self._substitutions) for x in exe["cmd"]]
 
                     res = self.run(cmd)
-                    if res.stdout:
-                        extra[key] = res.stdout.strip()
+                    if res.out:
+                        extra[key] = res.out
                 self._substitutions.update(extra)
 
         return self._substitutions
@@ -234,14 +234,14 @@ class Project(Object):
                 command.extend([self.substitute(arg) for arg in args])
 
         cmd = ShellCommand(*command, cwd=kwargs.pop("cwd", self.path), **kwargs)
-        res = cmd.exec()
+        cmd.exec()
 
         if not cmd.ok():
             raise ProgramError(
-                f"Failed CLI command [{res.code}] {cmd!r}: {res.err!r}"
+                f"Failed CLI command [{cmd.code}] {cmd!r}: {cmd.err!r}"
             )
 
-        return res
+        return cmd
 
     def add_dependencies(self):
         """Install all dependencies from the config file."""
@@ -271,7 +271,12 @@ class Project(Object):
         for step in plan.specs.get(steps, []):
             cmd = step["cmd"]
             outfile = step.get("out")
-            params = {"substitute": True, "options": step.get("options", {})}
+            params = {
+                "substitute": True,
+                "options": step.get("options", {}),
+                "env_path": step.get("env_path"),
+                "env": step.get("env", {}),
+            }
             if outfile:
                 path = self.path / outfile
                 with open(path, "w") as fp:

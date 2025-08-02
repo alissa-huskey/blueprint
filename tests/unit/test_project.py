@@ -4,7 +4,7 @@ from blueprint import AccessError
 from blueprint.object import Object
 from blueprint.plan import Plan
 from blueprint.project import Project
-from tests.unit import set_config_base, set_plans_root
+from tests.unit import cmd_strip_prefix, set_config_base, set_plans_root
 
 bp = breakpoint
 
@@ -327,6 +327,7 @@ class RunParams(Object):
 
 
 @pytest.mark.parametrize("params", [
+    RunParams(when="basic args", then="should work", args=["abc"], ex_args=["abc"]),
     RunParams(
         when="options=OPTIONS",
         then="present options should be added to command",
@@ -355,7 +356,6 @@ class RunParams(Object):
         kw=dict(cwd="abc"),
         ex_kw=dict(capture_output=True, text=True, cwd="abc"),
     ),
-    RunParams(when="basic args", then="should work", args=["abc"], ex_args=["abc"]),
     RunParams(
         when="substitute=True",
         then="substitutions should be replaced in command",
@@ -376,7 +376,9 @@ def test_project_run(subprocess_run_mock, params):
         f"({mock.call_args()})"
     )
 
-    assert call.args == (params.ex_args,), message
+    call.kwargs.pop("env", None)
+
+    assert call.args and cmd_strip_prefix(call.args[0]) == params.ex_args, message
     assert call.kwargs == params.ex_kw, message
 
 
@@ -392,7 +394,8 @@ def test_project_add_dependencies(subprocess_run_mock, tmp_path, config_yml):
         calls = mock.call_args_list
         dependencies = [call.args[0][-1] for call in calls]
 
-        assert calls[0].args[0] == ["poetry", "add", "--group", "dev", "pytest"]
+        assert cmd_strip_prefix(calls[0].args[0]) == \
+            ["poetry", "add", "--group", "dev", "pytest"]
         assert dependencies == ["pytest", "pynvim", "pylama", "black"]
 
 

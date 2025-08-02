@@ -38,19 +38,9 @@ def error(ex: Exception):
     errors.print(f"[red]Error[/red] {ex}")
 
 
-def shorten_path(path):
-    """Replace home with `~` and cwd with `.`."""
-    if path.is_relative_to(Path.cwd()):
-        path = f"./{path.relative_to(Path.cwd())}"
-    elif path.is_relative_to(Path.home()):
-        path = f"~/{path.relative_to(Path.home())}"
-
-    return path
-
-
 def verify(app: App):
     """Ask the user to confirm that they want to proceed."""
-    path = shorten_path(app.project.path)
+    path = ppath(app.project.path)
     prompt = f"Create {app.project.plan.name} project at '{path}'?"
     if not confirm(prompt):
         exit()

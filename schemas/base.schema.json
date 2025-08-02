@@ -16,6 +16,20 @@
       "description": "Output filename.",
       "$ref": "#nonEmptyString"
     },
+    "executable-env-paths": {
+      "$anchor": "EnvPath",
+      "description": "Path or list of paths to prefix to PATH environment variable.",
+      "types": ["string", "list"],
+      "items": { "$ref": "#nonEmptyString" }
+    },
+    "executable-env": {
+      "$anchor": "Env",
+      "description": "Environment variables.",
+      "type": "object",
+      "items": { "$ref": "#nonEmptyString" },
+      "propertyNames": {"type": "string" },
+      "additionalProperties": { "type": "string" }
+    },
     "executable-options": {
         "$anchor": "Options",
         "description": "Optional arguments to add to command or script only if variable in property name is defined",
@@ -43,6 +57,8 @@
           "items": { "type": "string" }
         },
         "options": { "$ref": "#Options" },
+        "env_path": { "$ref": "#EnvPath" },
+        "env": { "$ref": "#Env" },
         "outfile": { "$ref": "#Outfile" }
       }
     },
@@ -70,6 +86,8 @@
           "minItems": 1,
           "items": { "type": "string" }
         },
+        "env_path": { "$ref": "#EnvPath" },
+        "env": { "$ref": "#Env" },
         "options": { "$ref": "#Options" },
         "outfile": { "$ref": "#Outfile" }
       }

@@ -5,6 +5,7 @@ from subprocess import CompletedProcess
 import pytest
 
 from blueprint.shell_command import ShellCommand
+from tests.unit import cmd_strip_prefix
 
 bp = breakpoint
 
@@ -73,7 +74,7 @@ def test_shell_command_shell():
     cmd.shell = True
 
     assert cmd.shell is True
-    assert cmd.run_cmd == "ls"
+    assert cmd_strip_prefix(cmd.run_cmd) == "ls"
 
 
 def test_shell_command_exec(subprocess_run_mock):
@@ -101,7 +102,7 @@ def test_shell_command_exec(subprocess_run_mock):
     assert res == rv
     assert cmd.result == rv
 
-    assert call.args == (["ls"],)
+    assert cmd_strip_prefix(call.args[0]) == ["ls"]
 
 
 def test_shell_command_result():
@@ -130,7 +131,7 @@ def test_shell_command_run_cmd():
            (the first argument)
     """
     cmd = ShellCommand("ls", "-l")
-    assert cmd.run_cmd == ["ls", "-l"]
+    assert cmd_strip_prefix(cmd.run_cmd) == ["ls", "-l"]
 
 
 @pytest.mark.parametrize(["params", "expected", "given", "then"], [
@@ -162,7 +163,10 @@ def test_shell_command_run_kwargs(params, expected, given, then):
 
     cmd = ShellCommand("pwd", **params)
 
-    assert cmd.run_kwargs == expected, (
+    kwargs = cmd.run_kwargs
+    kwargs.pop("env", None)
+
+    assert kwargs == expected, (
         f"Given a ShellCommand object with {given}, "
         "when .run_kwargs is accessed, it should {then}."
     )
@@ -176,17 +180,6 @@ def test_shell_command__env():
     cmd = ShellCommand(env={"CLICOLOR": False})
 
     assert cmd._env == {"CLICOLOR": False}
-
-
-def test_shell_command_env_empty():
-    """
-    GIVEN: A ShellCommand object where ._env is falsy
-    WHEN:  the .env is accessed
-    THEN:  it should return an empty dict
-    """
-    cmd = ShellCommand()
-
-    assert not cmd.env
 
 
 def test_shell_command_env_not_empty():
@@ -211,6 +204,7 @@ def test_shell_command_env_path():
     WHEN:  the .env_path setter is used
     THEN:  PATH should be added to .env
     AND:   the path or paths should be prepended to os.environ["PATH"]
+    AND:   .run_kwargs should include "PATH"
     """
     cmd = ShellCommand(env_path="./bin")
     old_path = environ.get("PATH", "")
@@ -219,6 +213,7 @@ def test_shell_command_env_path():
 
     assert cmd.env_path == new_path
     assert cmd.env.get("PATH") == new_path
+    assert cmd.run_kwargs.get("env", {}).get("PATH", "") == new_path
 
 
 def test_shell_command_ok(subprocess_run_mock):

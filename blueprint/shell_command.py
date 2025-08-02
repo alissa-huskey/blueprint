@@ -38,6 +38,7 @@ class ShellCommand(Object):
         "capture_output",
         "text",
         "cwd",
+        "env",
     )
     """List of kwargs to send to subprocess.run() if present."""
 
@@ -101,8 +102,6 @@ class ShellCommand(Object):
 
         NOTE: Immutable, as values should be modified via ._env.
         """
-        if not self._env:
-            return frozendict()
         env = environ.copy()
         env.update(self._env)
         return frozendict(env)
@@ -147,7 +146,7 @@ class ShellCommand(Object):
     @property
     def run_cmd(self):
         """Get the command to send to subprocess.run()."""
-        cmd = [self.program, *self.args]
+        cmd = [self.which or self.program, *self.args]
         if self.shell:
             cmd = " ".join(cmd)
         return cmd
@@ -175,7 +174,7 @@ class ShellCommand(Object):
             )
         self._result = res
         self.code = res.returncode
-        self.out = res.stdout
+        self.out = res.stdout and res.stdout.strip() or None
         self.err = res.stderr
 
     # ---------------------------------------------------------------------------
