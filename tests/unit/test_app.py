@@ -1,4 +1,4 @@
-from blueprint.app import App
+from blueprint.cli.app import App
 
 
 def test_app():

@@ -306,7 +306,12 @@ def test_schema__validator(tmp_path):
 
 @pytest.mark.parametrize(["desc", "data", "expected", "error"], [
     ["A valid dict", {"title": "A project"}, True, None],
-    ["An invalid dict", {"name": "A project"}, False, "'title' is a required property"],
+    [
+        "An invalid dict",
+        {"name": "A project"},
+        False,
+        "[base.schema.json, A project] 'title' is a required property",
+    ],
 ])
 def test_schema_validate(tmp_path, desc, data, expected, error):
     """

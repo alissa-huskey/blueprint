@@ -4,6 +4,7 @@
 class Dict(dict):
     """Dict class where keys can be accessed as attributes."""
 
+    __getitem__ = dict.get
     __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__
 

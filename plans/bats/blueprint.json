@@ -3,5 +3,9 @@
   "title": "Bats",
   "description": "Bats testing framework.",
   "version": "0.1.0",
-  "type": "tooling"
+  "type": "tooling",
+  "stack": {
+    "category": "tests",
+    "tool": "bats"
+  }
 }

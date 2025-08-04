@@ -3,5 +3,14 @@
   "title": "Python: Typer CLI App",
   "description": "A CLI application built on Typer.",
   "version": "0.1.0",
-  "type": "framework-application"
+  "type": "framework-application",
+  "parent": "python-poetry",
+  "stack": {
+    "language": "python",
+    "dependencies": "poetry",
+    "formatter": "black",
+    "framework": "typer",
+    "linter": "flake8",
+    "tests": "pytest"
+  }
 }

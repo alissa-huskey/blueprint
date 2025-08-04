@@ -100,7 +100,8 @@ def test_plan_not_ok_invalid_file(tmp_path):
         plan = Plan("project")
 
         assert plan.ok() is False
-        assert plan.error == "'description' is a required property"
+        assert plan.error == \
+            "[language-toolstack.schema.json, plan] 'description' is a required property"
 
 
 def test_plan_config():

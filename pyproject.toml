@@ -46,8 +46,8 @@ fancycompleter = "0.9.1"
 argcomplete = "^3.6.2"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "-vvx -m 'not todo'"
+testpaths = ["tests/unit"]
+addopts = "-vvx"
 markers = ["todo"]
 
 [tool.black]

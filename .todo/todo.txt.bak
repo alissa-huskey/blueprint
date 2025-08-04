@@ -25,4 +25,3 @@
 (B) 2025-08-01 @feature @blueprints If stack is present in blueprint.json, add to README.md
 (A) 2025-08-01 @blueprint @phpbb-ext Add options for notifications/events/etc
 (A) 2025-08-02 @task @cli add: --author
-x 2025-08-02 2025-08-02 @quality split cli.py into multiple files.

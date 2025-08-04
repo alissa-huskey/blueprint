@@ -11,7 +11,7 @@
       "$comment": "Annotations",
       "type": "object",
       "additionalProperties": { "$ref": "base.schema.json#nonEmptyString" },
-      "required": ["language", "category", "tool"],
+      "required": ["category", "tool"],
       "properties": {
         "language": {
           "description": "Primary language this project is written in.",

@@ -26,6 +26,8 @@ class Plan(Object):
     _ok = True
     _parent = None
 
+    error: str = None
+
     def __init__(self, plan_id: str = None, **kwargs):
         """Initialize object."""
         self.id = plan_id
@@ -49,11 +51,15 @@ class Plan(Object):
     @property
     def plans(cls):
         """Return a list of plans."""
-        return [
-            cls(path.name)
-            for path in cls.ROOT.iterdir()
-            if (path / "blueprint.json").is_file()
-        ]
+        plans = []
+        for path in cls.ROOT.iterdir():
+            try:
+                plans.append(cls(path.name))
+            except PlanError:
+                plan = cls()
+                plan.id = path.name
+                plans.append(plan)
+        return plans
 
     @attr
     def schema(self):
@@ -93,14 +99,15 @@ class Plan(Object):
     def specs(self) -> dict:
         """Return the parsed blueprint.json file."""
         if not (self.id and self.blueprint.is_file()):
-            return
+            return Dict()
 
         if not self._specs:
             try:
                 with open(self.blueprint) as fp:
                     self._specs = Dict(json.load(fp))
-            except JSONDecodeError:
-                raise PlanError(f"JSON parse error, plan: {self.id}")
+            except JSONDecodeError as ex:
+                msg = f"[{self.id}:{ex.lineno},{ex.colno}] JSON parse error: {ex.msg}"
+                raise PlanError(msg)
 
         return self._specs
 

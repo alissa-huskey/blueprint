@@ -36,7 +36,6 @@
         "examples": [ { "{{ SUMMARY }}": ["--description", "{{ SUMMARY }}"] } ],
         "type": "object",
         "minProperties": 1,
-        "propertyNames": { "pattern": "^[$]\\{[A-Z_]+\\}$" },
         "additionalProperties": {
           "type": "array",
           "minItems": 1,
@@ -52,12 +51,12 @@
         "install": {
           "description": "File to install",
           "examples": [ "after/git-description" ],
-          "type": "#nonEmptyString"
+          "$ref": "#nonEmptyString"
         },
         "dest": {
           "description": "Path relative to project directory to install file, inclusing filename.",
           "examples": [".git/description"],
-          "type": "#nonEmptyString"
+          "$ref": "#nonEmptyString"
         }
       }
     },

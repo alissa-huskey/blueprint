@@ -5,8 +5,8 @@ from copy import deepcopy
 from json import JSONDecodeError
 from pathlib import Path
 
-from jsonschema import SchemaError as JsonschemaSchemaError
-from jsonschema import ValidationError
+from jsonschema.exceptions import UnknownType
+from jsonschema.exceptions import _Error as JsonschemaError
 from jsonschema.validators import validator_for
 from referencing import Registry, Resource
 
@@ -82,10 +82,15 @@ class Schema(Object):
         """
         if not self._validator:
             return
+        prefix = f"[{self.id}, {data.get('name', '')}]"
         try:
             self._validator.validate(data)
-        except ValidationError as ex:
-            self.error = ex.message
+        except UnknownType as ex:
+            message = f"{prefix} unknown type: {ex.type} (in {ex.instance})"
+            self.error = message
+            return False
+        except (JsonschemaError) as ex:
+            self.error = f"{prefix} {ex.message}"
             return False
         return True
 
@@ -140,7 +145,7 @@ class Schema(Object):
 
         try:
             self._validator_class.check_schema(self._data_raw)
-        except JsonschemaSchemaError as ex:
+        except JsonschemaError as ex:
             self.error = f"Schema error: {ex.json_path}: {ex.message}"
             return False
         return True
