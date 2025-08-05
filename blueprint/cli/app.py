@@ -1,5 +1,8 @@
 """Overall application logic."""
 
+import getpass
+import socket
+
 import click
 import rich_click as click  # noqa
 from click import confirm
@@ -10,6 +13,7 @@ from blueprint.attr import attr, hasattrs
 from blueprint.cli import tracebacks  # noqa
 from blueprint.object import Object
 from blueprint.project import Project
+from blueprint.shell_command import ShellCommand
 
 bp = breakpoint
 
@@ -58,3 +62,28 @@ class App(Object):
         """Ask the user to confirm that they want to proceed."""
         if not confirm(message):
             exit()
+
+    @attr
+    def system_user(self) -> str:
+        """Return the user information from the system.
+
+        Either the git user.name and user.email, or the current user and
+        hostname.
+        """
+        if not self._system_user:
+            cmd = ShellCommand("git", "config", "--get", "user.name")
+            cmd.exec()
+            self._system_user = cmd.out
+
+            cmd = ShellCommand("git", "config", "--get", "user.email")
+            cmd.exec()
+            if (email := cmd.out):
+                self._system_user += f" <{email}>"
+
+            if not self._system_user:
+                self._system_user = getpass.getuser()
+
+                if (host := socket.gethostname()):
+                    self._system_user += f" <{self._system_user}@{host}>"
+
+        return self._system_user
