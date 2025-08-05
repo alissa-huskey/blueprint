@@ -148,6 +148,25 @@ def test_project_install(tmp_path):
     assert "# My Project" in path.read_text()
 
 
+def test_project_install_ignore(tmp_path, blueprint_json):
+    """
+    GIVEN: a project object where create() has been called
+    WHEN: project.install() is called with a file named ".ignore"
+          directory
+    THEN: The file should not exist in the new project
+    """
+    plans_root = tmp_path / "plans"
+
+    make_blueprint(plans_root, "plan", blueprint_json, {"skeleton/.ignore": ""})
+
+    with set_plans_root(plans_root):
+        project = Project("plan", "my project", dest=tmp_path)
+        project.create()
+        project.install(".ignore")
+
+        assert not (project.path / ".ignore").is_file()
+
+
 def test_project_install_dest(tmp_path):
     """
     GIVEN: a project object where create() has been called

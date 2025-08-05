@@ -4,7 +4,7 @@
 (M) 2024-04-17 @blueprint add: bash-script
 (D) 2024-04-17 @feature add command: file/install, ie `bp file bash`, `bp file pytest` to create new file
 (M) 2024-04-17 @blueprint add: git-crypt
-(M) 2024-05-14 @blueprint @basic add license to to readme if present
+(A) 2024-05-14 @blueprint @basic add license to to readme if present
 (D) 2024-06-18 @feature @python add bp generate(?) [test|class]
 (C) 2025-07-29 @blueprint @php-composer @bug phpunit is currently not working
 (M) 2025-07-29 @blueprint @phpbb-ext add: --phpbb-version option
@@ -13,14 +13,15 @@
 (M) 2025-07-31 @blueprints @config Add 'defaults' section to config files.
 (C) 2025-07-31 @blueprint @bats finish
 (B) 2025-07-31 @blueprint @php-composer @phpbb-ext Figure out how to search for backslash regexes
-(A) 2025-07-31 @blueprint @phpbb-ext add: --dirs option (cron, event, etc); Link to script that will create all of the directories.
+(B) 2025-07-31 @blueprint @phpbb-ext add: --dirs option (cron, event, etc); Link to script that will create all of the directories.
 (M) 2025-07-31 @blueprint @python-typer Finish
 (M) 2025-07-31 @blueprint add: python-click
-(B) 2025-07-31 @housekeeping Update README.md
 (C) 2025-07-31 @blueprints Do something about SNAKE_NAME etc in file/directory names. (use {{NAME|to_snake}}?)
 (C) 2025-07-31 @task @base.schema.json executable: add 'name' key
 (D) 2025-07-31 @task Plan: let child executable override parents by name. (ie. php-composer/phpbb-ext composer-install)
-(C) 2025-07-31 @blueprints Add .ignore files so you can keep directories.
-(B) 2025-08-01 @feature @blueprints If stack is present in blueprint.json, add to README.md
-(A) 2025-08-01 @blueprint @phpbb-ext Add options for notifications/events/etc
-(B) 2025-08-04 @feature @cli Add command to check / validate blueprint.
+(A) 2025-08-01 @feature @blueprints If stack is present in blueprint.json, add to README.md
+(B) 2025-08-01 @blueprint @phpbb-ext Add options for notifications/events/etc
+(A) 2025-08-04 @feature @cli Add `bp blueprint check` command
+(C) 2025-08-04 @feature Pull in plans from ~/.config/blueprint/plans
+(A) 2025-08-04 @feature @cli Add `bp blueprint init` command
+(A) 2025-08-04 @feature Add `bp blueprint show` command

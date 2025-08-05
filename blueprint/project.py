@@ -133,6 +133,9 @@ class Project(Object):
         if isinstance(path, str):
             path = plan.skeleton / path
 
+        if path.name == ".ignore":
+            return
+
         rel_path = path.relative_to(plan.skeleton)
 
         if dest:

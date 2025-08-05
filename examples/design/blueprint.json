@@ -1,0 +1,31 @@
+{
+  "name": "design",
+  "title": "Design",
+  "parent": "basic",
+  "description": "Graphic design projects.",
+  "version": "0.1.0",
+  "type": "generic",
+  "requirements": ["git", "gh"],
+  "options": {
+    "software": {
+      "help": "Graphic design software",
+      "choices": [
+        "illustrator",
+        "inkscape",
+        "sketchup",
+        "fusion"
+      ]
+    }
+  },
+  "setup": [
+    {
+      "script": "setup-art-dir",
+      "arguments": ["{{ PATH }}", "{{ SOFTWARE }}"]
+    }
+  ],
+  "after": [
+    { "cmd": ["git", "add", "."] },
+    { "cmd": ["git", "commit", "-m", "Initial commit."] },
+    { "cmd": ["gh", "repo", "create", "--public", "--push", "--source", "."] }
+  ]
+}

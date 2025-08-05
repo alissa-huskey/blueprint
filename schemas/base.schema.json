@@ -19,7 +19,7 @@
     "executable-env-paths": {
       "$anchor": "EnvPath",
       "description": "Path or list of paths to prefix to PATH environment variable.",
-      "types": ["string", "list"],
+      "types": ["string", "array"],
       "items": { "$ref": "#nonEmptyString" }
     },
     "executable-env": {
@@ -168,7 +168,7 @@
       "$ref": "#nonEmptyString"
     },
     "project-dir": {
-      "description": "Pattern of what to name the base project directory.",
+      "description": "Pattern for project directory name.",
       "examples": ["phpbb-{{ NAME }}"],
       "$ref": "#nonEmptyString"
     },
@@ -228,14 +228,11 @@
       "items": { "$ref": "#Executable" }
     },
     "after": {
-      "description": "Steps to take after skeleton has been installed.",
+      "description": "Steps to take after all other steps.",
       "examples": [
         {
-          "cmd": [
-            "cp",
-            "{TYPE_ROOT}/after/CodeSniffer.conf",
-            "vendor/squizlabs/php_codesniffer/"
-          ]
+          "install": "CodeSniffer.conf",
+          "dest": "vendor/squizlabs/php_codesniffer/CodeSniffer.conf"
         }
       ],
       "type": "array",

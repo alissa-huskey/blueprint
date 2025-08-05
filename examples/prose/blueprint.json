@@ -1,0 +1,8 @@
+{
+  "name": "prose",
+  "title": "Prose",
+  "description": "Writing projects.",
+  "version": "0.1.0",
+  "type": "generic",
+  "parent": "basic"
+}

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#
+# Create the directory where art will be stored, depending on the software used
+# to create it.
+#
+# Usage: scripts/setup-art-dir BASE SOFTWARE
+#
+
+main() {
+  local base="$1" sw="$2" dirname path
+
+  # make sure both arguments have been passed
+  if [[ -z "$base" ]] || [[ -z "$sw" ]]; then
+    echo "Missing base '$base' and/or sw: '$sw'"
+    exit 1
+  fi
+
+  # make sure the project directory exists
+  if ! [[ -d "$base" ]]; then
+    echo "not a dir: '$base'"
+    exit 1
+  fi
+
+  case "${sw}" in
+    sketchup|fusion)       dirname="models"   ;;
+    illustrator|inkscape)  dirname="designs"  ;;
+    *)
+      echo "invalid argument for sw: '$sw'"
+      exit 1
+      ;;
+  esac
+
+  path="${base}/${dirname}"
+
+  if [[ -d "${path}" ]]; then
+    echo "directory already exists: ${path}"
+    exit 1
+  fi
+
+  echo "creating directory: ${path}"
+  mkdir "${path}"
+
+  if ! [[ -d "${path}" ]]; then
+    echo "failed to create directory: ${path}"
+    exit 1
+  fi
+}
+
+main ${1:+"$@"}

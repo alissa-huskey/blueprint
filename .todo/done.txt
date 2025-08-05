@@ -37,3 +37,5 @@ x 2025-08-02 2024-06-01 @blueprint @basic add project name to .git/description f
 x 2025-08-02 2025-08-02 @quality split cli.py into multiple files.
 x 2025-08-04 2025-08-02 @task @cli add: --author
 x 2025-08-04 2025-07-31 @task Project: Validate requirements from blueprint.json files.
+x 2025-08-05 2025-07-31 @blueprints Add .ignore files so you can keep directories.
+x 2025-08-05 2025-07-31 @housekeeping Update README.md
