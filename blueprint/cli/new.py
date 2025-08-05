@@ -13,6 +13,8 @@ from blueprint.plan import Plan
 
 bp = breakpoint
 
+app = App()
+
 
 def dest_should_exist(ctx, self, path: Path):
     """Confirm the destination directory exists."""
@@ -42,8 +44,13 @@ new_options = {
     "license": click.Option(
         ["--license", "-l"],
         default="MIT",
-        help="License of the package.",
+        help="Project license.",
     ),
+    "author": click.Option(
+        ["--author", "-a"],
+        help="Project author's name.",
+        default=app.system_user,
+    )
 }
 
 

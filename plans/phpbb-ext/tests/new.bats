@@ -13,6 +13,7 @@ load 'helper'
   assert_output --partial -- --dest
   assert_output --partial -- --summary
   assert_output --partial -- --license
+  assert_output --partial -- --author
 
   assert_output --partial -- --phpv
   assert_output --partial -- --php-constraint
@@ -22,9 +23,10 @@ load 'helper'
 @test "bp new phpbb-ext [OPTIONS] NAME" {
   dest="$TEST_DIR/phpbb-my-project"
 
-  run bp_y new phpbb-ext     \
+  run bp_y new phpbb-ext         \
     --dest "$TEST_DIR"           \
     --summary "My new project."  \
+    --author "Jane Doe"          \
     "acme" "my project"
 
   assert_success
@@ -52,14 +54,14 @@ load 'helper'
   assert_file_contains "${dest}/composer.json" '"description": "My new project.",'
   assert_file_contains "${dest}/composer.json" '"version": "0.1.0",'
   assert_file_contains "${dest}/composer.json" '"type": "phpbb-extension",'
-  assert_file_contains "${dest}/composer.json" '"authors": \[ { "name": "" } \],'
+  assert_file_contains "${dest}/composer.json" '"authors": \[ { "name": "Jane Doe" } \],'
   assert_file_contains "${dest}/composer.json" '"php": ">=7.3",'
   # assert_file_contains "${dest}/composer.json" '"acme\\\\myproject\\\\": "./src/",'
   # assert_file_contains "${dest}/composer.json" '"acme\\\\myproject\\\\tests\\\\": "./tests/",'
 
   assert_file_contains "${dest}/core/compat.php" 'PHP version >=7.3'
   assert_file_contains "${dest}/core/compat.php" '@package [ ]*PhpBB_Acme_MyProject'
-  # assert_file_contains "${dest}/core/compat.php" '@author [ ]*{{ AUTHOR }}'
+  assert_file_contains "${dest}/core/compat.php" '@author [ ]*Jane Doe'
   assert_file_contains "${dest}/core/compat.php" '@license [ ]*http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2'
 
   # assert_file_contains "${dest}/tests/TestMyProject.php" 'namespace Acme\MyProject\Tests;'

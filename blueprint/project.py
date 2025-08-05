@@ -30,6 +30,7 @@ class Project(Object):
                  dest=None,
                  summary="",
                  license="",
+                 author="",
                  **kwargs):
         """Create a new project object."""
         self.plan = plan
@@ -37,6 +38,7 @@ class Project(Object):
         self.dest = dest
         self.summary = summary or ""
         self.license = license or ""
+        self.author = author or ""
 
         if self.plan and self.plan.specs:
             for key, value in (self.plan.specs.get("options", {})).items():
@@ -162,6 +164,7 @@ class Project(Object):
                 "VERSION": self.DEFAULT_VERSION,
                 "SUMMARY": self.summary,
                 "LICENSE": self.license,
+                "AUTHOR": self.author,
                 "PLANS_ROOT": (self.plan and self.plan.root or ""),
                 "DEST": self.dest,
                 "PATH": self.path,

@@ -13,6 +13,7 @@ load 'helper'
   assert_output --partial -- --dest
   assert_output --partial -- --summary
   assert_output --partial -- --license
+  assert_output --partial -- --author
   assert_output --partial -- --phpv
   assert_output --partial -- --php-constraint
   assert_output --partial -- --project-type
@@ -22,9 +23,10 @@ load 'helper'
 @test "bp new php-composer [OPTIONS] NAME" {
   dest="$TEST_DIR/my-project"
 
-  run bp_y new php-composer     \
+  run bp_y new php-composer      \
     --dest "$TEST_DIR"           \
     --summary "My new project."  \
+    --author "Jane Doe"          \
     "acme" "my project"
 
   assert_success
@@ -55,14 +57,14 @@ load 'helper'
   assert_file_contains "${dest}/composer.json" '"type": "project",'
   assert_file_contains "${dest}/composer.json" '"license": "MIT",'
   assert_file_contains "${dest}/composer.json" \
-    '"authors": \[ { "name": "" } \],'
+    '"authors": \[ { "name": "Jane Doe" } \],'
   assert_file_contains "${dest}/composer.json" '"php": ">=7.3",'
   # assert_file_contains "${dest}/composer.json" '"Acme\\\\MyProject\\\\": "./src/",'
   # assert_file_contains "${dest}/composer.json" '"Acme\\\\MyProject\\\\Tests\\\\": "./tests/",'
 
   assert_file_contains "${dest}/src/MyProject.php" 'PHP version >=7.3'
   assert_file_contains "${dest}/src/MyProject.php" '@package  Acme_MyProject'
-  # assert_file_contains "${dest}/src/MyProject.php" '@author   {{ AUTHOR }}'
+  assert_file_contains "${dest}/src/MyProject.php" '@author   Jane Doe'
   assert_file_contains "${dest}/src/MyProject.php" '@license  MIT'
   assert_file_contains "${dest}/src/MyProject.php" 'namespace Acme\\MyProject;'
   assert_file_contains "${dest}/src/MyProject.php" 'final class MyProject'

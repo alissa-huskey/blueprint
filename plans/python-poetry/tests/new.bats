@@ -9,6 +9,7 @@ load 'helper'
   assert_output --partial -- --dest
   assert_output --partial -- --summary
   assert_output --partial -- --license
+  assert_output --partial -- --author
   assert_output --partial -- --pyv
   assert_output --partial -- --pyv-constraint
 }
