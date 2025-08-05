@@ -3,6 +3,7 @@
 import json
 from json import JSONDecodeError
 from pathlib import Path
+from shutil import which
 
 from blueprint import ROOT, PlanError
 from blueprint.attr import attr, hasattrs
@@ -28,7 +29,7 @@ class Plan(Object):
 
     error: str = None
 
-    def __init__(self, plan_id: str = None, **kwargs):
+    def __init__(self, plan_id: str = None, read: bool = False, **kwargs):
         """Initialize object."""
         self.id = plan_id
 
@@ -64,8 +65,14 @@ class Plan(Object):
     @attr
     def schema(self):
         """Return the data parsed from the schema JSON."""
-        if not self._schema and self.specs and (name := self.specs.get("type")):
-            self._schema = Schema(name)
+        if not self._schema:
+            try:
+                if self.specs and (name := self.specs.get("type")):
+                    self._schema = Schema(name)
+            except PlanError as ex:
+                self.error = ex.message
+                self._ok = False
+                return
         return self._schema
 
     def _process_exe(self, exe) -> dict:
@@ -76,7 +83,11 @@ class Plan(Object):
         if (script := exe.pop("script", None)):
             path = self.root / "scripts" / script
             if not path.is_file():
-                raise PlanError(f"No such script: {path}")
+                ids = ""
+                if self.schema:
+                    ids = f"{self.schema.id}, "
+                ids += self.id
+                raise PlanError(f"[{ids}] No such script: {path}")
             exe["cmd"] = [str(path), *exe.pop("arguments", [])]
         return exe
 
@@ -169,23 +180,36 @@ class Plan(Object):
         if self._ok is False:
             return False
 
+        ids = ""
+        if self.schema:
+            ids = f"{self.schema.id}, "
+        ids += self.id
+        prefix = f"[{ids}]"
+
         self.error = None
 
         if not self.blueprint.is_file():
-            self.error = f"No such blueprint file: {self.blueprint}"
+            self.error = f"{prefix} No such blueprint file: {self.blueprint}"
             return False
 
         try:
             self.specs
         except PlanError as ex:
-            self.error = ex.message
+            self.error = f"{prefix} {ex.message}"
             return False
 
         is_valid = self.schema.validate(self.specs)
         if not is_valid:
             self.error = self.schema.error
+            return False
 
-        return is_valid
+        requirements = self.specs.get("requirements", [])
+        for required in requirements:
+            if not which(required):
+                self.error = f"{prefix} missing requirement: '{required}'"
+                return False
+
+        return True
 
     @attr
     def jinja(self) -> Jinja:

@@ -18,7 +18,6 @@
 (M) 2025-07-31 @blueprint add: python-click
 (B) 2025-07-31 @housekeeping Update README.md
 (C) 2025-07-31 @blueprints Do something about SNAKE_NAME etc in file/directory names. (use {{NAME|to_snake}}?)
-(B) 2025-07-31 @task Project: Validate requirements from blueprint.json files.
 (C) 2025-07-31 @task @base.schema.json executable: add 'name' key
 (D) 2025-07-31 @task Plan: let child executable override parents by name. (ie. php-composer/phpbb-ext composer-install)
 (C) 2025-07-31 @blueprints Add .ignore files so you can keep directories.

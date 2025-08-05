@@ -81,7 +81,28 @@ def test_plan_not_ok_missing_file(tmp_path):
         plan = Plan("project")
 
         assert plan.ok() is False
-        assert plan.error == f"No such blueprint file: {plan.blueprint}"
+        assert plan.error == f"[project] No such blueprint file: {plan.blueprint}"
+
+
+def test_plan_not_ok_parse_error(tmp_path):
+    contents = """
+        {
+            "name": "project",
+            "title": "Project Plan",
+            "version": "0.1.0",
+            "type": "language-toolstack",
+        }
+    """
+    make_blueprint(tmp_path, "project", contents)
+
+    with set_plans_root(tmp_path):
+        plan = Plan("project")
+
+        assert plan.ok() is False
+        assert plan.error == (
+            "[project:7,9] "
+            "JSON parse error: Expecting property name enclosed in double quotes"
+        )
 
 
 def test_plan_not_ok_invalid_file(tmp_path):
@@ -100,8 +121,25 @@ def test_plan_not_ok_invalid_file(tmp_path):
         plan = Plan("project")
 
         assert plan.ok() is False
-        assert plan.error == \
-            "[language-toolstack.schema.json, plan] 'description' is a required property"
+        assert plan.error == (
+            "[language-toolstack.schema.json, plan] "
+            "'description' is a required property"
+        )
+
+
+def test_plan_not_ok_missing_requirements(tmp_path, blueprint_json):
+    # invalid because it's missing "type" key
+    blueprint_json["requirements"] = ["xxx"]
+    make_blueprint(tmp_path, "project", blueprint_json)
+
+    with set_plans_root(tmp_path):
+        plan = Plan("project")
+
+        assert plan.ok() is False
+        assert plan.error == (
+            "[generic.schema.json, project] "
+            "missing requirement: 'xxx'"
+        )
 
 
 def test_plan_config():
